@@ -61,12 +61,8 @@ router.get("/shop_sys", function (req, res, next) {
   res.render("shop_sys");
 });
 
-//router.get("/shop_search", function (req, res, next) {
-//  res.render("shop_search");
-//});
 
-
-router.get("/revise_member", function (req, res, next) {
+router.get("/search_member", function (req, res, next) {
   
   // 寫入到json >> public/data/data.json
   const newData = { user: 'xxx@gmail.com' };
@@ -87,7 +83,7 @@ router.get("/revise_member", function (req, res, next) {
     jsonData = JSON.parse(data);
 
     // 將資料傳給前端
-    res.render("revise_member", jsonData);
+    res.render("search_member", jsonData);
   });
 
 });
@@ -214,7 +210,7 @@ router.post("/edit_member/:email", function (req, res, next) {
 //渲染 shop_search 页面
 
 router.get("/shop_search", function (req, res) {
-  res.render("shop_search", { data: null });
+  res.render("shop_search", { data: [] });
 });
 
 // 处理表单提交的 POST 请求
