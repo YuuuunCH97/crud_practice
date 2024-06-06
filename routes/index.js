@@ -99,7 +99,6 @@ router.get("/create_member", function (req, res, next) {
 router.get("/edit_member/:email", function (req, res, next) {
   const email = req.params.email;
 
-
   // 讀取 JSON 文件
   fs.readFile('public/data/data.json', 'utf8', (err, data) => {
     if (err) {

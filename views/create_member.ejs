@@ -119,7 +119,7 @@
       const email = document.getElementById('email').value;
       if (email) {
         // 發送一個GET請求到後端，檢查email是否存在於data.json中
-        fetch(`/check_member/${email}`)
+        fetch(`/edit_member/${email}`)
           .then(response => {
             if (response.ok) {
               // 如果email存在，將用戶重定向到編輯會員資料的頁面
@@ -127,7 +127,7 @@
             } else {
               // 如果回應中包含 "Member not found with email" 的錯誤訊息，彈出提醒訊息
               response.text().then(data => {
-                if (data.includes("Member not found with email")) {
+                if (data.includes("Member not found")) {
                   alert("未找到會員資料，請創建會員");
                 } else {
                   // 其他錯誤，彈出通用錯誤訊息
@@ -265,7 +265,7 @@
 
     /*滑鼠懸停顯示*/
     form button[name="sel"]:hover {
-      background-color: #45a049;
+      background-color: #5b85c9;
     }
 
     /*按鈕被點即時的顏色*/
@@ -351,6 +351,19 @@
     <br>
     <div id="checkboxContainer"></div>
 
+
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Email address</label>
+      <input type="email" class="" id="exampleFormControlInput1" placeholder="name@example.com">
+    </div>
+    <div class="mb-3">
+      <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    </div>
+
+
+
+
 <!--
     <br> 請選擇感興趣的主題 <br>
     <input type="checkbox" name="sell">動畫
@@ -368,7 +381,7 @@
 
 
     <br>備註<br>
-    <textarea name="note" rows="5" cols="50" wrap="off">
+    <textarea name="note" rows="5" cols="100" wrap="off">
         </textarea><br><br>
 
     <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
