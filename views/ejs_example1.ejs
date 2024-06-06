@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <style type="text/css">
+    #button1 { font-size: 20pt; 
+        font-weight: bold;
+        border: 3px;
+    }
+    </style>
+
+
+
+</head>
+<body>
+    
+    <%- include('header'); -%>
+    <%- title%>
+    <% if (show) { %>
+        <h2><%= user %></h2>
+      <% } else { %>
+        <h1>Please Login</h1>
+     <%} %>
+     %%>
+     <%# comment %>
+
+     <ul>
+        <% for(var i=0;i< animal.length;i++){ %>
+        <li><%-animal[i] %></li>
+        <%  } %>
+    </ul>
+
+
+    <br><br><br>
+
+    <button id="button1" type="button" class="btn btn-primary">I am a button</button>
+</body>
+</html>

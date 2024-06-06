@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員新增</title>
+  <%- include('./header') %>
+
+  <script>
+    let data = {}
+
+    function get_data() {
+      data["user"] = $("#user").val()
+    }
+
+    //// 國家相對應城市
+    function updateCities() {
+      var country = document.getElementById("select_country").value;
+      var citySelect = document.getElementById("select_city");
+      citySelect.innerHTML = ""; // 清空城市選項
+
+      // 根據選的國家跳城市
+      switch (country) {
+        case "台灣":
+          citySelect.innerHTML += "<option value='台北'>台北</option>";
+          citySelect.innerHTML += "<option value='台中'>台中</option>";
+          citySelect.innerHTML += "<option value='高雄'>高雄</option>";
+          citySelect.innerHTML += "<option value='台南'>台南</option>";
+          citySelect.innerHTML += "<option value='宜蘭'>宜蘭</option>";
+          citySelect.innerHTML += "<option value='花蓮'>花蓮</option>";
+          citySelect.innerHTML += "<option value='屏東'>屏東</option>";
+          break;
+        case "美國":
+          citySelect.innerHTML += "<option value='紐約'>紐約</option>";
+          citySelect.innerHTML += "<option value='洛杉磯'>洛杉磯</option>";
+          citySelect.innerHTML += "<option value='芝加哥'>芝加哥</option>";
+          citySelect.innerHTML += "<option value='加州'>加州</option>";
+          break;
+        case "英國":
+          citySelect.innerHTML += "<option value='倫敦'>倫敦</option>";
+          citySelect.innerHTML += "<option value='愛丁堡'>愛丁堡</option>";
+          citySelect.innerHTML += "<option value='牛津'>牛津</option>";
+          citySelect.innerHTML += "<option value='劍橋'>劍橋</option>";
+          break;
+        case "中國":
+          citySelect.innerHTML += "<option value='北京'>北京</option>";
+          citySelect.innerHTML += "<option value='上海'>上海</option>";
+          citySelect.innerHTML += "<option value='廣州'>廣州</option>";
+          citySelect.innerHTML += "<option value='哈爾濱'>哈爾濱</option>";
+          break;
+        default:
+          // 無國家 空
+          break;
+      }
+    }
+
+    ///專長輸入產生
+    function addSkillToCheckbox() {
+      var skillInput = document.getElementById("skillInput");
+      var skill = skillInput.value.trim();
+      if (skill) {
+        var checkboxContainer = document.getElementById("checkboxContainer");
+
+        var newCheckbox = document.createElement("input");
+        newCheckbox.type = "checkbox";
+        newCheckbox.name = "sell";
+        newCheckbox.value = skill;
+
+        var newLabel = document.createElement("label");
+        newLabel.appendChild(newCheckbox);
+        newLabel.appendChild(document.createTextNode(skill));
+
+        checkboxContainer.appendChild(newLabel);
+        checkboxContainer.appendChild(document.createElement("br"));
+
+        skillInput.value = ""; // 清空輸入框
+      } else {
+        alert("請輸入專長");
+      }
+    }
+
+    /////選擇刪除專長
+    function removeSelectedSkills() {
+      var checkboxContainer = document.getElementById("checkboxContainer");
+      var checkboxes = checkboxContainer.querySelectorAll("input[type='checkbox']:checked");
+
+      checkboxes.forEach(function (checkbox) {
+        var label = checkbox.parentNode;
+        var br = label.nextSibling;
+        checkboxContainer.removeChild(label); // 移除标签（包含复选框）
+        checkboxContainer.removeChild(br); // 移除换行符
+      });
+    }
+
+    /////// 檢查email是否有@
+    function validateEmail() {
+      var email = document.getElementById('email').value;
+      if (!email.includes('@')) {
+        alert('請輸入有效的電子郵件地址。');
+        return false;
+      }
+      return true;
+    }
+
+    function validateForm(event) {
+      event.preventDefault(); // 防止表單提交
+
+      if (validateEmail()) {
+        // 如果所有驗證都通過，顯示成功訊息
+        alert('已增加會員');
+        // 確保表單提交
+        document.forms["registration"].submit();
+      }
+    }
+
+    /////修改會員資料
+    function redirectToEditMember() {
+      const email = document.getElementById('email').value;
+      if (email) {
+        // 發送一個GET請求到後端，檢查email是否存在於data.json中
+        fetch(`/check_member/${email}`)
+          .then(response => {
+            if (response.ok) {
+              // 如果email存在，將用戶重定向到編輯會員資料的頁面
+              window.location.href = `/edit_member/${email}`;
+            } else {
+              // 如果回應中包含 "Member not found with email" 的錯誤訊息，彈出提醒訊息
+              response.text().then(data => {
+                if (data.includes("Member not found with email")) {
+                  alert("未找到會員資料，請創建會員");
+                } else {
+                  // 其他錯誤，彈出通用錯誤訊息
+                  alert("發生錯誤，請稍後再試");
+                }
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error checking member:', error);
+            alert("發生錯誤，請稍後再試");
+          });
+      } else {
+        // 如果用戶未填寫電子郵件地址，彈出一條消息提示用戶
+        alert("請先填寫電子郵件地址");
+      }
+    }
+
+
+    ///////json讀入興趣
+    // 動態加載興趣列表
+    function loadInterests() {
+      fetch('/data/interests.json')
+        .then(response => response.json())
+        .then(data => {
+          var interestsContainer = document.getElementById("interestsContainer");
+          data.interests.forEach(interest => {
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "interests";
+            checkbox.value = interest;
+
+            var label = document.createElement("label");
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(interest));
+
+            interestsContainer.appendChild(label);
+            interestsContainer.appendChild(document.createElement("br"));
+          });
+        })
+        .catch(error => console.error('Error loading interests:', error));
+    }
+
+    window.onload = function () {
+      loadInterests();
+    }
+
+
+  </script>
+
+  <style>
+    h1 {
+      background-color: #ece8e8;
+      color: rgb(153, 151, 151);
+      font-size: 13px;
+      background-size: 100%;
+    }
+
+    div li {
+      display: inline;
+      margin-right: 10px;
+    }
+
+    p {
+      width: 80px;
+      text-align: center;
+      background-color: #dddedf;
+      border-radius: 100px;
+    }
+
+    div a {
+      color: black;
+      text-decoration: none;
+    }
+    
+
+    /*會員管理系統 新增 查詢*/
+    .titleb {
+      background-color: #dddedf;
+      height: 30px;
+      width: 100%;
+      font-size: 20px;
+      ;
+    }
+    /*修改會員*/    
+    button[name="modify"] {
+      width: 80px;
+      text-align: center;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      outline-color: #90b0cc;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
+
+    /*滑鼠懸停顯示*/
+    p button[name="modify"]:hover {
+      background-color: #5b85c9;
+    }
+
+    /*按鈕被點即時的顏色*/
+    p button[name="modify"]:active {
+      background-color: #737e74;
+    }
+
+    form input[name="show"] {
+      width: 20%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: white;
+      border-radius: 100px;
+      border-color: #90b0cc;
+      outline-color: #90b0cc;
+    }
+
+    form input[name="sex"] {
+      margin-right: 5px;
+      position: absolute;
+      content: "";
+      border-radius: 50%;
+      background-color: #90b0cc;
+      border: 1px solid #90b0cc;
+    }
+
+    form button[name="sel"] {
+      width: 10%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      border-style: solid;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
+
+    /*滑鼠懸停顯示*/
+    form button[name="sel"]:hover {
+      background-color: #45a049;
+    }
+
+    /*按鈕被點即時的顏色*/
+    form button[name="sel"]:active {
+      background-color: #737e74;
+    }
+
+    form button[name="send"] {
+      width: 10%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      border-style: solid;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
+
+    /*必填*/
+    form sup {
+      font-weight: bold;
+      font-size: 11px;
+      color: #b62525;
+    }
+
+    #successMessage {
+      display: none;
+      color: green;
+      margin-top: 10px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1><b>會員新增</b></h1>
+  <div class="titleb">
+    <ul>
+      <li><b> 會員管理系統</b>
+      <li><a aria-current="page" href="/create_member"> 新增</a>
+      <li><a aria-current="page" href="/revise_member">查詢</a>
+      <li><a aria-current="page" href="/shop_sys">購物車系統</a>
+      <li><a aria-current="page" href="/shop_search">購物車查詢</a>
+    </ul>
+  </div><br>
+
+
+  <p><b>會員新增</b></p>
+  <p><button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button></p><br>
+
+
+  <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
+    <label for="email">電子郵件:</label><sup> 必填 </sup>
+    <input type="email" id="email" name="email" onblur="validateEmail()" required><br>
+    <label for="name">姓名:</label><sup> 必填 </sup>
+    <input type="text" id="name" name="name" required><br>
+
+    國家
+    <sup> 必填 </sup>
+    <select id="select_country" name="select_country" size="number" onchange="updateCities()">
+      <option value="" disabled selected>Select</option>
+      <option value="台灣">台灣</option>
+      <option value="美國">美國</option>
+      <option value="英國">英國</option>
+      <option value="中國">中國</option>
+    </select><br>
+
+    城市 <sup> 必填 </sup>
+    <select name="select_city" id="select_city" size="number">
+      <option value="">請選擇國家以顯示城市</option>
+    </select><br>
+
+
+    性別 &emsp;
+    <input type="radio" name="sex" value="male" checked> &emsp; 男性 
+    <input type="radio" name="sex" value="female"> &emsp; 女性<br>
+
+    專長
+    <sup> 必填 </sup>
+    <input id="skillInput" name="name" size="10">
+    <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
+    <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
+    <br>
+    <div id="checkboxContainer"></div>
+
+<!--
+    <br> 請選擇感興趣的主題 <br>
+    <input type="checkbox" name="sell">動畫
+    <input type="checkbox" name="sell">韓劇
+    <input type="checkbox" name="sell">日劇
+    <input type="checkbox" name="sell">戶外咖 <br>
+    <input type="checkbox" name="sell">網美
+    <input type="checkbox" name="sell">運動派
+    <input type="checkbox" name="sell">書生派
+    <input type="checkbox" name="sell">老人派 <br>
+-->
+
+    <br> 請選擇感興趣的主題 <br>
+    <div id="interestsContainer"></div>
+
+
+    <br>備註<br>
+    <textarea name="note" rows="5" cols="50" wrap="off">
+        </textarea><br><br>
+
+    <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
+
+  </form>
+</body>
+
+</html>

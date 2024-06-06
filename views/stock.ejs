@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Investor OG</title>
+    <%- include('./header') -%>
+    <script src="/javascripts/stock.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-auto">
+                <label for="stock_code" class="form-label">股票代號</label>
+                <input type="text" class="form-control" id="stock_code" placeholder="0050"><br>
+                <button class="btn btn-primary mb-3" onclick="checkStock()">查詢</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-auto">
+                <label for="stock_name" class="form-label">股票名稱</label>
+                <input type="text" class="form-control" id="stock_name" disabled>
+            </div>
+            <div class="col-auto">
+                <label for="stock_price" class="form-label">當日收盤價</label>
+                <input type="text" class="form-control" id="stock_price" disabled>
+            </div>
+            <div class="col-auto">
+                <label for="stock_monthly_average_price" class="form-label">月均價</label>
+                <input type="text" class="form-control" id="stock_monthly_average_price" disabled>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function checkStock(){
+            let stock_code = $('#stock_code').val();
+            $.ajax({
+                url: '/data/STOCK_DAY_AVG_ALL.json',
+                type: 'GET',
+                success: function(data, status, xhr){
+                if (xhr.status == 200) {
+                    var result = $.grep(data, function(item) {
+                        return item.Code === stock_code;
+                    });
+                    $('#stock_name').val(result[0]['Name']);
+                    $('#stock_price').val(result[0]['ClosingPrice']);
+                    $('#stock_monthly_average_price').val(result[0]['MonthlyAveragePrice']);
+                }
+                },
+                error: function(err) {
+                console.log(err)
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

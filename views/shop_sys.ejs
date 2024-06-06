@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車系統</title>
+    
+    
+    <script>
+        // 算總價
+        function calculateTotal(selectElement) {
+            // 找到父级 tr 元素
+            var tr = selectElement.parentNode.parentNode;
+            // 找到价格单元格和总价单元格
+            var priceCell = tr.cells[2]; // 价格单元格
+            var totalCell = tr.cells[4]; // 总价单元格
+            // 获取单价和购买数量
+            var price = parseFloat(priceCell.textContent);
+            var quantity = parseInt(selectElement.value);
+            // 计算总价
+            var total = price * quantity;
+            // 更新总价单元格内容
+            totalCell.textContent = total;
+            // 更新总金额
+            updateGrandTotal();
+        }
+
+        // 更新总金额
+        function updateGrandTotal() {
+            var grandTotal = 0;
+            var itemTotals = document.querySelectorAll('.item-total');
+            itemTotals.forEach(function(itemTotal) {
+                grandTotal += parseFloat(itemTotal.textContent);
+            });
+            document.getElementById('grand-total').textContent = grandTotal.toFixed(0);
+        }
+    </script>
+    <style>
+        h1 {
+            background-color:#ece8e8;
+            color:rgb(153, 151, 151);
+            font-size:13px;
+            background-size:100%;
+        }
+
+        div li {
+            display:inline;
+            margin-right:10px;
+        }
+
+        /*購物車系統*/
+        div p {
+            width: 120px;
+            text-align:center;
+            background-color: #dddedf;
+            border-radius: 100px;
+
+        }
+
+        div a {
+            color: black;
+            text-decoration: none;
+        }
+
+        /*會員管理系統 新增 查詢*/
+        .tit{
+            background-color: #dddedf;
+            height:30px;
+            width:100%;
+            font-size: 20px;;
+        }
+
+
+
+        /*左右框線*/
+        .no-border-left {
+            border-left: none;
+        }
+        .no-border-right {
+            border-right: none;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px 0;
+            font-size: 18px;
+            text-align: center; /* 表格內容置中 */
+            border-collapse: collapse;
+
+            /*
+            border-top: none;   /* 移除最上邊線 */
+            /*border-left: none; /* 移除最左邊線 */
+            /*border-right: 1px solid black; /* 只留右邊框線 */
+            /*border-bottom: 1px solid black; /* 只留下邊框線 */
+            
+        }
+
+        th, td {
+            border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
+            padding: 8px; /* 增加內邊距 */
+            text-align: center; /* 文字置中對齊 */
+        }
+
+        td:last-child {
+            border-right: 1px solid black; /* 最右邊的td添加1px寬的黑色實線邊框 */
+        }
+
+        tr:last-child td {
+            border-bottom: 1px solid black; /* 最下面的每個td添加1px寬的黑色實線邊框 */
+        }
+
+
+        th {
+            background-color: #E6E6FA; /* 淡紫色 */
+        }
+
+        .product-list-header {
+            background-color: #b693b6; /* 紫色 */
+            color: rgb(29, 27, 27); /* 白色文字 */
+            font-weight: bold;
+            text-align: center;
+            border-top: none;  /* 移除最上邊線 */
+            border-right: none; /* 移除最右邊線 */
+        }
+
+        .total {
+            font-weight: bold;
+            border-left: none;
+            border-right: none;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            background-color: #90b0cc; /* 淺藍色 */
+        }
+
+
+        /*送出*/
+        button{
+            width: 10%;
+            padding: 8px;
+            margin-top: 10px;
+            background-color: #90b0cc;
+            border-color:#90b0cc;
+            border-style:solid;
+            color:#ece8e8;
+            border-radius: 100px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <h1><b>購物車系統</b></h1>
+    <div class = "tit">
+        <ul>
+            <li><b>會員管理系統</b>
+                <li><a aria-current="page" href="/create_member"> 新增</a>
+                <li><a aria-current="page" href="/revise_member" >查詢</a>
+                <li><a aria-current="page" href="/shop_sys">購物車系統</a>
+                <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
+        </ul>
+    </div>
+
+    <div><p><b>購物車系統</b></p></div>
+    
+
+    <p><b>帳號 </b>
+        <select name="select_country" > 
+        <option value="" disabled selected>Select</option>
+        <option value="台灣">台灣</option>
+        <option value="美國">美國</option>
+        <option value="英國">英國</option>
+        <option value="中國">中國</option> 
+        </select>
+    </p>
+
+
+
+    <div class="table-section">
+        <form action="submit_url" method="post">
+            <table rules="groups" width="80%"  >           
+                <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
+                
+                <tr>
+                    <th>商品名稱</th>
+                    <th>照片</th>
+                    <th>價格</th>
+                    <th>購買數量</th>
+                    <th>總價</th>
+                </tr>
+        
+                <tr>
+                    <td>商品A</td>
+                    <td><img src="0101.PNG" alt="Keyboard"></td>
+                    <td>100</td>
+                    <td><input type="number" value="" onchange="calculateTotal(this)"></td>
+                    <td class="item-total"></td>
+                </tr>
+                <tr>
+                    <td>商品B</td>
+                    <td><img src="0101.PNG" alt="Keyboard"></td>
+                    <td>125</td>
+                    <td><input type="number" value="" onchange="calculateTotal(this)"></td>
+                    <td class="item-total"></td>
+                </tr>
+                <tr>
+                    <td>商品C</td>
+                    <td><img src="0101.PNG" alt="Keyboard"></td>
+                    <td>125</td>
+                    <td><input type="number" value="" onchange="calculateTotal(this)" ></td>
+                    <td class="item-total"></td>
+                </tr>        
+                <tr>               
+                    <td colspan="4" class="total">總金額:</td>
+                    <td id="grand-total">0</td>
+                </tr>
+
+            </table>
+            
+            <button type="submit" >送出</button>
+        </form>
+
+    </div>
+ 
+
+</body>
+</html>

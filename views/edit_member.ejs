@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Member</title>
+  <script>
+    // Update cities based on the selected country
+    function updateCities() {
+      const country = document.getElementById("select_country").value;
+      const citySelect = document.getElementById("select_city");
+      let cities = [];
+
+      switch (country) {
+        case "台灣":
+          cities = ["台北", "高雄", "台中","台南","宜蘭","花蓮","屏東"];
+          break;
+        case "美國":
+          cities = ["紐約", "洛杉磯", "芝加哥","加州"];
+          break;
+        case "英國":
+          cities = ["倫敦", "愛丁堡", "倫敦","劍橋"];
+          break;
+        case "中國":
+          cities = ["北京", "上海", "廣州","哈爾濱"];
+          break;
+        default:
+          cities = [];
+      }
+
+      // Clear current options
+      citySelect.innerHTML = '';
+
+      // Populate new options
+      cities.forEach(city => {
+        const option = document.createElement("option");
+        option.value = city;
+        option.text = city;
+        citySelect.add(option);
+      });
+
+      // Select the city that matches the member's data
+      citySelect.value = "<%= member.select_city %>";
+    }
+
+    // Ensure cities are updated on page load
+    window.onload = function() {
+      updateCities();
+    }
+  </script>
+  <style>
+        /*必填*/
+    sup {
+      font-weight: bold;
+      font-size: 11px;
+      color: #b62525;
+    }
+
+    button {
+      width: 10%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      border-style: solid;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
+    button:hover {
+      background-color: #4961d4;
+    }
+    /*按鈕被點即時的顏色*/
+    button:active {
+      background-color: #737e74;
+    }
+
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <h1>修改會員資料</h1>
+  <form action="/edit_member/<%= member.email %>" method="POST">
+    <label for="email">電子郵件:</label><sup> 必填 </sup>
+    <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>
+
+    <label for="name">姓名:</label><sup> 必填 </sup>
+    <input type="text" id="name" name="name" value="<%= member.name %>" required><br><br>
+
+    <label for="select_country">國家:</label><sup> 必填 </sup>
+    <select id="select_country" name="select_country" onchange="updateCities()" required>
+      <option value="" disabled>Select</option>
+      <option value="台灣" <%= member.select_country === "台灣" ? "selected" : "" %>>台灣</option>
+      <option value="美國" <%= member.select_country === "美國" ? "selected" : "" %>>美國</option>
+      <option value="英國" <%= member.select_country === "英國" ? "selected" : "" %>>英國</option>
+      <option value="中國" <%= member.select_country === "中國" ? "selected" : "" %>>中國</option>
+    </select><br><br>
+
+    <label for="select_city">城市:</label><sup> 必填 </sup>
+    <select id="select_city" name="select_city" required>
+      <option value="">請選擇國家以顯示城市</option>
+    </select><br><br>
+
+    <label for="sex">性別:</label><br>
+    <input type="radio" id="male" name="sex" value="male" <%= member.sex === "male" ? "checked" : "" %>> 男性
+    <input type="radio" id="female" name="sex" value="female" <%= member.sex === "female" ? "checked" : "" %>> 女性<br><br>
+
+    <label for="interests">興趣:</label><br>
+    <input type="text" id="interests" name="interests" value="<%= member.interests %>"><br><br>
+
+    <label for="note">備註:</label><br>
+    <textarea id="note" name="note"><%= member.note %></textarea><br><br>
+
+    <button type="submit">保存修改</button>
+  </form>
+
+  <button onclick="window.location.href='/create_member'">返回</button>
+</body>
+</html>
