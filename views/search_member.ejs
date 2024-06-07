@@ -185,6 +185,15 @@
         cursor: pointer;
         margin: 20px auto; /* 自動上下居中，左右20px的間距 */
     }
+    /*滑鼠懸停顯示*/
+    button#刪除:hover {
+        background-color: #4d66d5;
+    }
+    /*按鈕被點即時的顏色*/
+    button#刪除:active {
+        background-color: #737e74;
+    }
+
 
 
 </style>
@@ -192,136 +201,138 @@
 </head>
 
 <body>
-  <h1><b>會員新增</b></h1>
-  <div class = "titleb">
-      <ul>
-          <li><b> 會員管理系統</b>
+
+    <h1><b>會員新增</b></h1>
+    <div class = "titleb">
+        <ul>
+            <li><b> 會員管理系統</b>
             <li><a aria-current="page" href="/create_member"> 新增</a>
             <li><a aria-current="page" href="/revise_member" >查詢</a>
             <li><a aria-current="page" href="/shop_sys">購物車系統</a>
             <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
-      </ul>
-  </div>
+        </ul>
+    </div>
 
-  <p><b>會員查詢</b></p>
+    <p><b>會員查詢</b></p>
 
-  <form>
+    <form>
 
-      <table id="name1" border="1" rules="groups">
+        <table id="name1" border="1" rules="groups">
 
-      <tr>
-          <td>紀錄日期 </td>
-          <td>開始日 
-              <input type="date" ame="start-date" size="10">           
-          </td>
-          <td > ~ 結束日
-              <input type="date" ame="end-date" size="10">
-          </td>
+        <tr>
+            <td>紀錄日期 </td>
+            <td>開始日 
+                <input type="date" ame="start-date" size="10">           
+            </td>
+            <td > ~ 結束日
+                <input type="date" ame="end-date" size="10">
+            </td>
 
-          <td> 流水號 </td>
+            <td> 流水號 </td>
 
-          <td> <input name="nunber" size="10"> </td>
-      </tr>
-      <tr>
+            <td> <input name="nunber" size="10"> </td>
+        </tr>
+        <tr>
 
-      </tr>
-      <tr>
-          <td>國家</td>
-          <td  >
-              <select id="select_country" name="select_country"  size="number" onchange="updateCities()">
-                <option value="" disabled selected>Select</option>
-                <option value="台灣">台灣</option>
-                <option value="美國">美國</option>
-                <option value="英國">英國</option>
-                <option value="中國">中國</option>
-              </select><br>
+        </tr>
+        <tr>
+            <td>國家</td>
+            <td  >
+                <select id="select_country" name="select_country"  size="number" onchange="updateCities()">
+                    <option value="" disabled selected>Select</option>
+                    <option value="台灣">台灣</option>
+                    <option value="美國">美國</option>
+                    <option value="英國">英國</option>
+                    <option value="中國">中國</option>
+                </select><br>
 
-          </td>
-          <td></td>
-
-
-          <td>城市</td>
-          <td>
-              <select name="select_city" id="select_city" size="number">
-                  <option value="">請選擇國家以顯示城市</option>
-              </select><br>    
-          </td>
+            </td>
+            <td></td>
 
 
-
-      </tr>
-
-      <tr>
-          <td>專長</td>
-          <td >
-              <select name="select_country"  size="number" onchange="updateCities()" >
-                  <option value="" disabled selected>Select</option>
-                  <option value="select_country">台灣
-                  <option value="select_country">美國
-                  <option value="select_country">英國
-                  <option value="select_country">中國  
-              </select>
-          </td>
-          <td></td>
+            <td>城市</td>
+            <td>
+                <select name="select_city" id="select_city" size="number">
+                    <option value="">請選擇國家以顯示城市</option>
+                </select><br>    
+            </td>
 
 
-          <td>帳號</td>
-          <td><input name="name" size="10"> </td>
-          
-      </tr>
-      <tr>
-          <td></td>
-          <td ><th align="left" ><input type="submit" name="send" value="查詢"></th></td>
-          <td></td>
-          <td></td>
 
-      </tr>
-      </table>
-  </form>
+        </tr>
 
-<p></p>
-<form>
-  <table id="name2" border="1" rules="all" >
-      <thead>
+        <tr>
+            <td>專長</td>
+            <td >
+                <select name="select_country"  size="number" onchange="updateCities()" >
+                    <option value="" disabled selected>Select</option>
+                    <option value="select_country">台灣
+                    <option value="select_country">美國
+                    <option value="select_country">英國
+                    <option value="select_country">中國  
+                </select>
+            </td>
+            <td></td>
 
-          <tr>
-              <td>刪除</td>
-              <td>紀錄日期</td>
-              <td>帳號 </td>
-              <td>國家</td>
-              <td>城市</td>
-              <td>姓名</td>
-              <td>性別</td>
-              <td>修改</td>
-          </tr>
-      </thead>
-      <tbody>
-          <tr>
-              <td><input type="checkbox"></td>
-              <td>2024/01/02</td>
-              <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-              <td>國家</td>
-              <td>城市</td>
-              <td>姓名</td>
-              <td>男</td>
-              <td><button type="button" name="sex" >修改</button></td>
-          </tr>
-          <tr>
-              <td><input type="checkbox" ></td>
-              <td>2024/01/03</td>
-              <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-              <td>國家</td>
-              <td>城市</td>
-              <td>姓名</td>
-              <td>女</td>
-              <td><button type="button" name="sex">修改</button></td>
-          </tr>
-      </tbody>
 
-  </table>
-  <div id="刪除-container">
-      <button type="button" id ="刪除"> 刪除</button>
-  </div>
+            <td>帳號</td>
+            <td><input name="name" size="10"> </td>
+            
+        </tr>
+        <tr>
+            <td></td>
+            <td ><th align="left" ><input type="submit" name="send" value="查詢"></th></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+        </table>
+    </form>
+
+    <p></p>
+    <form>
+    <table id="name2" border="1" rules="all" >
+        <thead>
+
+            <tr>
+                <td>刪除</td>
+                <td>紀錄日期</td>
+                <td>帳號 </td>
+                <td>國家</td>
+                <td>城市</td>
+                <td>姓名</td>
+                <td>性別</td>
+                <td>修改</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>2024/01/02</td>
+                <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
+                <td>國家</td>
+                <td>城市</td>
+                <td>姓名</td>
+                <td>男</td>
+                <td><button type="button" name="sex" >修改</button></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" ></td>
+                <td>2024/01/03</td>
+                <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
+                <td>國家</td>
+                <td>城市</td>
+                <td>姓名</td>
+                <td>女</td>
+                <td><button type="button" name="sex">修改</button></td>
+            </tr>
+        </tbody>
+
+    </table>
+    <div id="刪除-container">
+        <button type="button" id ="刪除"> 刪除</button>
+    </div>
+
 </form>
 
 

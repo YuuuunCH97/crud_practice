@@ -15,6 +15,6 @@ nodemon start
 # 打開網頁輸入網址
 
 ```
-http://127.0.0.1:3000/create_member
+http://127.0.0.1:8888/create_member
 ```
 

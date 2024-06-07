@@ -94,39 +94,40 @@ router.get("/create_member", function (req, res, next) {
   console.log("Rendering create_member page");
   res.render("create_member");
 });
+
 ///edit_member
 // 渲染修改會員頁面
-router.get("/edit_member/:email", function (req, res, next) {
+// 编辑会员页面的 GET 路由
+router.get('/edit_member/:email', function (req, res, next) {
   const email = req.params.email;
 
-  // 讀取 JSON 文件
   fs.readFile('public/data/data.json', 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading file:', err);
-      return res.status(500).send("Internal Server Error");
+      return res.status(500).send('Internal Server Error');
     }
 
-    // 解析 JSON 數據
     let jsonData;
     try {
       jsonData = JSON.parse(data);
     } catch (err) {
       console.error('Error parsing JSON:', err);
-      return res.status(500).send("Internal Server Error");
+      return res.status(500).send('Internal Server Error');
     }
 
-    // 查找對應的會員資料
     const member = jsonData.members.find(m => m.email === email);
     if (!member) {
-      console.log(`Member not found with email: ${email}`);
-      return res.status(404).send("Member not found");
+      return res.status(404).send('未找到會員資料，請創建會員');
     }
 
-    // 渲染修改會員頁面，並傳遞會員資料
-    console.log(`Found member: ${JSON.stringify(member)}`);
-    res.render("edit_member", { member });
+    res.render('edit_member', {
+      member: member,
+      showAlert: false
+    });
   });
 });
+
+
 ///create_member
 // 處理創建會員的表單提交
 router.post("/create_member", function (req, res, next) {
@@ -160,6 +161,7 @@ router.post("/create_member", function (req, res, next) {
     });
   });
 });
+
 /// edit_member
 // 處理修改會員的表單提交
 router.post("/edit_member/:email", function (req, res, next) {
@@ -197,11 +199,29 @@ router.post("/edit_member/:email", function (req, res, next) {
       }
 
       console.log("Member updated:", email);
+
       // 這裡沒有重定向，因為找到了相應的會員
-      return res.send("會員資料已更新");
+      //return res.send("會員資料已更新");
+
+      // 重新渲染页面并传递成功消息
+      // res.render('edit_member', {
+      //   member: updatedMemberData,
+      //   successMessage: '會員資料已更新'
+      // });
+
+      res.render('edit_member', {
+        member: updatedMemberData,
+        showAlert: true
+      });
+
+
     });
   });
 });
+
+
+
+
 
 
 //shop_search
@@ -217,6 +237,12 @@ router.post("/shop_search", function (req, res) {
   const startDate = req.body['start-date'] ? new Date(req.body['start-date']) : null;
   const endDate = req.body['end-date'] ? new Date(req.body['end-date']) : null;
   const email = req.body.email;
+  // 检查日期或邮箱是否未填写
+  if (!startDate || !endDate || !email) {
+    // 如果其中一个没有填写，返回错误消息并渲染空的数据
+    return res.render("shop_search", { data: [], errorMessage: "請填寫日期或帳號" });
+  }
+
 
   // 读取 shop_searchdata.json 文件
   fs.readFile(path.join(__dirname, '../public/data/shop_searchdata.json'), 'utf8', (err, data) => {
@@ -249,7 +275,7 @@ router.post("/shop_search", function (req, res) {
       // 渲染包含过滤后数据的表格
       console.log('Filtered Data:', filteredData);
       console.log(data); // 在这里输出 data 变量的值
-      res.render("shop_search", { data: filteredData });
+      res.render("shop_search", { data: filteredData , errorMessage: null});
 
   });
 });

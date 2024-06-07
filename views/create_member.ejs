@@ -179,6 +179,21 @@
   </script>
 
   <style>
+    /* 设置表单元素之间的间距 */
+    form label {
+      margin-bottom: 5px; /* 设置标签下方的间距 */
+    }
+
+    form input,
+    form select,
+    form textarea {
+      margin-bottom: 10px; /* 设置表单元素之间的垂直间距 */
+    }
+
+    form button {
+      margin-bottom: 20px; /* 设置按钮下方的间距 */
+    }
+    
     h1 {
       background-color: #ece8e8;
       color: rgb(153, 151, 151);
@@ -350,31 +365,6 @@
     <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
     <br>
     <div id="checkboxContainer"></div>
-
-
-    <div class="mb-3">
-      <label for="exampleFormControlInput1" class="form-label">Email address</label>
-      <input type="email" class="" id="exampleFormControlInput1" placeholder="name@example.com">
-    </div>
-    <div class="mb-3">
-      <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-    </div>
-
-
-
-
-<!--
-    <br> 請選擇感興趣的主題 <br>
-    <input type="checkbox" name="sell">動畫
-    <input type="checkbox" name="sell">韓劇
-    <input type="checkbox" name="sell">日劇
-    <input type="checkbox" name="sell">戶外咖 <br>
-    <input type="checkbox" name="sell">網美
-    <input type="checkbox" name="sell">運動派
-    <input type="checkbox" name="sell">書生派
-    <input type="checkbox" name="sell">老人派 <br>
--->
 
     <br> 請選擇感興趣的主題 <br>
     <div id="interestsContainer"></div>

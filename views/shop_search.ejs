@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>購物車查詢</title>
 
+    <script>
+        function validateForm() {
+            var startDate = document.getElementById("start-date").value;
+            var endDate = document.getElementById("end-date").value;
+            var email = document.getElementById("email").value;
+
+            if (!startDate || !endDate || !email) {
+                alert("請填寫日期跟帳號");
+                return false;
+            }
+            return true;
+        }
+    </script>
+
+
 
 
     <style>
@@ -101,7 +116,7 @@
 
     <div><p><b>購物車系統</b></p></div>
 
-    <form method="POST" action="/shop_search">
+    <form method="POST" action="/shop_search" onsubmit="return validateForm()">
         <label for="start-date">管理日期 開始日</label>
         <input type="date" id="start-date" name="start-date">
         

@@ -47,6 +47,11 @@
     window.onload = function() {
       updateCities();
     }
+
+    function showAlert(message) {
+      alert(message);
+    }
+
   </script>
   <style>
         /*必填*/
@@ -84,6 +89,11 @@
 </head>
 <body>
   <h1>修改會員資料</h1>
+  <% if (showAlert) { %>
+    <script>
+      showAlert('會員資料已更新');
+    </script>
+  <% } %>
   <form action="/edit_member/<%= member.email %>" method="POST">
     <label for="email">電子郵件:</label><sup> 必填 </sup>
     <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>
