@@ -163,15 +163,16 @@
 
     <div><p><b>購物車系統</b></p></div>
 
-    <p><b>帳號 </b>
-        <select name="select_country" > 
-        <option value="" disabled selected>Select</option>
-        <option value="台灣">台灣</option>
-        <option value="美國">美國</option>
-        <option value="英國">英國</option>
-        <option value="中國">中國</option> 
-        </select>
-    </p>
+    <label for="email"><b>帳號:</b></label>
+    <input list="emailOptions" id="emailInput" name="email">
+    <datalist id="emailOptions">
+        <option value="Chocolate@google"></option>
+        <option value="Coconut@yahoo"></option>
+        <option value="Mint@google"></option>
+        <option value="Strawberry@hinet"></option>
+        <option value="Vanilla@yahoo"></option>
+    </datalist><br>
+
 
 
     <div class="table-section">
