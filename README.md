@@ -4,6 +4,12 @@
 ```bash
 npm install -g express-generator
 npm install -g nodemon
+
+# 有缺模組執行
+npm install
+
+# 執行有問題的話 嘗試修復
+npm audit fix --force
 ```
 
 # 啟動專案
