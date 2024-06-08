@@ -94,7 +94,7 @@
                             nameCell.textContent = product.name;
                             photoCell.innerHTML = '<img src="' + product.photo + '" alt="' + product.name + '">';
                             priceCell.textContent = product.price; // 保留两位小数
-                            quantityCell.innerHTML = '<input type="number" value="" onchange="calculateTotal(this)">';
+                            quantityCell.innerHTML = '<input type="number" value="" step="1" min="1" onchange="calculateTotal(this)">';
                             totalCell.className = 'item-total'; // 设置 class 以便后续更新总金额
                             totalCell.textContent = '0'; // 初始化总价为 0.00
 
@@ -112,7 +112,70 @@
                 })
                 .catch(error => console.error('Error loading data:', error));
         };
+        
+        function generateSerialNumber() {
+        // 隨機生成一個不重複的流水號
+        return 'shop' + Math.floor(1000000000 + Math.random() * 9000000000);
+        }
 
+        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('shoppingCartForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // 阻止默认的表单提交行为
+
+                var email = document.getElementById('emailInput').value;
+                if (!email) {
+                    alert("請輸入帳號");
+                    return;
+                }
+
+                var items = [];
+                var rows = document.querySelectorAll('#productTable tr');
+                rows.forEach((row, index) => {
+                    if (index > 1 && index < rows.length - 1) {
+                        var cells = row.cells;
+                        var name = cells[0].textContent;
+                        var price = parseFloat(cells[2].textContent) || 0;
+                        var quantity = parseInt(cells[3].querySelector('input').value) || 0;
+                        if (quantity > 0) {
+                            items.push({ name, quantity, price });
+                        }
+                    }
+                });
+
+                if (items.length === 0) {
+                    alert("請至少選擇一個商品");
+                    return;
+                }
+
+                var formData = {
+                    email: email,
+                    items: items
+                };
+
+                fetch('/shop_submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("購物車資料已成功保存");
+                        document.getElementById('emailInput').value = '';
+                        document.querySelectorAll('#productTable input[type=number]').forEach(input => input.value = '');
+                        document.querySelectorAll('.item-total').forEach(cell => cell.textContent = '0');
+                        document.getElementById('grandTotal').textContent = '0';
+                    } else {
+                        throw new Error("儲存失敗");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("儲存失敗");
+                });
+            });
+        });
 
 
 
@@ -263,7 +326,7 @@
 
 
         <div class="table-section">
-            <form action="submit_url" method="post">
+            <form id="shoppingCartForm" action="/shop_submit" method="post">
                 <table id="productTable" rules="groups" width="80%"  >           
                     <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
                     
@@ -280,7 +343,7 @@
                             <td><%= product.name %></td>
                             <td><img src="<%= product.photo %>" alt="<%= product.name %>"></td>
                             <td><%= product.price %></td>
-                            <td><input type="number" value="" min="0" onchange="calculateTotal(this)"></td>
+                            <td><input type="number" value="" min="0" step="1" onchange="calculateTotal(this)"></td>
                             <td class="item-total"></td>
                         </tr>
                     <% }); %>

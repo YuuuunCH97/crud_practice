@@ -99,8 +99,13 @@
 
         th, td {
             border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
-            padding: 8px; /* 增加內邊距 */
+            padding: 15px; /* 增加內邊距 */
             text-align: center; /* 文字置中對齊 */
+        }
+
+        table ul li {
+            display: block; /* 每個商品顯示為獨立的一行 */
+            margin-bottom: 5px; /* 為每個商品之間增加些許間距 */
         }
 
     </style>
@@ -158,7 +163,10 @@
                                 <% item.items.forEach(function(product) { %>
                                     <% var subtotal = product.quantity * product.price; %>
                                     <% totalPurchase += subtotal; %>
-                                    <li><%= product.name %> - 數量: <%= product.quantity %>, 價錢: <%= product.price %>, 金額: <%= subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></li>
+                                    <li><%= product.name %> - 數量: <%= product.quantity %>, 
+                                        價錢: <%= product.price %>, 
+                                        金額: <%= subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %>
+                                    </li>
                                 <% }); %>
                             </ul>
                         </td>

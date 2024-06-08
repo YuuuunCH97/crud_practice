@@ -1,34 +1,75 @@
 [
-    {
-      "purchaseDate": "2024-06-10",
-      "serialNumber": "shop123456789",
-      "email": "user1@example.com",
-      "items": [
-        {"name": "商品A", "quantity": 2, "price": 200},
-        {"name": "商品B", "quantity": 5, "price": 100}
-      ]
-    },
-    {
-
-      "purchaseDate": "2024-06-15",
-      "serialNumber": "shop123456791",
-      "email": "user1@example.com",
-      "items": [
-        {"name": "商品C", "quantity": 8, "price": 850},
-        {"name": "商品B", "quantity": 6, "price": 100}
-      ]
-
-    },
-    {
-      "purchaseDate": "2024-06-12",
-      "serialNumber": "shop987654321",
-      "email": "user2@example.com",
-      "items": [
-        {"name": "商品C", "quantity": 1, "price": 300},
-        {"name": "商品D", "quantity": 3, "price": 150}
-      ]
-    }
-
-    
-    
-  ]
+  {
+    "purchaseDate": "2024-06-10",
+    "serialNumber": "shop123456789",
+    "email": "user1@example.com",
+    "items": [
+      {
+        "name": "商品A",
+        "quantity": 2,
+        "price": 200
+      },
+      {
+        "name": "商品B",
+        "quantity": 5,
+        "price": 100
+      }
+    ]
+  },
+  {
+    "purchaseDate": "2024-06-15",
+    "serialNumber": "shop123456791",
+    "email": "user1@example.com",
+    "items": [
+      {
+        "name": "商品C",
+        "quantity": 8,
+        "price": 850
+      },
+      {
+        "name": "商品B",
+        "quantity": 6,
+        "price": 100
+      }
+    ]
+  },
+  {
+    "purchaseDate": "2024-06-12",
+    "serialNumber": "shop987654321",
+    "email": "user2@example.com",
+    "items": [
+      {
+        "name": "商品C",
+        "quantity": 1,
+        "price": 300
+      },
+      {
+        "name": "商品D",
+        "quantity": 3,
+        "price": 150
+      }
+    ]
+  },
+  {
+    "purchaseDate": "2024-06-08",
+    "serialNumber": "shop1861770723",
+    "email": "hyeeee@gmail",
+    "items": [
+      {
+        "name": "商品1",
+        "quantity": 2,
+        "price": 100
+      },
+      {
+        "name": "商品2",
+        "quantity": 2,
+        "price": 200
+      },
+      {
+        "name": "商品3",
+        "quantity": 8,
+        "price": 150
+      }
+    ]
+  }
+]
