@@ -71,5 +71,27 @@
         "price": 150
       }
     ]
+  },
+  {
+    "purchaseDate": "2024-06-08",
+    "serialNumber": "shop9932973204",
+    "email": "ysssss@yahoo.com",
+    "items": [
+      {
+        "name": "商品1",
+        "quantity": 1,
+        "price": 100
+      },
+      {
+        "name": "商品2",
+        "quantity": 4,
+        "price": 200
+      },
+      {
+        "name": "商品3",
+        "quantity": 1,
+        "price": 150
+      }
+    ]
   }
 ]
