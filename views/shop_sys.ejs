@@ -34,6 +34,35 @@
             });
             document.getElementById('grand-total').textContent = grandTotal.toFixed(0);
         }
+
+        window.onload = function() {
+    // 获取datalist元素
+            var dataList = document.getElementById('emailOptions');
+        // 使用fetch从data.json加载数据
+            fetch('/data/data.json')
+            .then(response => response.json())
+            .then(data => {
+            // 迭代data中的每个成员，并将其email添加为datalist选项
+                data.members.forEach(member => {
+                var option = document.createElement('option');
+                option.value = member.email;
+                dataList.appendChild(option);
+                });
+        })
+        .catch(error => console.error('Error loading data:', error));
+    };
+
+</script>
+
+
+
+
+
+
+
+
+
+
     </script>
     <style>
         /* 增加整体容器的左侧边距 */
@@ -147,8 +176,8 @@
             border-style:solid;
             color:#ece8e8;
             border-radius: 100px;
-        }        
-
+        }    
+        
     </style>
 
 </head>
@@ -169,14 +198,8 @@
         <div><p><b>購物車系統</b></p></div>
 
         <label for="email"><b>帳號:</b></label>
-        <input list="emailOptions" id="emailInput" name="email">
-        <datalist id="emailOptions">
-            <option value="Chocolate@google"></option>
-            <option value="Coconut@yahoo"></option>
-            <option value="Mint@google"></option>
-            <option value="Strawberry@hinet"></option>
-            <option value="Vanilla@yahoo"></option>
-        </datalist><br>
+        <input list="emailOptions" id="emailInput" name="email" placeholder="請選擇或輸入帳號">
+        <datalist id="emailOptions"></datalist><br>
 
 
 
