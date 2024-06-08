@@ -9,54 +9,109 @@
     <script>
         // 算總價
         function calculateTotal(selectElement) {
-            // 找到父级 tr 元素
-            var tr = selectElement.parentNode.parentNode;
-            // 找到价格单元格和总价单元格
-            var priceCell = tr.cells[2]; // 价格单元格
-            var totalCell = tr.cells[4]; // 总价单元格
-            // 获取单价和购买数量
-            var price = parseFloat(priceCell.textContent);
-            var quantity = parseInt(selectElement.value);
-            // 计算总价
+            // 檢查帳號是否已經填寫
+            var emailInput = document.getElementById('emailInput');
+            if (emailInput.value.trim() === "") {
+                alert("請先輸入帳號！");
+                selectElement.value = ""; // 清空購買數量輸入框
+                return;
+            }
+            // 確保正確獲取父級 tr 元素
+            var tr = selectElement.closest('tr');
+            // 獲取價格單元格和總價單元格
+            var priceCell = tr.cells[2];
+            var totalCell = tr.cells[4];
+            // 解析價格和數量，確保為有效數字
+            var price = parseFloat(priceCell.textContent) || 0; // 如果解析失敗，默認為 0
+            var quantity = parseInt(selectElement.value) || 0; // 如果解析失敗，默認為 0
+            // 計算總價
             var total = price * quantity;
-            // 更新总价单元格内容
-            totalCell.textContent = total;
-            // 更新总金额
+            // 更新總價單元格
+            totalCell.textContent = total; // 不保留小數位
+            // 更新總金額
             updateGrandTotal();
         }
 
-        // 更新总金额
+
         function updateGrandTotal() {
             var grandTotal = 0;
-            var itemTotals = document.querySelectorAll('.item-total');
-            itemTotals.forEach(function(itemTotal) {
-                grandTotal += parseFloat(itemTotal.textContent);
+            document.querySelectorAll('.item-total').forEach(function(totalCell) {
+                var total = parseFloat(totalCell.textContent) || 0;
+                grandTotal += total;
             });
-            document.getElementById('grand-total').textContent = grandTotal.toFixed(0);
+            // 更新總金額，將值放入 'grandTotal' 元素內
+            document.getElementById('grandTotal').textContent = grandTotal;
         }
 
+
+
         window.onload = function() {
-    // 获取datalist元素
+
             var dataList = document.getElementById('emailOptions');
-        // 使用fetch从data.json加载数据
+
+            // 使用fetch从data.json加载数据
             fetch('/data/data.json')
-            .then(response => response.json())
-            .then(data => {
-            // 迭代data中的每个成员，并将其email添加为datalist选项
-                data.members.forEach(member => {
-                var option = document.createElement('option');
-                option.value = member.email;
-                dataList.appendChild(option);
-                });
-        })
-        .catch(error => console.error('Error loading data:', error));
-    };
+                .then(response => response.json())
+                .then(data => {
+                    data.members.forEach(member => {
+                        var option = document.createElement('option');
+                        option.value = member.email;
+                        dataList.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading data:', error));
 
-</script>
+            // 获取table元素
+            var table = document.getElementById('productTable');
+
+            // 使用fetch从product.json加载数据
+            fetch('/data/product.json')
+                .then(response => response.json())
+                .then(data => {
+                    // 清空表格内容
+                    table.innerHTML = '';
+
+                    // 创建一个 Set 用于存储已经添加的商品名称，确保不重复添加
+                    var addedProducts = new Set();
+                    // 添加商品列表
+                    var productListRow = table.insertRow();
+                    productListRow.innerHTML = '<td colspan="5" class="product-list-header">商品列表</td>';
+                    var headerRow = table.insertRow();
+                    headerRow.innerHTML = '<th>商品名稱</th><th>照片</th><th>價格</th><th>購買數量</th><th>總價</th>';
 
 
+                    // 迭代每个产品并将其添加到表格中
+                    data.products.forEach(product => {
+                        // 检查商品是否已经添加过
+                        if (!addedProducts.has(product.name)) {
+                            var row = table.insertRow(); // 插入新行到表格末尾
+                            var nameCell = row.insertCell(0); // 商品名单元格
+                            var photoCell = row.insertCell(1); // 照片单元格
+                            var priceCell = row.insertCell(2); // 价格单元格
+                            var quantityCell = row.insertCell(3); // 购买数量单元格
+                            var totalCell = row.insertCell(4); // 总价单元格
+
+                            nameCell.textContent = product.name;
+                            photoCell.innerHTML = '<img src="' + product.photo + '" alt="' + product.name + '">';
+                            priceCell.textContent = product.price; // 保留两位小数
+                            quantityCell.innerHTML = '<input type="number" value="" onchange="calculateTotal(this)">';
+                            totalCell.className = 'item-total'; // 设置 class 以便后续更新总金额
+                            totalCell.textContent = '0'; // 初始化总价为 0.00
+
+                            // 将商品名称添加到 Set 中
+                            addedProducts.add(product.name);
+                        }
+                    });
+                    // 添加总价行
+                    var totalRow = table.insertRow();
+                    totalRow.innerHTML = '<td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>';
 
 
+                    // 更新总金额
+                    updateGrandTotal();
+                })
+                .catch(error => console.error('Error loading data:', error));
+        };
 
 
 
@@ -120,13 +175,8 @@
             text-align: center; /* 表格內容置中 */
             border-collapse: collapse;
 
-            /*
-            border-top: none;   /* 移除最上邊線 */
-            /*border-left: none; /* 移除最左邊線 */
-            /*border-right: 1px solid black; /* 只留右邊框線 */
-            /*border-bottom: 1px solid black; /* 只留下邊框線 */
-            
         }
+
 
         th, td {
             border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
@@ -177,6 +227,15 @@
             color:#ece8e8;
             border-radius: 100px;
         }    
+
+                /*滑鼠懸停顯示*/
+        button:hover {
+            background-color: #5c68d4;
+        }
+        /*按鈕被點即時的顏色*/
+        button:active {
+            background-color: #737e74;
+        }
         
     </style>
 
@@ -205,7 +264,7 @@
 
         <div class="table-section">
             <form action="submit_url" method="post">
-                <table rules="groups" width="80%"  >           
+                <table id="productTable" rules="groups" width="80%"  >           
                     <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
                     
                     <tr>
@@ -215,32 +274,21 @@
                         <th>購買數量</th>
                         <th>總價</th>
                     </tr>
-            
-                    <tr>
-                        <td>商品A</td>
-                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                        <td>100</td>
-                        <td><input type="number" value="" onchange="calculateTotal(this)"></td>
-                        <td class="item-total"></td>
+
+                    <% products.forEach(product => { %>
+                        <tr>
+                            <td><%= product.name %></td>
+                            <td><img src="<%= product.photo %>" alt="<%= product.name %>"></td>
+                            <td><%= product.price %></td>
+                            <td><input type="number" value="" min="0" onchange="calculateTotal(this)"></td>
+                            <td class="item-total"></td>
+                        </tr>
+                    <% }); %>
+                    <tr class="total">
+                        <!-- 將 '總金額' 和數值放在同一個單元格，並將 colspan 設為 5 -->
+                        <td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>
                     </tr>
-                    <tr>
-                        <td>商品B</td>
-                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                        <td>125</td>
-                        <td><input type="number" value="" onchange="calculateTotal(this)"></td>
-                        <td class="item-total"></td>
-                    </tr>
-                    <tr>
-                        <td>商品C</td>
-                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                        <td>125</td>
-                        <td><input type="number" value="" onchange="calculateTotal(this)" ></td>
-                        <td class="item-total"></td>
-                    </tr>        
-                    <tr>               
-                        <td colspan="4" class="total">總金額:</td>
-                        <td id="grand-total">0</td>
-                    </tr>
+
 
                 </table>
                 

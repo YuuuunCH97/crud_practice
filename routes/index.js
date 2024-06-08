@@ -9,7 +9,10 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 const DATA_PATH = path.join(__dirname, '../public/data/data.json');
 
-app.use(express.static(path.join(__dirname, 'public')));
+
+const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
+
+
 
 
 
@@ -83,10 +86,18 @@ router.get('/create_member', (req, res) => {
     res.render('create_member');
 });
 
-// 渲染購物車系統頁面
-router.get('/shop_sys', (req, res) => {
-    res.render('shop_sys');
+// 渲染购物车系统页面 /shop_sys
+router.get('/shop_sys', async (req, res) => {
+    try {
+        const productData = await fs.readFile(PRODUCT_DATA_PATH, 'utf8');
+        const products = JSON.parse(productData).products;
+        res.render('shop_sys', { products });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
+
 
 // 渲染 shop_search 页面
 router.get('/shop_search', (req, res) => {

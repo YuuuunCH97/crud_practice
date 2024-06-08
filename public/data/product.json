@@ -1,0 +1,23 @@
+{
+    "products": [
+        {
+            "name": "商品1",
+            "photo": "",
+            "price": 100
+        },
+        {
+            "name": "商品2",
+            "photo": "",
+            "price": 200
+        },
+        {
+            "name": "商品3",
+            "photo": "",
+            "price": 150
+        }
+    ]
+}
+
+
+
+

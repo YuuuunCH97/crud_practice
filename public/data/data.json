@@ -1,17 +1,3 @@
 {
-  "user": "xxx@gmail.com",
-  "members": [
-    {
-      "email": "hyeeee@gmail",
-      "name": [
-        "Yuuun",
-        ""
-      ],
-      "select_country": "美國",
-      "select_city": "洛杉磯",
-      "sex": "male",
-      "interests": "韓劇",
-      "note": ""
-    }
-  ]
+  "user": "xxx@gmail.com"
 }
