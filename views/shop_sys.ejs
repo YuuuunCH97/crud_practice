@@ -36,6 +36,10 @@
         }
     </script>
     <style>
+        /* 增加整体容器的左侧边距 */
+        .container {
+        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+        }
         h1 {
             background-color:#ece8e8;
             color:rgb(153, 151, 151);
@@ -161,66 +165,67 @@
         </ul>
     </div>
 
-    <div><p><b>購物車系統</b></p></div>
+    <div class="container">
+        <div><p><b>購物車系統</b></p></div>
 
-    <label for="email"><b>帳號:</b></label>
-    <input list="emailOptions" id="emailInput" name="email">
-    <datalist id="emailOptions">
-        <option value="Chocolate@google"></option>
-        <option value="Coconut@yahoo"></option>
-        <option value="Mint@google"></option>
-        <option value="Strawberry@hinet"></option>
-        <option value="Vanilla@yahoo"></option>
-    </datalist><br>
+        <label for="email"><b>帳號:</b></label>
+        <input list="emailOptions" id="emailInput" name="email">
+        <datalist id="emailOptions">
+            <option value="Chocolate@google"></option>
+            <option value="Coconut@yahoo"></option>
+            <option value="Mint@google"></option>
+            <option value="Strawberry@hinet"></option>
+            <option value="Vanilla@yahoo"></option>
+        </datalist><br>
 
 
 
-    <div class="table-section">
-        <form action="submit_url" method="post">
-            <table rules="groups" width="80%"  >           
-                <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
-                
-                <tr>
-                    <th>商品名稱</th>
-                    <th>照片</th>
-                    <th>價格</th>
-                    <th>購買數量</th>
-                    <th>總價</th>
-                </tr>
-        
-                <tr>
-                    <td>商品A</td>
-                    <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                    <td>100</td>
-                    <td><input type="number" value="" onchange="calculateTotal(this)"></td>
-                    <td class="item-total"></td>
-                </tr>
-                <tr>
-                    <td>商品B</td>
-                    <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                    <td>125</td>
-                    <td><input type="number" value="" onchange="calculateTotal(this)"></td>
-                    <td class="item-total"></td>
-                </tr>
-                <tr>
-                    <td>商品C</td>
-                    <td><img src="/data/0101.PNG" alt="Keyboard"></td>
-                    <td>125</td>
-                    <td><input type="number" value="" onchange="calculateTotal(this)" ></td>
-                    <td class="item-total"></td>
-                </tr>        
-                <tr>               
-                    <td colspan="4" class="total">總金額:</td>
-                    <td id="grand-total">0</td>
-                </tr>
-
-            </table>
+        <div class="table-section">
+            <form action="submit_url" method="post">
+                <table rules="groups" width="80%"  >           
+                    <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
+                    
+                    <tr>
+                        <th>商品名稱</th>
+                        <th>照片</th>
+                        <th>價格</th>
+                        <th>購買數量</th>
+                        <th>總價</th>
+                    </tr>
             
-            <button type="submit" >送出</button>
-        </form>
+                    <tr>
+                        <td>商品A</td>
+                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
+                        <td>100</td>
+                        <td><input type="number" value="" onchange="calculateTotal(this)"></td>
+                        <td class="item-total"></td>
+                    </tr>
+                    <tr>
+                        <td>商品B</td>
+                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
+                        <td>125</td>
+                        <td><input type="number" value="" onchange="calculateTotal(this)"></td>
+                        <td class="item-total"></td>
+                    </tr>
+                    <tr>
+                        <td>商品C</td>
+                        <td><img src="/data/0101.PNG" alt="Keyboard"></td>
+                        <td>125</td>
+                        <td><input type="number" value="" onchange="calculateTotal(this)" ></td>
+                        <td class="item-total"></td>
+                    </tr>        
+                    <tr>               
+                        <td colspan="4" class="total">總金額:</td>
+                        <td id="grand-total">0</td>
+                    </tr>
 
+                </table>
+                
+                <button type="submit" >送出</button>
+            </form>
+
+        </div>
     </div>
- 
 
 </body>
 </html>

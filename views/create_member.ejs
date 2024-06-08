@@ -193,6 +193,11 @@
     form button {
       margin-bottom: 20px; /* 设置按钮下方的间距 */
     }
+    /* 增加整体容器的左侧边距 */
+    .container {
+      margin-left: 20px; /* 可以根据需要调整具体的数值 */
+    }
+
     
     h1 {
       background-color: #ece8e8;
@@ -311,72 +316,111 @@
       color: green;
       margin-top: 10px;
     }
+
+    /* 增加横排显示兴趣列表的样式 */
+    #interestsContainer {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    #interestsContainer label {
+      margin-right: 10px;
+      margin-bottom: 5px;
+    }
+
+
+
+    /*
+    #checkboxContainer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #checkboxContainer label {
+      margin-right: 10px;
+      margin-bottom: 5px;
+      clear: none; 
+    }
+    */
+    
+    /* Clear float every two items */
+    #interestsContainer label:nth-child(odd) {
+      clear: left;
+    }
+
+
+
+
   </style>
 
 </head>
 
 <body>
   <h1><b>會員新增</b></h1>
-  <div class="titleb">
-    <ul>
-      <li><b> 會員管理系統</b>
-      <li><a aria-current="page" href="/create_member"> 新增</a>
-      <li><a aria-current="page" href="/search_member">查詢</a>
-      <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-      <li><a aria-current="page" href="/shop_search">購物車查詢</a>
-    </ul>
-  </div><br>
+  
+    <div class="titleb">
+      <ul>
+        <li><b> 會員管理系統</b>
+        <li><a aria-current="page" href="/create_member"> 新增</a>
+        <li><a aria-current="page" href="/search_member">查詢</a>
+        <li><a aria-current="page" href="/shop_sys">購物車系統</a>
+        <li><a aria-current="page" href="/shop_search">購物車查詢</a>
+      </ul>
+    </div><br>
 
 
-  <p><b>會員新增</b></p>
-  <p><button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button></p><br>
+    <div class="container">
+      <p><b>會員新增</b></p>
+      <p><button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button></p><br>
 
 
-  <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
-    <label for="email">電子郵件:</label><sup> 必填 </sup>
-    <input type="email" id="email" name="email" onblur="validateEmail()" required><br>
-    <label for="name">姓名:</label><sup> 必填 </sup>
-    <input type="text" id="name" name="name" required><br>
+      <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
+        <label for="email">電子郵件:</label><sup> 必填 </sup>
+        <input type="email" id="email" name="email" onblur="validateEmail()" required><br>
+        <label for="name">姓名:</label><sup> 必填 </sup>
+        <input type="text" id="name" name="name" required><br>
 
-    國家
-    <sup> 必填 </sup>
-    <select id="select_country" name="select_country" size="number" onchange="updateCities()">
-      <option value="" disabled selected>Select</option>
-      <option value="台灣">台灣</option>
-      <option value="美國">美國</option>
-      <option value="英國">英國</option>
-      <option value="中國">中國</option>
-    </select><br>
+        國家
+        <sup> 必填 </sup>
+        <select id="select_country" name="select_country" size="number" onchange="updateCities()">
+          <option value="" disabled selected>Select</option>
+          <option value="台灣">台灣</option>
+          <option value="美國">美國</option>
+          <option value="英國">英國</option>
+          <option value="中國">中國</option>
+        </select><br>
 
-    城市 <sup> 必填 </sup>
-    <select name="select_city" id="select_city" size="number">
-      <option value="">請選擇國家以顯示城市</option>
-    </select><br>
-
-
-    性別 &emsp;
-    <input type="radio" name="sex" value="male" checked> &emsp; 男性 
-    <input type="radio" name="sex" value="female"> &emsp; 女性<br>
-
-    專長
-    <sup> 必填 </sup>
-    <input id="skillInput" name="name" size="10">
-    <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
-    <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
-    <br>
-    <div id="checkboxContainer"></div>
-
-    <br> 請選擇感興趣的主題 <br>
-    <div id="interestsContainer"></div>
+        城市 <sup> 必填 </sup>
+        <select name="select_city" id="select_city" size="number">
+          <option value="">請選擇國家以顯示城市</option>
+        </select><br>
 
 
-    <br>備註<br>
-    <textarea name="note" rows="5" cols="100" wrap="off">
-        </textarea><br><br>
+        性別 &emsp;
+        <input type="radio" name="sex" value="male" checked> &emsp; 男性 
+        <input type="radio" name="sex" value="female"> &emsp; 女性<br>
 
-    <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
+        專長
+        <sup> 必填 </sup>
+        <input id="skillInput" name="name" size="10">
+        <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
+        <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
+        <br>
+        <div id="checkboxContainer"></div>
 
-  </form>
+        <br> 請選擇感興趣的主題 <br>
+        <div id="interestsContainer"></div>
+
+
+        <br>備註<br>
+        <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
+
+        <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
+
+      </form>
+    </div>
 </body>
 
 </html>

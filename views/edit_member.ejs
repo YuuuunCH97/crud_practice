@@ -52,9 +52,17 @@
       alert(message);
     }
 
+
+
   </script>
   <style>
-        /*必填*/
+    /* 增加整体容器的左侧边距 */
+    .container {
+      margin-left: 20px; /* 可以根据需要调整具体的数值 */
+    }
+
+
+    /*必填*/
     sup {
       font-weight: bold;
       font-size: 11px;
@@ -88,46 +96,48 @@
   </style>
 </head>
 <body>
-  <h1>修改會員資料</h1>
-  <% if (showAlert) { %>
-    <script>
-      showAlert('會員資料已更新');
-    </script>
-  <% } %>
-  <form action="/edit_member/<%= member.email %>" method="POST">
-    <label for="email">電子郵件:</label><sup> 必填 </sup>
-    <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>
+  <div class="container">
+    <h1>修改會員資料</h1>
+    <% if (showAlert) { %>
+      <script>
+        showAlert('會員資料已更新');
+      </script>
+    <% } %>
+    <form action="/edit_member/<%= member.email %>" method="POST">
+      <label for="email">電子郵件:</label><sup> 必填 </sup>
+      <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>
 
-    <label for="name">姓名:</label><sup> 必填 </sup>
-    <input type="text" id="name" name="name" value="<%= member.name %>" required><br><br>
+      <label for="name">姓名:</label><sup> 必填 </sup>
+      <input type="text" id="name" name="name" value="<%= member.name %>" required><br><br>
 
-    <label for="select_country">國家:</label><sup> 必填 </sup>
-    <select id="select_country" name="select_country" onchange="updateCities()" required>
-      <option value="" disabled>Select</option>
-      <option value="台灣" <%= member.select_country === "台灣" ? "selected" : "" %>>台灣</option>
-      <option value="美國" <%= member.select_country === "美國" ? "selected" : "" %>>美國</option>
-      <option value="英國" <%= member.select_country === "英國" ? "selected" : "" %>>英國</option>
-      <option value="中國" <%= member.select_country === "中國" ? "selected" : "" %>>中國</option>
-    </select><br><br>
+      <label for="select_country">國家:</label><sup> 必填 </sup>
+      <select id="select_country" name="select_country" onchange="updateCities()" required>
+        <option value="" disabled>Select</option>
+        <option value="台灣" <%= member.select_country === "台灣" ? "selected" : "" %>>台灣</option>
+        <option value="美國" <%= member.select_country === "美國" ? "selected" : "" %>>美國</option>
+        <option value="英國" <%= member.select_country === "英國" ? "selected" : "" %>>英國</option>
+        <option value="中國" <%= member.select_country === "中國" ? "selected" : "" %>>中國</option>
+      </select><br><br>
 
-    <label for="select_city">城市:</label><sup> 必填 </sup>
-    <select id="select_city" name="select_city" required>
-      <option value="">請選擇國家以顯示城市</option>
-    </select><br><br>
+      <label for="select_city">城市:</label><sup> 必填 </sup>
+      <select id="select_city" name="select_city" required>
+        <option value="">請選擇國家以顯示城市</option>
+      </select><br><br>
 
-    <label for="sex">性別:</label><br>
-    <input type="radio" id="male" name="sex" value="male" <%= member.sex === "male" ? "checked" : "" %>> 男性
-    <input type="radio" id="female" name="sex" value="female" <%= member.sex === "female" ? "checked" : "" %>> 女性<br><br>
+      <label for="sex">性別:</label><br>
+      <input type="radio" id="male" name="sex" value="male" <%= member.sex === "male" ? "checked" : "" %>> 男性
+      <input type="radio" id="female" name="sex" value="female" <%= member.sex === "female" ? "checked" : "" %>> 女性<br><br>
 
-    <label for="interests">興趣:</label><br>
-    <input type="text" id="interests" name="interests" value="<%= member.interests %>"><br><br>
+      <label for="interests">興趣:</label><br>
+      <input type="text" id="interests" name="interests" value="<%= member.interests %>"><br><br>
 
-    <label for="note">備註:</label><br>
-    <textarea id="note" name="note"><%= member.note %></textarea><br><br>
+      <label for="note">備註:</label><br>
+      <textarea id="note" name="note"><%= member.note %></textarea><br><br>
 
-    <button type="submit">保存修改</button>
-  </form>
+      <button type="submit">保存修改</button>
+    </form>
 
-  <button onclick="window.location.href='/create_member'">返回</button>
+    <button onclick="window.location.href='/create_member'">返回</button>
+  </div>
 </body>
 </html>

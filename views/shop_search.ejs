@@ -23,6 +23,10 @@
 
 
     <style>
+        /* 增加整体容器的左侧边距 */
+        .container {
+        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+        }
         h1 {
             background-color:#ece8e8;
             color:rgb(153, 151, 151);
@@ -114,54 +118,56 @@
         </ul>
     </div>
 
-    <div><p><b>購物車系統</b></p></div>
+    <div class="container">
+        <div><p><b>購物車系統</b></p></div>
 
-    <form method="POST" action="/shop_search" onsubmit="return validateForm()">
-        <label for="start-date">管理日期 開始日</label>
-        <input type="date" id="start-date" name="start-date">
-        
-        <label for="end-date">~結束日</label>
-        <input type="date" id="end-date" name="end-date">
+        <form method="POST" action="/shop_search" onsubmit="return validateForm()">
+            <label for="start-date">管理日期 開始日</label>
+            <input type="date" id="start-date" name="start-date">
+            
+            <label for="end-date">~結束日</label>
+            <input type="date" id="end-date" name="end-date">
 
-        <label for="email">帳號</label>
-        <input type="email" id="email" name="email" placeholder="請輸入email">
+            <label for="email">帳號</label>
+            <input type="email" id="email" name="email" placeholder="請輸入email">
 
-        <button type="submit">查詢</button>
-    </form>
+            <button type="submit">查詢</button>
+        </form>
 
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>購買日期</th>
-                <th>序列號</th>
-                <th>Email</th>
-                <th>商品列表</th>
-                <th>總採購金額</th>
-            </tr>
-        </thead>
-        
-        <tbody>
-            <% data.forEach(function(item) { %>
+        <table border="1">
+            <thead>
                 <tr>
-                    <td><%= item.purchaseDate %></td>
-                    <td><%= item.serialNumber %></td>
-                    <td><%= item.email %></td>
-                    <td>
-                        <ul>
-                            <% var totalPurchase = 0; %>
-                            <% item.items.forEach(function(product) { %>
-                                <% var subtotal = product.quantity * product.price; %>
-                                <% totalPurchase += subtotal; %>
-                                <li><%= product.name %> - 數量: <%= product.quantity %>, 價錢: <%= product.price %>, 金額: <%= subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></li>
-                            <% }); %>
-                        </ul>
-                    </td>
-                    <td><%= totalPurchase.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></td>
+                    <th>購買日期</th>
+                    <th>序列號</th>
+                    <th>Email</th>
+                    <th>商品列表</th>
+                    <th>總採購金額</th>
                 </tr>
-            <% }); %>
-        </tbody>
-    </table>
+            </thead>
+            
+            <tbody>
+                <% data.forEach(function(item) { %>
+                    <tr>
+                        <td><%= item.purchaseDate %></td>
+                        <td><%= item.serialNumber %></td>
+                        <td><%= item.email %></td>
+                        <td>
+                            <ul>
+                                <% var totalPurchase = 0; %>
+                                <% item.items.forEach(function(product) { %>
+                                    <% var subtotal = product.quantity * product.price; %>
+                                    <% totalPurchase += subtotal; %>
+                                    <li><%= product.name %> - 數量: <%= product.quantity %>, 價錢: <%= product.price %>, 金額: <%= subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></li>
+                                <% }); %>
+                            </ul>
+                        </td>
+                        <td><%= totalPurchase.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
     
 
 
