@@ -193,6 +193,7 @@
     form button {
       margin-bottom: 20px; /* 设置按钮下方的间距 */
     }
+
     /* 增加整体容器的左侧边距 */
     .container {
       margin-left: 20px; /* 可以根据需要调整具体的数值 */
@@ -212,7 +213,7 @@
     }
 
     p {
-      width: 80px;
+      width: 120px;
       text-align: center;
       background-color: #dddedf;
       border-radius: 100px;
@@ -225,7 +226,7 @@
     
 
     /*會員管理系統 新增 查詢*/
-    .titleb {
+    .tit {
       background-color: #dddedf;
       height: 30px;
       width: 100%;
@@ -244,12 +245,12 @@
     }
 
     /*滑鼠懸停顯示*/
-    p button[name="modify"]:hover {
+    button[name="modify"]:hover {
       background-color: #5b85c9;
     }
 
     /*按鈕被點即時的顏色*/
-    p button[name="modify"]:active {
+    button[name="modify"]:active {
       background-color: #737e74;
     }
 
@@ -328,22 +329,6 @@
       margin-right: 10px;
       margin-bottom: 5px;
     }
-
-
-
-    /*
-    #checkboxContainer {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    #checkboxContainer label {
-      margin-right: 10px;
-      margin-bottom: 5px;
-      clear: none; 
-    }
-    */
     
     /* Clear float every two items */
     #interestsContainer label:nth-child(odd) {
@@ -358,22 +343,21 @@
 </head>
 
 <body>
-  <h1><b>會員新增</b></h1>
-  
-    <div class="titleb">
+  <h1><b>會員新增</b></h1>  
+    <div class="tit">
       <ul>
         <li><b> 會員管理系統</b>
         <li><a aria-current="page" href="/create_member"> 新增</a>
         <li><a aria-current="page" href="/search_member">查詢</a>
         <li><a aria-current="page" href="/shop_sys">購物車系統</a>
         <li><a aria-current="page" href="/shop_search">購物車查詢</a>
-      </ul>
+        </ul>
     </div><br>
 
 
     <div class="container">
       <p><b>會員新增</b></p>
-      <p><button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button></p><br>
+      <button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button><br><br>
 
 
       <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">

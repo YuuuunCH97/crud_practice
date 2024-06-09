@@ -48,10 +48,14 @@
       updateCities();
     }
 
-    function showAlert(message) {
-      alert(message);
-    }
-
+    // 在表單提交後顯示訊息
+    document.querySelector('form').addEventListener('submit', function(event) {
+      event.preventDefault(); // 防止表單默認提交行為
+      // 提交表單
+      // 可以添加其他程式碼來處理表單提交，例如發送 POST 請求到後端儲存資料
+      // 在此處添加顯示訊息的代碼
+      alert('會員資料已成功保存修改！');
+    });
 
 
   </script>
@@ -98,11 +102,7 @@
 <body>
   <div class="container">
     <h1>修改會員資料</h1>
-    <% if (showAlert) { %>
-      <script>
-        showAlert('會員資料已更新');
-      </script>
-    <% } %>
+
     <form action="/edit_member/<%= member.email %>" method="POST">
       <label for="email">電子郵件:</label><sup> 必填 </sup>
       <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>

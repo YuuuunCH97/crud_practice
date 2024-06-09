@@ -48,11 +48,55 @@
         }
     }
 
+    let selectedEmails = []; // 用於存儲選中會員的電子郵件地址
+
+    // 當checkbox選取時將電子郵件地址添加到selectedEmails列表中
+    function handleCheckboxChange(email) {
+        if (selectedEmails.includes(email)) {
+            selectedEmails = selectedEmails.filter(item => item !== email);
+        } else {
+            selectedEmails.push(email);
+        }
+    }
+
+    // 點擊刪除按鈕時調用的函數
+    function deleteSelectedMembers() {
+
+        const selectedEmails = Array.from(document.querySelectorAll('input[name="delete"]:checked'))
+                                    .map(checkbox => checkbox.value);
+
+        if (selectedEmails.length === 0) {
+            alert("請選擇要刪除的會員");
+            return;
+        }
+
+        if (confirm("確定要刪除選取的會員嗎？")) {
+            fetch(`/delete_selected_members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ selectedEmails })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('刪除會員失敗');
+                }
+                // 刷新頁面或者重新加載資料
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('刪除會員失敗:', error);
+            });
+        }
+    }
+
+
     </script>
     <style>
         /* 增加整体容器的左侧边距 */
         .container {
-        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+            margin-left: 20px; /* 可以根据需要调整具体的数值 */
         }
 
 
@@ -64,7 +108,6 @@
         }
 
         div li {
-
             display:inline;
             margin-right:10px;
         }
@@ -75,15 +118,17 @@
             text-decoration: none;
             }
 
-        p {
-            width: 80px;
+        div p {
+            width: 120px;
             text-align:center;
             background-color: #dddedf;
             border-radius: 100px;
         }
 
+
+
         /*會員管理系統 新增 查詢*/
-        .titleb{
+        .tit{
             background-color: #dddedf;
             height:30px;
             width:100%;
@@ -93,7 +138,7 @@
 
             /* 表格全局樣式 */
         table {
-                width: 80%;
+                width: 100%;
         }
 
             /* 表格 1 的樣式 */
@@ -127,6 +172,30 @@
                 padding: 8px;
                 text-align: center;
         }
+
+        /* 修改按鈕 */
+        #name2 td button {
+            width: 50%;
+            padding: 8px;
+            background-color: #90b0cc; /* 藍色背景 */
+            border: none; /* 刪除四邊形灰色的框 */
+            color: #ece8e8; /* 文字顏色 */
+            border-radius: 100px; /* 四邊圓角 */
+            cursor: pointer;
+            outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
+        }
+
+        /* 滑鼠懸停時的樣式 */
+        #name2 td button:hover {
+            background-color: #4d66d5;
+        }
+
+        /* 按下時的樣式 */
+        #name2 td button:active {
+            background-color: #737e74;
+        }
+
+
 
         #name1 input[type="submit"] {
             width: 25%;
@@ -168,35 +237,37 @@
             background-color: #737e74;
         }
 
-        /* 將"刪除"按鈕移到表格正中央 */
-        #刪除-container {
 
-            margin-top: 10px;
-            /* border-style:solid;*/
-            text-align: center;
-            margin: 20px auto; /* 自動上下居中，左右20px的間距 */
-        }
-
-        #刪除 {
-            width: 10%;
+        /*delete button*/
+        .delete-button-container {
+            position: fixed;
+            bottom: 20px; /* 與底部的距離 */
+            left: 50%; /* 與左邊的距離 */
+            transform: translateX(-50%); /* 水平居中 */
+            z-index: 999; /* 確保在最上層 */
+            width: 25%;
             padding: 8px;
-            background-color: #90b0cc;
-            border-color:#90b0cc;
-            color:#ece8e8;
-            border-radius: 100px; /*圓角*/
-
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            margin-top: 10px;
+            background-color: transparent; /* 背景透明 */
+            border: none; /* 刪除外框 */
             cursor: pointer;
-            margin: 20px auto; /* 自動上下居中，左右20px的間距 */
+            outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
         }
+
+        .delete-button-container button {
+            background-color: #90b0cc; /* 藍色背景 */
+            color: #ece8e8; /* 文字顏色 */
+            border: none; /* 刪除四邊形灰色的框 */
+            border-radius: 100px; /* 四邊圓角 */
+            padding: 8px 16px; /* 調整按鈕內容的間距 */
+        }
+
         /*滑鼠懸停顯示*/
-        button#刪除:hover {
+        .delete-button-container button:hover {
             background-color: #4d66d5;
         }
         /*按鈕被點即時的顏色*/
-        button#刪除:active {
+        .delete-button-container button:active {
             background-color: #737e74;
         }
 
@@ -207,22 +278,21 @@
 </head>
 
 <body>
-
     <h1><b>會員新增</b></h1>
-    <div class = "titleb">
+    <div class = "tit">
         <ul>
             <li><b> 會員管理系統</b>
             <li><a aria-current="page" href="/create_member"> 新增</a>
-            <li><a aria-current="page" href="/revise_member" >查詢</a>
+            <li><a aria-current="page" href="/search_member" >查詢</a>
             <li><a aria-current="page" href="/shop_sys">購物車系統</a>
             <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
         </ul>
-    </div>
+    </div><br>
 
     <div class="container">
-        <br><p><b>會員查詢</b></p>
+        <div><p><b>會員查詢</b></p></div>
 
-        <form>
+        <form action="/search_member" method="POST" id="searchForm">
 
             <table id="name1" border="1" rules="groups">
 
@@ -283,7 +353,7 @@
 
 
                 <td>帳號</td>
-                <td><input name="name" size="10"> </td>
+                <td><input typr=“email” name="email" size="10"> </td>
                 
             </tr>
             <tr>
@@ -297,51 +367,70 @@
         </form>
 
         <p></p>
-        <form>
-        <table id="name2" border="1" rules="all" >
-            <thead>
+        <% if (errorMessage) { %>
+            <div class="alert">
+                <p><%= errorMessage %></p>
+            </div>
+        <% } %>
 
-                <tr>
-                    <td>刪除</td>
-                    <td>紀錄日期</td>
-                    <td>帳號 </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>性別</td>
-                    <td>修改</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>2024/01/02</td>
-                    <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>男</td>
-                    <td><button type="button" name="sex" >修改</button></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" ></td>
-                    <td>2024/01/03</td>
-                    <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>女</td>
-                    <td><button type="button" name="sex">修改</button></td>
-                </tr>
-            </tbody>
-
-        </table>
-        <div id="刪除-container">
-            <button type="button" id ="刪除"> 刪除</button>
-        </div>
+        <% if (data && data.length > 0) { %>
+            <table id="name2" border="1" rules="groups">
+                <thead>
+                    <tr>
+                        <td>刪除</td>
+                        <td>紀錄日期</td>
+                        <td>帳號</td>
+                        <td>國家</td>
+                        <td>城市</td>
+                        <td>姓名</td>
+                        <td>性別</td>
+                        <td>修改</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.forEach(member => { %>
+                        <tr>
+                            <td><input type="checkbox" name="delete" value="<%= member.email %>"></td>
+                            <td><%= member.recordDate %></td>
+                            <td><%= member.email %></td>
+                            <td><%= member.select_country %></td>
+                            <td><%= member.select_city %></td>
+                            <td><%= member.name %></td>
+                            <td><%= member.sex %></td>
+                            <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <table id="name2" border="1" rules="groups">
+                <thead>
+                    <tr>
+                        <td>刪除</td>
+                        <td>紀錄日期</td>
+                        <td>帳號</td>
+                        <td>國家</td>
+                        <td>城市</td>
+                        <td>姓名</td>
+                        <td>性別</td>
+                        <td>修改</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 空的第一列 -->
+                    <tr>
+                        <td colspan="8">No data found</td>
+                    </tr>
+                </tbody>
+            </table>
+        <% } %>
     </div>
 
-</form>
+
+    <div class="delete-button-container">
+        <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
+    </div>
+
 
 
 

@@ -14,9 +14,86 @@ const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.js
 
 
 // 渲染查詢會員頁面
+//router.get('/search_member', async (req, res) => {
+//    const newData = { user: 'xxx@gmail.com' };
+//    try {
+//        await fs.writeFile(DATA_PATH, JSON.stringify(newData, null, 2));
+//        console.log('File successfully written');
+//        
+//        const data = await fs.readFile(DATA_PATH, 'utf8');
+//        const jsonData = JSON.parse(data);
+//        res.render('search_member', jsonData);
+//    } catch (err) {
+//        console.error('Error:', err);
+//        res.status(500).send('Internal Server Error');
+//    }
+//});
+
+
+// 渲染查詢會員頁面
 router.get('/search_member', async (req, res) => {
-    res.render('search_member');
+    try {
+        const data = await fs.readFile(DATA_PATH, 'utf8');
+        const jsonData = JSON.parse(data);
+        res.render('search_member', { data: jsonData.members || [], errorMessage: null });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
 });
+
+// 处理查询会员的 POST 请求
+router.post('/search_member', async (req, res) => {
+    const { startDate, endDate, email, country, city } = req.body;
+    try {
+        const data = await fs.readFile(DATA_PATH, 'utf8');
+        let jsonData = JSON.parse(data).members || [];
+
+        const filteredData = jsonData.filter(member => {
+            const recordDate = new Date(member.recordDate);
+            return (!startDate || recordDate >= new Date(startDate)) &&
+                (!endDate || recordDate <= new Date(endDate)) &&
+                (!email || member.email.includes(email)) &&
+                (!country || member.country === country) &&
+                (!city || member.city === city);
+        });
+
+        if (filteredData.length === 0) {
+            res.render('search_member', { data: [], errorMessage: '沒有符合條件的紀錄' });
+        } else {
+            res.render('search_member', { data: filteredData, errorMessage: null });
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+// POST 請求處理刪除選取的會員
+router.post('/delete_selected_members', async (req, res) => {
+    const { selectedEmails } = req.body;
+    try {
+        // 讀取現有會員數據
+        const data = await fs.readFile(DATA_PATH, 'utf8');
+        const jsonData = JSON.parse(data);
+
+        // 刪除選中的會員
+        jsonData.members = jsonData.members.filter(member => !selectedEmails.includes(member.email));
+
+        // 寫入更新後的數據到 data.json 文件中
+        await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
+
+        res.status(200).send('成功刪除選取的會員');
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
 
 // 創建會員
 router.post('/create_member', async (req, res) => {
@@ -56,15 +133,53 @@ router.post('/edit_member/:email', async (req, res) => {
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
         console.log('Member updated:', email);
 
-        res.render('edit_member', {
-            member: updatedMemberData,
-            showAlert: true
-        });
+        res.redirect(`/edit_member/${encodeURIComponent(updatedMemberData.email)}`);
     } catch (err) {
-        console.error('Error:', err);
+        console.error('Error:', err.stack);
         res.status(500).send('Internal Server Error');
     }
 });
+
+router.get('/edit_member/:email', async (req, res) => {
+    const email = req.params.email;
+    console.log('收到编辑会员请求，邮箱:', email);
+
+    try {
+        console.log('Reading data file:', DATA_PATH);
+        //讀取數據文件
+        const data = await fs.readFile(DATA_PATH, 'utf8');
+        console.log('Data file read successfully');
+        const jsonData = JSON.parse(data);//解析json
+        console.log('JSON data parsed successfully');
+        const member = jsonData.members.find(member => member.email === email);
+        if (!member) {
+            console.log('Member not found:', email);
+            return res.status(404).send('未找到会员数据，请创建会员');
+        }
+
+        res.render('edit_member', { member: member });
+        console.log('找到会员:', member);
+        // 添加调试信息
+        console.log('准备渲染模板');
+        res.render('edit_member', { member: member }, (err, html) => {
+            if (err) {
+                console.error('模板渲染错误:', err);
+                if (!res.headersSent) {
+                    return res.status(500).send(`内部服务器错误: ${err.message}`);
+                }
+            } else {
+                res.send(html);
+                console.log('模板渲染成功');
+            }
+        });
+    } catch (err) {
+        console.error('错误:', err.stack);
+        if (!res.headersSent) {
+            res.status(500).send(`内部服务器错误: ${err.message}`);
+        }
+    }
+});
+
 
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
