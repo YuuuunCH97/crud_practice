@@ -2,17 +2,17 @@
     "products": [
         {
             "name": "商品1",
-            "photo": "",
+            "photo": "/data/010101.jpg",
             "price": 100
         },
         {
             "name": "商品2",
-            "photo": "",
+            "photo": "/data/010101.jpg",
             "price": 200
         },
         {
             "name": "商品3",
-            "photo": "",
+            "photo": "/data/010101.jpg",
             "price": 150
         }
     ]
