@@ -8,30 +8,14 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 const DATA_PATH = path.join(__dirname, '../public/data/data.json');
-
-
 const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
 // 設定存儲購物車資料的文件路徑
 const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.json');
 
 
-
-
-
 // 渲染查詢會員頁面
 router.get('/search_member', async (req, res) => {
-    const newData = { user: 'xxx@gmail.com' };
-    try {
-        await fs.writeFile(DATA_PATH, JSON.stringify(newData, null, 2));
-        console.log('File successfully written');
-        
-        const data = await fs.readFile(DATA_PATH, 'utf8');
-        const jsonData = JSON.parse(data);
-        res.render('search_member', jsonData);
-    } catch (err) {
-        console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
-    }
+    res.render('search_member');
 });
 
 // 創建會員
