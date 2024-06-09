@@ -52,7 +52,7 @@
     <style>
         /* 增加整体容器的左侧边距 */
         .container {
-        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+            margin-left: 20px; /* 可以根据需要调整具体的数值 */
         }
 
 
@@ -64,7 +64,6 @@
         }
 
         div li {
-
             display:inline;
             margin-right:10px;
         }
@@ -75,15 +74,17 @@
             text-decoration: none;
             }
 
-        p {
-            width: 80px;
+        div p {
+            width: 120px;
             text-align:center;
             background-color: #dddedf;
             border-radius: 100px;
         }
 
+
+
         /*會員管理系統 新增 查詢*/
-        .titleb{
+        .tit{
             background-color: #dddedf;
             height:30px;
             width:100%;
@@ -207,22 +208,21 @@
 </head>
 
 <body>
-
     <h1><b>會員新增</b></h1>
-    <div class = "titleb">
+    <div class = "tit">
         <ul>
             <li><b> 會員管理系統</b>
             <li><a aria-current="page" href="/create_member"> 新增</a>
-            <li><a aria-current="page" href="/revise_member" >查詢</a>
+            <li><a aria-current="page" href="/search_member" >查詢</a>
             <li><a aria-current="page" href="/shop_sys">購物車系統</a>
             <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
         </ul>
-    </div>
+    </div><br>
 
     <div class="container">
-        <br><p><b>會員查詢</b></p>
+        <div><p><b>會員查詢</b></p></div>
 
-        <form>
+        <form action="/search_member" method="POST" id="searchForm">
 
             <table id="name1" border="1" rules="groups">
 
@@ -283,7 +283,7 @@
 
 
                 <td>帳號</td>
-                <td><input name="name" size="10"> </td>
+                <td><input typr=“email” name="email" size="10"> </td>
                 
             </tr>
             <tr>
@@ -297,51 +297,69 @@
         </form>
 
         <p></p>
-        <form>
-        <table id="name2" border="1" rules="all" >
-            <thead>
+        <% if (errorMessage) { %>
+            <div class="alert">
+                <p><%= errorMessage %></p>
+            </div>
+        <% } %>
 
-                <tr>
-                    <td>刪除</td>
-                    <td>紀錄日期</td>
-                    <td>帳號 </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>性別</td>
-                    <td>修改</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>2024/01/02</td>
-                    <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>男</td>
-                    <td><button type="button" name="sex" >修改</button></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" ></td>
-                    <td>2024/01/03</td>
-                    <td><a href="mailto:email2@mail.com">email2@mail.com</a> </td>
-                    <td>國家</td>
-                    <td>城市</td>
-                    <td>姓名</td>
-                    <td>女</td>
-                    <td><button type="button" name="sex">修改</button></td>
-                </tr>
-            </tbody>
+        <% if (data && data.length > 0) { %>
+            <table id="name2" border="1" rules="groups">
+                <thead>
+                    <tr>
+                        <td>刪除</td>
+                        <td>紀錄日期</td>
+                        <td>帳號</td>
+                        <td>國家</td>
+                        <td>城市</td>
+                        <td>姓名</td>
+                        <td>性別</td>
+                        <td>修改</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.forEach(member => { %>
+                        <tr>
+                            <td><input type="checkbox" name="delete" value="<%= member.email %>"></td>
+                            <td><%= member.recordDate %></td>
+                            <td><%= member.email %></td>
+                            <td><%= member.country %></td>
+                            <td><%= member.city %></td>
+                            <td><%= member.name %></td>
+                            <td><%= member.gender %></td>
+                            <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <table id="name2" border="1" rules="groups">
+                <thead>
+                    <tr>
+                        <td>刪除</td>
+                        <td>紀錄日期</td>
+                        <td>帳號</td>
+                        <td>國家</td>
+                        <td>城市</td>
+                        <td>姓名</td>
+                        <td>性別</td>
+                        <td>修改</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 空的第一列 -->
+                    <tr>
+                        <td colspan="8">No data found</td>
+                    </tr>
+                </tbody>
+            </table>
+        <% } %>
+        
+        
 
-        </table>
-        <div id="刪除-container">
-            <button type="button" id ="刪除"> 刪除</button>
-        </div>
+
+        
     </div>
-
-</form>
 
 
 
