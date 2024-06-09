@@ -75,6 +75,29 @@ router.post('/search_member', async (req, res) => {
 });
 
 
+// POST 請求處理刪除選取的會員
+router.post('/delete_selected_members', async (req, res) => {
+    const { selectedEmails } = req.body;
+    try {
+        // 讀取現有會員數據
+        const data = await fs.readFile(DATA_PATH, 'utf8');
+        const jsonData = JSON.parse(data);
+
+        // 刪除選中的會員
+        jsonData.members = jsonData.members.filter(member => !selectedEmails.includes(member.email));
+
+        // 寫入更新後的數據到 data.json 文件中
+        await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
+
+        res.status(200).send('成功刪除選取的會員');
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
 
 
 // 創建會員
@@ -115,7 +138,7 @@ router.post('/edit_member/:email', async (req, res) => {
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
         console.log('Member updated:', email);
 
-        res.redirect(`/edit_member/${encodeURIComponent(member.email)}`);
+        res.redirect(`/edit_member/${encodeURIComponent(updatedMemberData.email)}`);
     } catch (err) {
         console.error('Error:', err.stack);
         res.status(500).send('Internal Server Error');
@@ -138,13 +161,30 @@ router.get('/edit_member/:email', async (req, res) => {
             console.log('Member not found:', email);
             return res.status(404).send('未找到会员数据，请创建会员');
         }
+
         res.render('edit_member', { member: member });
         console.log('找到会员:', member);
+        // 添加调试信息
+        console.log('准备渲染模板');
+        res.render('edit_member', { member: member }, (err, html) => {
+            if (err) {
+                console.error('模板渲染错误:', err);
+                if (!res.headersSent) {
+                    return res.status(500).send(`内部服务器错误: ${err.message}`);
+                }
+            } else {
+                res.send(html);
+                console.log('模板渲染成功');
+            }
+        });
     } catch (err) {
-        console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        console.error('错误:', err.stack);
+        if (!res.headersSent) {
+            res.status(500).send(`内部服务器错误: ${err.message}`);
+        }
     }
 });
+
 
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {

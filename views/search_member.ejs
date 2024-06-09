@@ -48,6 +48,50 @@
         }
     }
 
+    let selectedEmails = []; // 用於存儲選中會員的電子郵件地址
+
+    // 當checkbox選取時將電子郵件地址添加到selectedEmails列表中
+    function handleCheckboxChange(email) {
+        if (selectedEmails.includes(email)) {
+            selectedEmails = selectedEmails.filter(item => item !== email);
+        } else {
+            selectedEmails.push(email);
+        }
+    }
+
+    // 點擊刪除按鈕時調用的函數
+    function deleteSelectedMembers() {
+
+        const selectedEmails = Array.from(document.querySelectorAll('input[name="delete"]:checked'))
+                                    .map(checkbox => checkbox.value);
+
+        if (selectedEmails.length === 0) {
+            alert("請選擇要刪除的會員");
+            return;
+        }
+
+        if (confirm("確定要刪除選取的會員嗎？")) {
+            fetch(`/delete_selected_members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ selectedEmails })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('刪除會員失敗');
+                }
+                // 刷新頁面或者重新加載資料
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('刪除會員失敗:', error);
+            });
+        }
+    }
+
+
     </script>
     <style>
         /* 增加整体容器的左侧边距 */
@@ -170,15 +214,14 @@
         }
 
         /* 將"刪除"按鈕移到表格正中央 */
-        #刪除-container {
-
+        td button {
             margin-top: 10px;
             /* border-style:solid;*/
             text-align: center;
             margin: 20px auto; /* 自動上下居中，左右20px的間距 */
         }
 
-        #刪除 {
+        td button {
             width: 10%;
             padding: 8px;
             background-color: #90b0cc;
@@ -193,11 +236,11 @@
             margin: 20px auto; /* 自動上下居中，左右20px的間距 */
         }
         /*滑鼠懸停顯示*/
-        button#刪除:hover {
+        td button:hover {
             background-color: #4d66d5;
         }
         /*按鈕被點即時的顏色*/
-        button#刪除:active {
+        td button:active {
             background-color: #737e74;
         }
 
@@ -354,12 +397,10 @@
                 </tbody>
             </table>
         <% } %>
-        
-        
-
-
-        
     </div>
+
+    <td><button onclick="deleteSelectedMembers()">刪除</button></td>
+
 
 
 

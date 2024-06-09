@@ -1,33 +1,21 @@
 {
-  "user": "xxx@gmail.com",
-  "members": [
-    {
-      "email": "ysssss@yahoo.com",
-      "name": [
-        "Yuuun",
-        ""
-      ],
-      "select_country": "美國",
-      "select_city": "紐約",
-      "sex": "male",
-      "interests": "日劇",
-      "note": ""
-    },
-    {
-      "email": "12345@gmail",
-      "name": [
-        "12345",
-        ""
-      ],
-      "select_country": "英國",
-      "select_city": "劍橋",
-      "sex": "female",
-      "interests": [
-        "動畫",
-        "韓劇",
-        "日劇"
-      ],
-      "note": ""
-    }
-  ]
+    "user": "xxx@gmail.com",
+    "members": [
+        {
+            "email": "12345@gmail",
+            "name": [
+                "12345",
+                ""
+            ],
+            "select_country": "英國",
+            "select_city": "劍橋",
+            "sex": "female",
+            "interests": [
+                "動畫",
+                "韓劇",
+                "日劇"
+            ],
+            "note": ""
+        }
+    ]
 }
