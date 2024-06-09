@@ -138,7 +138,7 @@
 
             /* 表格全局樣式 */
         table {
-                width: 80%;
+                width: 100%;
         }
 
             /* 表格 1 的樣式 */
@@ -172,6 +172,30 @@
                 padding: 8px;
                 text-align: center;
         }
+
+        /* 修改按鈕 */
+        #name2 td button {
+            width: 50%;
+            padding: 8px;
+            background-color: #90b0cc; /* 藍色背景 */
+            border: none; /* 刪除四邊形灰色的框 */
+            color: #ece8e8; /* 文字顏色 */
+            border-radius: 100px; /* 四邊圓角 */
+            cursor: pointer;
+            outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
+        }
+
+        /* 滑鼠懸停時的樣式 */
+        #name2 td button:hover {
+            background-color: #4d66d5;
+        }
+
+        /* 按下時的樣式 */
+        #name2 td button:active {
+            background-color: #737e74;
+        }
+
+
 
         #name1 input[type="submit"] {
             width: 25%;
@@ -213,34 +237,37 @@
             background-color: #737e74;
         }
 
-        /* 將"刪除"按鈕移到表格正中央 */
-        td button {
-            margin-top: 10px;
-            /* border-style:solid;*/
-            text-align: center;
-            margin: 20px auto; /* 自動上下居中，左右20px的間距 */
-        }
 
-        td button {
-            width: 10%;
+        /*delete button*/
+        .delete-button-container {
+            position: fixed;
+            bottom: 20px; /* 與底部的距離 */
+            left: 50%; /* 與左邊的距離 */
+            transform: translateX(-50%); /* 水平居中 */
+            z-index: 999; /* 確保在最上層 */
+            width: 25%;
             padding: 8px;
-            background-color: #90b0cc;
-            border-color:#90b0cc;
-            color:#ece8e8;
-            border-radius: 100px; /*圓角*/
-
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            margin-top: 10px;
+            background-color: transparent; /* 背景透明 */
+            border: none; /* 刪除外框 */
             cursor: pointer;
-            margin: 20px auto; /* 自動上下居中，左右20px的間距 */
+            outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
         }
+
+        .delete-button-container button {
+            background-color: #90b0cc; /* 藍色背景 */
+            color: #ece8e8; /* 文字顏色 */
+            border: none; /* 刪除四邊形灰色的框 */
+            border-radius: 100px; /* 四邊圓角 */
+            padding: 8px 16px; /* 調整按鈕內容的間距 */
+        }
+
         /*滑鼠懸停顯示*/
-        td button:hover {
+        .delete-button-container button:hover {
             background-color: #4d66d5;
         }
         /*按鈕被點即時的顏色*/
-        td button:active {
+        .delete-button-container button:active {
             background-color: #737e74;
         }
 
@@ -366,10 +393,10 @@
                             <td><input type="checkbox" name="delete" value="<%= member.email %>"></td>
                             <td><%= member.recordDate %></td>
                             <td><%= member.email %></td>
-                            <td><%= member.country %></td>
-                            <td><%= member.city %></td>
+                            <td><%= member.select_country %></td>
+                            <td><%= member.select_city %></td>
                             <td><%= member.name %></td>
-                            <td><%= member.gender %></td>
+                            <td><%= member.sex %></td>
                             <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
                         </tr>
                     <% }); %>
@@ -399,7 +426,10 @@
         <% } %>
     </div>
 
-    <td><button onclick="deleteSelectedMembers()">刪除</button></td>
+
+    <div class="delete-button-container">
+        <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
+    </div>
 
 
 
