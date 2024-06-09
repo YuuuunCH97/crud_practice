@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>購物車查詢</title>
+    <%- include('./header') -%>
 
     <script>
         function validateForm() {
@@ -18,9 +19,6 @@
             return true;
         }
     </script>
-
-
-
 
     <style>
         /* 增加整体容器的左侧边距 */
@@ -116,16 +114,15 @@
 </head>
 
 <body>
-    <h1><b>購物車系統</b></h1>
     <div class = "tit">
         <ul>
             <li><b>會員管理系統</b>
-                <li><a aria-current="page" href="/create_member"> 新增</a>
-                <li><a aria-current="page" href="/search_member" >查詢</a>
-                <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-                <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
+            <li><a aria-current="page" href="/create_member"> 新增</a>
+            <li><a aria-current="page" href="/search_member" >查詢</a>
+            <li><a aria-current="page" href="/shop_sys">購物車系統</a>
+            <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
         </ul>
-    </div>
+    </div><br>
 
     <div class="container">
         <div><p><b>購物車系統</b></p></div>
