@@ -8,14 +8,9 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 const DATA_PATH = path.join(__dirname, '../public/data/data.json');
-
-
 const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
 // 設定存儲購物車資料的文件路徑
 const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.json');
-
-
-
 
 
 // 渲染查詢會員頁面
