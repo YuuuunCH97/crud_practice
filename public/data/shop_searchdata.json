@@ -115,5 +115,27 @@
         "price": 150
       }
     ]
+  },
+  {
+    "purchaseDate": "2024-06-11",
+    "serialNumber": "shop3427915359",
+    "email": "user1@gmail.com",
+    "items": [
+      {
+        "name": "商品1",
+        "quantity": 1,
+        "price": 100
+      },
+      {
+        "name": "商品2",
+        "quantity": 3,
+        "price": 2180
+      },
+      {
+        "name": "商品3",
+        "quantity": 1,
+        "price": 150
+      }
+    ]
   }
 ]

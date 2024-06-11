@@ -1,21 +1,53 @@
 {
-    "user": "xxx@gmail.com",
-    "members": [
-        {
-            "email": "12345@gmail",
-            "name": [
-                "12345",
-                ""
-            ],
-            "select_country": "英國",
-            "select_city": "劍橋",
-            "sex": "female",
-            "interests": [
-                "動畫",
-                "韓劇",
-                "日劇"
-            ],
-            "note": ""
-        }
-    ]
+  "user": "xxx@gmail.com",
+  "members": [
+    {
+      "email": "user1@gmail.com",
+      "name": [
+        "user1",
+        ""
+      ],
+      "select_country": "美國",
+      "select_city": "洛杉磯",
+      "sex": "male",
+      "interests": [
+        "日劇",
+        "戶外咖"
+      ],
+      "note": "",
+      "record_date": "2024-06-11"
+    },
+    {
+      "email": "user2@gmail.com",
+      "name": [
+        "user2",
+        ""
+      ],
+      "select_country": "英國",
+      "select_city": "劍橋",
+      "sex": "female",
+      "interests": [
+        "老人派",
+        "狗派"
+      ],
+      "note": "",
+      "record_date": "2024-06-11"
+    },
+    {
+      "email": "user3@gmail.com",
+      "name": [
+        "user3",
+        ""
+      ],
+      "select_country": "美國",
+      "select_city": "芝加哥",
+      "sex": "male",
+      "interests": [
+        "韓劇",
+        "老人派"
+      ],
+      "note": "",
+      "record_date": "2024-06-11"
+    }
+  ]
 }

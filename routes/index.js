@@ -31,38 +31,48 @@ const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.js
 
 
 // 渲染查詢會員頁面
-router.get('/search_member', async (req, res) => {
-    try {
-        const data = await fs.readFile(DATA_PATH, 'utf8');
-        const jsonData = JSON.parse(data);
-        res.render('search_member', { data: jsonData.members || [], errorMessage: null });
-    } catch (err) {
-        console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
-    }
+// router.get('/search_member', async (req, res) => {
+//     try {
+//         const data = await fs.readFile(DATA_PATH, 'utf8');
+//         const jsonData = JSON.parse(data);
+//         res.render('search_member', { data: jsonData.members || [], errorMessage: null });
+//     } catch (err) {
+//         console.error('Error:', err);
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
+
+// 渲染查詢會員頁面，初始頁面不顯示會員資料
+router.get('/search_member', (req, res) => {
+    res.render('search_member', { data: [], errorMessage: null });
 });
+
 
 // 处理查询会员的 POST 请求
 router.post('/search_member', async (req, res) => {
     const { startDate, endDate, email, country, city } = req.body;
+    // 檢查是否所有字段都為空
+    const isEmpty = !startDate && !endDate && !email && !country && !city;
+
     try {
         const data = await fs.readFile(DATA_PATH, 'utf8');
         let jsonData = JSON.parse(data).members || [];
 
-        const filteredData = jsonData.filter(member => {
-            const recordDate = new Date(member.recordDate);
-            return (!startDate || recordDate >= new Date(startDate)) &&
-                (!endDate || recordDate <= new Date(endDate)) &&
-                (!email || member.email.includes(email)) &&
-                (!country || member.country === country) &&
-                (!city || member.city === city);
-        });
-
-        if (filteredData.length === 0) {
-            res.render('search_member', { data: [], errorMessage: '沒有符合條件的紀錄' });
-        } else {
-            res.render('search_member', { data: filteredData, errorMessage: null });
+        let filteredData = [];
+        // 如果所有字段都为空，则不发送任何会员数据到前端
+        if (!isEmpty) {
+            filteredData = jsonData.filter(member => {
+                const recordDate = new Date(member.recordDate);
+                return (!startDate || recordDate >= new Date(startDate)) &&
+                    (!endDate || recordDate <= new Date(endDate)) &&
+                    (!email || member.email.includes(email)) &&
+                    (!country || member.select_country === country) &&
+                    (!city || member.select_city === city);
+            });
         }
+
+
+        res.render('search_member', { data: filteredData, errorMessage: filteredData.length === 0 ? null : null });
     } catch (err) {
         console.error('Error:', err);
         res.status(500).send('Internal Server Error');
@@ -95,24 +105,71 @@ router.post('/delete_selected_members', async (req, res) => {
 
 
 
-// 創建會員
+// // 創建會員
+// router.post('/create_member', async (req, res) => {
+//     const memberData = req.body;
+//     // 检查是否存在 record_date，没有的话在服务器端生成当前日期
+//     if (!memberData.record_date) {
+//         memberData.record_date = new Date().toISOString().split('T')[0]; // 获取当前日期并格式化为 YYYY-MM-DD
+//     }
+//     try {
+//         // 读取现有数据
+//         const data = await fs.readFile(DATA_PATH, 'utf8');
+//         let jsonData = JSON.parse(data);
+//         // 确保members数组存在
+//         jsonData.members = jsonData.members || [];
+//         // 添加新成员数据
+//         jsonData.members.push(memberData);
+        
+//         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
+//         console.log('Member created:', memberData.email);
+//         res.redirect('/create_member');
+//     } catch (err) {
+//         console.error('Error:', err);
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
+
 router.post('/create_member', async (req, res) => {
     const memberData = req.body;
+
+    // 检查是否存在 record_date，如果没有，则生成当前日期
+    if (!memberData.record_date) {
+        memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式为 YYYY-MM-DD
+    }
+
     try {
+        // 读取现有数据
         const data = await fs.readFile(DATA_PATH, 'utf8');
-        let jsonData = JSON.parse(data);
+        let jsonData;
         
-        jsonData.members = jsonData.members || [];
+        try {
+            jsonData = JSON.parse(data); // 解析 JSON 数据
+        } catch (parseError) {
+            console.error('Error parsing JSON:', parseError);
+            return res.status(500).send('Internal Server Error');
+        }
+
+        // 确保 members 数组存在
+        if (!Array.isArray(jsonData.members)) {
+            jsonData.members = [];
+        }
+
+        // 添加新成员数据
         jsonData.members.push(memberData);
-        
+
+        // 写入文件
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
         console.log('Member created:', memberData.email);
+
+        // 重定向到 create_member 页面
         res.redirect('/create_member');
     } catch (err) {
         console.error('Error:', err);
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 // 修改會員
 router.post('/edit_member/:email', async (req, res) => {

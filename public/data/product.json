@@ -1,19 +1,19 @@
 {
     "products": [
         {
-            "name": "商品1",
+            "name": "keyboard",
             "photo": "/data/010101.jpg",
-            "price": 100
+            "price": 500
         },
         {
-            "name": "商品2",
-            "photo": "/data/010101.jpg",
+            "name": "mouse",
+            "photo": "/data/020202.jpg",
             "price": 200
         },
         {
             "name": "商品3",
-            "photo": "/data/010101.jpg",
-            "price": 150
+            "photo": "/data/030303.jpg",
+            "price": 2180
         }
     ]
 }

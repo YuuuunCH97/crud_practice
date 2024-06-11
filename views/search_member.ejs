@@ -7,45 +7,45 @@
     <%- include('./header') -%>
 
     <script>
-    function updateCities() {
-        var country = document.getElementById("select_country").value;
-        var citySelect = document.getElementById("select_city");
-        citySelect.innerHTML = ""; // 清空城市選項
-
-        // 根據選的國家跳城市
-        switch (country) {
-            case "台灣":
-                citySelect.innerHTML += "<option value='台北'>台北</option>";
-                citySelect.innerHTML += "<option value='台中'>台中</option>";
-                citySelect.innerHTML += "<option value='高雄'>高雄</option>";
-                citySelect.innerHTML += "<option value='台南'>台南</option>";
-                citySelect.innerHTML += "<option value='宜蘭'>宜蘭</option>";
-                citySelect.innerHTML += "<option value='花蓮'>花蓮</option>";
-                citySelect.innerHTML += "<option value='屏東'>屏東</option>";
-                break;
-            case "美國":
-                citySelect.innerHTML += "<option value='紐約'>紐約</option>";
-                citySelect.innerHTML += "<option value='洛杉磯'>洛杉磯</option>";
-                citySelect.innerHTML += "<option value='芝加哥'>芝加哥</option>";
-                citySelect.innerHTML += "<option value='加州'>加州</option>";
-                break;
-            case "英國":
-                citySelect.innerHTML += "<option value='倫敦'>倫敦</option>";
-                citySelect.innerHTML += "<option value='愛丁堡'>愛丁堡</option>";
-                citySelect.innerHTML += "<option value='牛津'>牛津</option>";
-                citySelect.innerHTML += "<option value='劍橋'>劍橋</option>";
-                break;
-            case "中國":
-                citySelect.innerHTML += "<option value='北京'>北京</option>";
-                citySelect.innerHTML += "<option value='上海'>上海</option>";
-                citySelect.innerHTML += "<option value='廣州'>廣州</option>";
-                citySelect.innerHTML += "<option value='哈爾濱'>哈爾濱</option>";
-                break;
-            default:
-                // 無國家 空
-                break;
+        // 國家
+        function updateCities() {
+            var country = document.getElementById("select_country").value;
+            var citySelect = document.getElementById("select_city");
+            citySelect.innerHTML = ""; // 清空城市選項
+            // 根據選的國家跳城市
+            switch (country) {
+                case "台灣":
+                    citySelect.appendChild(new Option('台北', '台北'));
+                    citySelect.appendChild(new Option('台中', '台中'));
+                    citySelect.appendChild(new Option('高雄', '高雄'));
+                    citySelect.appendChild(new Option('台南', '台南'));
+                    citySelect.appendChild(new Option('宜蘭', '宜蘭'));
+                    citySelect.appendChild(new Option('花蓮', '花蓮'));
+                    citySelect.appendChild(new Option('屏東', '屏東'));
+                    break;
+                case "美國":
+                    citySelect.appendChild(new Option('紐約', '紐約'));
+                    citySelect.appendChild(new Option('洛杉磯', '洛杉磯'));
+                    citySelect.appendChild(new Option('芝加哥', '芝加哥'));
+                    citySelect.appendChild(new Option('加州', '加州'));
+                    break;
+                case "英國":
+                    citySelect.appendChild(new Option('倫敦', '倫敦'));
+                    citySelect.appendChild(new Option('愛丁堡', '愛丁堡'));
+                    citySelect.appendChild(new Option('牛津', '牛津'));
+                    citySelect.appendChild(new Option('劍橋', '劍橋'));
+                    break;
+                case "中國":
+                    citySelect.appendChild(new Option('北京', '北京'));
+                    citySelect.appendChild(new Option('上海', '上海'));
+                    citySelect.appendChild(new Option('廣州', '廣州'));
+                    citySelect.appendChild(new Option('哈爾濱', '哈爾濱'));
+                    break;
+                default:
+                    // 無國家 空
+                    break;
+            }
         }
-    }
 
     let selectedEmails = []; // 用於存儲選中會員的電子郵件地址
 
@@ -90,6 +90,19 @@
         }
     }
 
+    //按出查詢檢查是否有填入資料
+    function validateForm() {
+        const startDate = document.querySelector('input[name="startDate"]').value;
+        const endDate = document.querySelector('input[name="endDate"]').value;
+        const email = document.querySelector('input[name="email"]').value;
+        const country = document.querySelector('select[name="country"]').value;
+        const city = document.querySelector('select[name="city"]').value;
+        if (!startDate && !endDate && !email && !country && !city) {
+            alert("請輸入查詢條件");
+            return false; // 阻止表單提交
+        }
+        return true; // 允許表單提交
+    }
 
     </script>
     <style>
@@ -115,7 +128,7 @@
         div a {
             color: black;
             text-decoration: none;
-            }
+        }
 
         div p {
             width: 120px;
@@ -143,12 +156,17 @@
             /* 表格 1 的樣式 */
         #name1 {
                 border-collapse: collapse;
-
         }
 
         #name1 td {
             padding: 8px;
             text-align: left;
+        }
+
+        /* 固定表單元素寬度 */
+        #name1 input, #name1 select {
+            width: 100px; /* 調整這個值以達到最佳效果 */
+            box-sizing: border-box; /* 確保 padding 和 border 不影響總寬度 */
         }
 
 
@@ -289,76 +307,57 @@
     <div class="container">
         <div><p><b>會員查詢</b></p></div>
 
-        <form action="/search_member" method="POST" id="searchForm">
+        <form action="/search_member" method="POST" id="searchForm" onsubmit="return validateForm()">
 
             <table id="name1" border="1" rules="groups">
-
             <tr>
                 <td>紀錄日期 </td>
                 <td>開始日 
                     <input type="date" ame="start-date" size="10">           
                 </td>
-                <td > ~ 結束日
+                <td> ~ 結束日
                     <input type="date" ame="end-date" size="10">
                 </td>
-
                 <td> 流水號 </td>
-
-                <td> <input name="nunber" size="10"> </td>
+                <td> <input name="nunber" size="10" style="width: 200px;"> </td>
             </tr>
-            <tr>
-
-            </tr>
+            <tr></tr>
             <tr>
                 <td>國家</td>
                 <td  >
-                    <select id="select_country" name="select_country"  size="number" onchange="updateCities()">
+                    <select id="select_country" name="select_country"  size="number" onchange="updateCities()" style="width:100px;">
                         <option value="" disabled selected>Select</option>
                         <option value="台灣">台灣</option>
                         <option value="美國">美國</option>
                         <option value="英國">英國</option>
                         <option value="中國">中國</option>
-                    </select><br>
-
-                </td>
-                <td></td>
-
-
-                <td>城市</td>
-                <td>
-                    <select name="select_city" id="select_city" size="number">
-                        <option value="">請選擇國家以顯示城市</option>
-                    </select><br>    
-                </td>
-
-
-
-            </tr>
-
-            <tr>
-                <td>專長</td>
-                <td >
-                    <select name="select_country"  size="number" onchange="updateCities()" >
-                        <option value="" disabled selected>Select</option>
-                        <option value="select_country">台灣
-                        <option value="select_country">美國
-                        <option value="select_country">英國
-                        <option value="select_country">中國  
                     </select>
                 </td>
                 <td></td>
-
-
+                <td>城市</td>
+                <td>
+                    <select name="select_city" id="select_city" size="number" style="width:100px;">
+                        <option value="">請選擇國家以顯示城市</option>
+                    </select><br>
+                </td>
+            </tr>
+            <tr>
+                <td>專長</td>
+                <td >
+                    <select name="select_country" >
+                        <option value="" disabled selected>Select</option>
+                        <option value="select_country">台灣
+                    </select>
+                </td>
+                <td></td>
                 <td>帳號</td>
-                <td><input typr=“email” name="email" size="10"> </td>
-                
+                <td><input typr=“email” name="email" size="10" style="width: 200px;" > </td>
             </tr>
             <tr>
                 <td></td>
-                <td ><th align="left" ><input type="submit" name="send" value="查詢"></th></td>
+                <td><th><input type="submit" name="send" value="查詢"></th></td>
                 <td></td>
                 <td></td>
-
             </tr>
             </table>
         </form>
@@ -388,7 +387,7 @@
                     <% data.forEach(member => { %>
                         <tr>
                             <td><input type="checkbox" name="delete" value="<%= member.email %>"></td>
-                            <td><%= member.recordDate %></td>
+                            <td><%= member.record_date %></td>
                             <td><%= member.email %></td>
                             <td><%= member.select_country %></td>
                             <td><%= member.select_city %></td>
@@ -422,7 +421,6 @@
             </table>
         <% } %>
     </div>
-
 
     <div class="delete-button-container">
         <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
