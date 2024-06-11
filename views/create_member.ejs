@@ -14,6 +14,19 @@
       data["user"] = $("#user").val()
     }
 
+        // 设置记录日期为当前日期
+        function setRecordDate() {
+        const today = new Date().toISOString().split('T')[0]; // 格式化当前日期为 YYYY-MM-DD
+        document.getElementById('record_date').value = today;
+    }
+
+    // 在页面加载时设置记录日期
+    window.onload = function () {
+        setRecordDate();
+        loadInterests(); // 保留已有的 loadInterests 调用
+    }
+
+    
     $(document).ready(function() {
       // 透過API取得國家資料
       // TODO 需要繼續寫城市串接
