@@ -14,7 +14,25 @@
       data["user"] = $("#user").val()
     }
 
-    //// 國家相對應城市
+    $(document).ready(function() {
+      // 透過API取得國家資料
+      // TODO 需要繼續寫城市串接
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {},
+        success: function (msg) {
+          let country_http = ""
+          for (var key in msg['receivedData']) {
+            country_http += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_country").html(country_http)
+          updateCities()
+        }
+      });
+    })
+
+    // 國家相對應城市
     function updateCities() {
       var country = document.getElementById("select_country").value;
       var citySelect = document.getElementById("select_city");
