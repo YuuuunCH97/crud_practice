@@ -14,20 +14,25 @@
       data["user"] = $("#user").val()
     }
 
-    // 设置记录日期为当前日期
-    function setRecordDate() {
-        const today = new Date().toISOString().split('T')[0]; // 格式化当前日期为 YYYY-MM-DD
-        document.getElementById('record_date').value = today;
-    }
+    $(document).ready(function() {
+      // 透過API取得國家資料
+      // TODO 需要繼續寫城市串接
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {},
+        success: function (msg) {
+          let country_http = ""
+          for (var key in msg['receivedData']) {
+            country_http += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_country").html(country_http)
+          updateCities()
+        }
+      });
+    })
 
-    // 在页面加载时设置记录日期
-    window.onload = function () {
-        setRecordDate();
-        loadInterests(); // 保留已有的 loadInterests 调用
-    }
-
-
-    //// 國家相對應城市
+    // 國家相對應城市
     function updateCities() {
       var country = document.getElementById("select_country").value;
       var citySelect = document.getElementById("select_city");

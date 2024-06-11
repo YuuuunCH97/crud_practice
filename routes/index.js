@@ -12,6 +12,8 @@ const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
 // 設定存儲購物車資料的文件路徑
 const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.json');
 
+const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json');
+
 
 // 渲染查詢會員頁面
 //router.get('/search_member', async (req, res) => {
@@ -334,6 +336,26 @@ router.post('/shop_search', async (req, res) => {
         });
 
         res.render('shop_search', { data: filteredData, errorMessage: null });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post('/get_country_city', async (req, res) => {
+    // 無輸入參數 {} >> 取得國家list資料
+    // 輸入參數 {"country": "台灣"} >> 取得城市list資料
+    try {
+        const country = req.body['country'];
+        const jsonData_text = await fs.readFile(COUNTRY_CITY_PATH, 'utf8');
+        const jsonData = JSON.parse(jsonData_text);
+        let country_city_list
+        if (country){
+            country_city_list = jsonData[country]
+        } else {
+            country_city_list = Object.keys(jsonData)
+        }
+        res.json({receivedData: country_city_list});
     } catch (err) {
         console.error('Error:', err);
         res.status(500).send('Internal Server Error');
