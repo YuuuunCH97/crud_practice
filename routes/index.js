@@ -161,7 +161,8 @@ router.post('/create_member', async (req, res) => {
         for (i=0; i<=jsonData.members.length; i++ ) {
             let data_email = jsonData.members[i] || {'email': ''}
             if (data_email['email'] == memberData['email']){
-                return res.render('create_member', {"msg": "帳號重複"});
+                let memberData_json = JSON.stringify(memberData)
+                return res.render('create_member', {"msg": "帳號重複", "data": memberData_json});
             }
         }
         // 添加新成员数据
@@ -234,7 +235,7 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    return res.render('create_member', {"msg": ""});
+    return res.render('create_member', {"msg": "", "data": "{}"});
     
 });
 
