@@ -157,23 +157,21 @@ router.post('/create_member', async (req, res) => {
             jsonData.members = [];
         }
 
-        console.log(memberData, '!!!!!!!!!!!!!!!')
         // 掃描是否有重複的帳號
-        for (i=1; i<=jsonData.members.length; i++ ) {
-            if (jsonData.members[i]['email'] == memberData['email']){
-                
+        for (i=0; i<=jsonData.members.length; i++ ) {
+            let data_email = jsonData.members[i] || {'email': ''}
+            if (data_email['email'] == memberData['email']){
+                return res.render('create_member', {"msg": "帳號重複"});
             }
         }
-
         // 添加新成员数据
         jsonData.members.push(memberData);
-
         // 写入文件
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
         console.log('Member created:', memberData.email);
 
         // 重定向到 create_member 页面
-        res.redirect('/create_member');
+        res.redirect('/search_member');
     } catch (err) {
         console.error('Error:', err);
         res.status(500).send('Internal Server Error');
@@ -251,7 +249,8 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    res.render('create_member');
+    res.render('create_member', {"msg": ""});
+    
 });
 
 // 渲染购物车系统页面 /shop_sys

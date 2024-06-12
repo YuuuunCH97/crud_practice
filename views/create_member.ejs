@@ -114,7 +114,7 @@
 
       if (validateEmail()) {
         // 如果所有驗證都通過，顯示成功訊息
-        alert('已增加會員');
+        // alert('已增加會員');
         // 確保表單提交
         document.forms["registration"].submit();
       }
@@ -406,6 +406,11 @@
         <br>備註<br>
         <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
 
+        <% if (msg) { %>
+        <div class="alert alert-danger" role="alert">
+          <%= msg %>
+        </div>
+        <% } %>
         <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
         <input type="hidden" id="record_date" name="record_date" value="">
       </form>
