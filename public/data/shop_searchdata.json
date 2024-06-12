@@ -115,5 +115,49 @@
         "price": 150
       }
     ]
+  },
+  {
+    "purchaseDate": "2024-06-11",
+    "serialNumber": "shop3427915359",
+    "email": "user1@gmail.com",
+    "items": [
+      {
+        "name": "商品1",
+        "quantity": 1,
+        "price": 100
+      },
+      {
+        "name": "商品2",
+        "quantity": 3,
+        "price": 2180
+      },
+      {
+        "name": "商品3",
+        "quantity": 1,
+        "price": 150
+      }
+    ]
+  },
+  {
+    "purchaseDate": "2024-06-11",
+    "serialNumber": "shop6537331271",
+    "email": "user2@gmail.com",
+    "items": [
+      {
+        "name": "keyboard",
+        "quantity": 2,
+        "price": 500
+      },
+      {
+        "name": "mouse",
+        "quantity": 1,
+        "price": 200
+      },
+      {
+        "name": "商品3",
+        "quantity": 1,
+        "price": 2180
+      }
+    ]
   }
 ]

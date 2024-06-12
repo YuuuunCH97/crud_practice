@@ -2,20 +2,36 @@
     "user": "xxx@gmail.com",
     "members": [
         {
-            "email": "12345@gmail",
+            "email": "user2@gmail.com",
             "name": [
-                "12345",
+                "user2",
                 ""
             ],
             "select_country": "英國",
             "select_city": "劍橋",
             "sex": "female",
             "interests": [
-                "動畫",
-                "韓劇",
-                "日劇"
+                "老人派",
+                "狗派"
             ],
-            "note": ""
+            "note": "",
+            "record_date": "2024-06-11"
+        },
+        {
+            "email": "user3@gmail.com",
+            "name": [
+                "user3",
+                ""
+            ],
+            "select_country": "美國",
+            "select_city": "芝加哥",
+            "sex": "male",
+            "interests": [
+                "韓劇",
+                "老人派"
+            ],
+            "note": "",
+            "record_date": "2024-06-11"
         }
     ]
 }
