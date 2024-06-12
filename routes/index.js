@@ -46,7 +46,7 @@ const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json
 
 // 渲染查詢會員頁面，初始頁面不顯示會員資料
 router.get('/search_member', (req, res) => {
-    res.render('search_member', { data: [], errorMessage: null });
+    return res.render('search_member', { data: [], errorMessage: null });
 });
 
 
@@ -74,10 +74,10 @@ router.post('/search_member', async (req, res) => {
         }
 
 
-        res.render('search_member', { data: filteredData, errorMessage: filteredData.length === 0 ? null : null });
+        return res.render('search_member', { data: filteredData, errorMessage: filteredData.length === 0 ? null : null });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -96,10 +96,10 @@ router.post('/delete_selected_members', async (req, res) => {
         // 寫入更新後的數據到 data.json 文件中
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
 
-        res.status(200).send('成功刪除選取的會員');
+        return res.status(200).send('成功刪除選取的會員');
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -174,7 +174,7 @@ router.post('/create_member', async (req, res) => {
         res.redirect('/search_member');
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -201,7 +201,7 @@ router.post('/edit_member/:email', async (req, res) => {
         res.redirect(`/edit_member/${encodeURIComponent(updatedMemberData.email)}`);
     } catch (err) {
         console.error('Error:', err.stack);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -221,26 +221,11 @@ router.get('/edit_member/:email', async (req, res) => {
             console.log('Member not found:', email);
             return res.status(404).send('未找到会员数据，请创建会员');
         }
-
-        res.render('edit_member', { member: member });
-        console.log('找到会员:', member);
-        // 添加调试信息
-        console.log('准备渲染模板');
-        res.render('edit_member', { member: member }, (err, html) => {
-            if (err) {
-                console.error('模板渲染错误:', err);
-                if (!res.headersSent) {
-                    return res.status(500).send(`内部服务器错误: ${err.message}`);
-                }
-            } else {
-                res.send(html);
-                console.log('模板渲染成功');
-            }
-        });
+        return res.render('edit_member', { member: member });
     } catch (err) {
         console.error('错误:', err.stack);
         if (!res.headersSent) {
-            res.status(500).send(`内部服务器错误: ${err.message}`);
+            return res.status(500).send(`内部服务器错误: ${err.message}`);
         }
     }
 });
@@ -249,7 +234,7 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    res.render('create_member', {"msg": ""});
+    return res.render('create_member', {"msg": ""});
     
 });
 
@@ -258,10 +243,10 @@ router.get('/shop_sys', async (req, res) => {
     try {
         const productData = await fs.readFile(PRODUCT_DATA_PATH, 'utf8');
         const products = JSON.parse(productData).products;
-        res.render('shop_sys', { products });
+        return res.render('shop_sys', { products });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -303,10 +288,10 @@ router.post('/shop_submit', async (req, res) => {
         await fs.writeFile(SHOP_SEARCH_PATH, JSON.stringify(shopData, null, 2), 'utf8');
         console.log('購物車資料已成功保存:', newCartData);
 
-        res.status(200).send('購物車資料已成功保存');
+        return res.status(200).send('購物車資料已成功保存');
     } catch (err) {
         console.error('Error saving shop search data:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -314,7 +299,7 @@ router.post('/shop_submit', async (req, res) => {
 
 // 渲染 shop_search 页面
 router.get('/shop_search', (req, res) => {
-    res.render('shop_search', { data: [] });
+    return res.render('shop_search', { data: [] });
 });
 
 // 处理表单提交的 POST 请求
@@ -342,10 +327,10 @@ router.post('/shop_search', async (req, res) => {
             return true;
         });
 
-        res.render('shop_search', { data: filteredData, errorMessage: null });
+        return res.render('shop_search', { data: filteredData, errorMessage: null });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
@@ -362,10 +347,10 @@ router.post('/get_country_city', async (req, res) => {
         } else {
             country_city_list = Object.keys(jsonData)
         }
-        res.json({receivedData: country_city_list});
+        return res.json({receivedData: country_city_list});
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }
 });
 
