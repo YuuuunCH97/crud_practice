@@ -28,62 +28,61 @@
 
     
     $(document).ready(function() {
-      // 透過API取得國家資料
-      // TODO 需要繼續寫城市串接
-      $.ajax({
-        type: "POST",
-        url: "/get_country_city",
-        data: {},
-        success: function (msg) {
-          let country_http = ""
-          for (var key in msg['receivedData']) {
-            country_http += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
-          }
-          $("#select_country").html(country_http)
-          updateCities()
-        }
-      });
+      let dataElement = document.getElementById("data-json");
+      let jsonData;
+      if (dataElement && dataElement.textContent){
+          jsonData = JSON.parse(dataElement.textContent);
+      } else {
+          jsonData = {}
+      }
+      if (jsonData){
+        console.log(jsonData["email"])
+        $("#email").val(jsonData["email"])
+        $("#name").val(jsonData["name"])
+        $("#select_country").val(jsonData["select_country"])
+        updateCities();
+        setTimeout(() => {
+          $("#select_city").val(jsonData["select_city"])
+        }, 300);
+
+        $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
+        //TODO 專長 主題
+
+      }
     })
+
+
+    // 透過API取得國家資料
+    $.ajax({
+      type: "POST",
+      url: "/get_country_city",
+      data: {},
+      success: function (msg) {
+        let country_html = ""
+        for (var key in msg['receivedData']) {
+          country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+        }
+        $("#select_country").html(country_html)
+        updateCities()
+      }
+    });
+    
 
     // 國家相對應城市
     function updateCities() {
       var country = document.getElementById("select_country").value;
-      var citySelect = document.getElementById("select_city");
-      citySelect.innerHTML = ""; // 清空城市選項
-
-      // 根據選的國家跳城市
-      switch (country) {
-        case "台灣":
-          citySelect.innerHTML += "<option value='台北'>台北</option>";
-          citySelect.innerHTML += "<option value='台中'>台中</option>";
-          citySelect.innerHTML += "<option value='高雄'>高雄</option>";
-          citySelect.innerHTML += "<option value='台南'>台南</option>";
-          citySelect.innerHTML += "<option value='宜蘭'>宜蘭</option>";
-          citySelect.innerHTML += "<option value='花蓮'>花蓮</option>";
-          citySelect.innerHTML += "<option value='屏東'>屏東</option>";
-          break;
-        case "美國":
-          citySelect.innerHTML += "<option value='紐約'>紐約</option>";
-          citySelect.innerHTML += "<option value='洛杉磯'>洛杉磯</option>";
-          citySelect.innerHTML += "<option value='芝加哥'>芝加哥</option>";
-          citySelect.innerHTML += "<option value='加州'>加州</option>";
-          break;
-        case "英國":
-          citySelect.innerHTML += "<option value='倫敦'>倫敦</option>";
-          citySelect.innerHTML += "<option value='愛丁堡'>愛丁堡</option>";
-          citySelect.innerHTML += "<option value='牛津'>牛津</option>";
-          citySelect.innerHTML += "<option value='劍橋'>劍橋</option>";
-          break;
-        case "中國":
-          citySelect.innerHTML += "<option value='北京'>北京</option>";
-          citySelect.innerHTML += "<option value='上海'>上海</option>";
-          citySelect.innerHTML += "<option value='廣州'>廣州</option>";
-          citySelect.innerHTML += "<option value='哈爾濱'>哈爾濱</option>";
-          break;
-        default:
-          // 無國家 空
-          break;
-      }
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {"country": country},
+        success: function (msg) {
+          let city_html = ""
+          for (var key in msg['receivedData']) {
+            city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_city").html(city_html)
+        }
+      });
     }
 
     ///專長輸入產生
@@ -139,7 +138,7 @@
 
       if (validateEmail()) {
         // 如果所有驗證都通過，顯示成功訊息
-        alert('已增加會員');
+        // alert('已增加會員');
         // 確保表單提交
         document.forms["registration"].submit();
       }
@@ -418,7 +417,7 @@
 
         專長
         <sup> 必填 </sup>
-        <input id="skillInput" name="name" size="10">
+        <input id="skillInput" name="skillInput" size="10">
         <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
         <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
         <br>
@@ -431,10 +430,17 @@
         <br>備註<br>
         <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
 
+        <% if (msg) { %>
+        <div class="alert alert-danger" role="alert">
+          <%= msg %>
+        </div>
+        <% } %>
         <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
         <input type="hidden" id="record_date" name="record_date" value="">
       </form>
     </div>
+
+    <script type="application/json" id="data-json"><%- data %></script>
 </body>
 
 </html>
