@@ -94,17 +94,25 @@ router.post('/delete_selected_members', async (req, res) => {
 });
 
 
-
-
-
 // 創建會員
 router.post('/create_member', async (req, res) => {
     const memberData = req.body;
     try {
         const data = await fs.readFile(DATA_PATH, 'utf8');
         let jsonData = JSON.parse(data);
+
+        console.log(memberData, '!!!!!!!!!!!!!!!')
         
         jsonData.members = jsonData.members || [];
+
+        // 掃描是否有重複的帳號
+        for (i=1; i<=jsonData.members.length; i++ ) {
+            if (jsonData.members[i]['email'] == memberData['email']){
+                
+            }
+        }
+
+
         jsonData.members.push(memberData);
         
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));

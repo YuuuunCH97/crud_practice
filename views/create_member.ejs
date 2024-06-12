@@ -16,17 +16,16 @@
 
     $(document).ready(function() {
       // 透過API取得國家資料
-      // TODO 需要繼續寫城市串接
       $.ajax({
         type: "POST",
         url: "/get_country_city",
         data: {},
         success: function (msg) {
-          let country_http = ""
+          let country_html = ""
           for (var key in msg['receivedData']) {
-            country_http += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+            country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
           }
-          $("#select_country").html(country_http)
+          $("#select_country").html(country_html)
           updateCities()
         }
       });
@@ -35,42 +34,18 @@
     // 國家相對應城市
     function updateCities() {
       var country = document.getElementById("select_country").value;
-      var citySelect = document.getElementById("select_city");
-      citySelect.innerHTML = ""; // 清空城市選項
-
-      // 根據選的國家跳城市
-      switch (country) {
-        case "台灣":
-          citySelect.innerHTML += "<option value='台北'>台北</option>";
-          citySelect.innerHTML += "<option value='台中'>台中</option>";
-          citySelect.innerHTML += "<option value='高雄'>高雄</option>";
-          citySelect.innerHTML += "<option value='台南'>台南</option>";
-          citySelect.innerHTML += "<option value='宜蘭'>宜蘭</option>";
-          citySelect.innerHTML += "<option value='花蓮'>花蓮</option>";
-          citySelect.innerHTML += "<option value='屏東'>屏東</option>";
-          break;
-        case "美國":
-          citySelect.innerHTML += "<option value='紐約'>紐約</option>";
-          citySelect.innerHTML += "<option value='洛杉磯'>洛杉磯</option>";
-          citySelect.innerHTML += "<option value='芝加哥'>芝加哥</option>";
-          citySelect.innerHTML += "<option value='加州'>加州</option>";
-          break;
-        case "英國":
-          citySelect.innerHTML += "<option value='倫敦'>倫敦</option>";
-          citySelect.innerHTML += "<option value='愛丁堡'>愛丁堡</option>";
-          citySelect.innerHTML += "<option value='牛津'>牛津</option>";
-          citySelect.innerHTML += "<option value='劍橋'>劍橋</option>";
-          break;
-        case "中國":
-          citySelect.innerHTML += "<option value='北京'>北京</option>";
-          citySelect.innerHTML += "<option value='上海'>上海</option>";
-          citySelect.innerHTML += "<option value='廣州'>廣州</option>";
-          citySelect.innerHTML += "<option value='哈爾濱'>哈爾濱</option>";
-          break;
-        default:
-          // 無國家 空
-          break;
-      }
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {"country": country},
+        success: function (msg) {
+          let city_html = ""
+          for (var key in msg['receivedData']) {
+            city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_city").html(city_html)
+        }
+      });
     }
 
     ///專長輸入產生
