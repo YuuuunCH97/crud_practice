@@ -35,7 +35,8 @@
       } else {
           jsonData = {}
       }
-      if (jsonData){
+
+      if (Object.keys(jsonData).length > 0){
         console.log(jsonData["email"])
         $("#email").val(jsonData["email"])
         $("#name").val(jsonData["name"])
@@ -43,7 +44,7 @@
         updateCities();
         setTimeout(() => {
           $("#select_city").val(jsonData["select_city"])
-        }, 300);
+        }, 500);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
         //TODO 專長 主題
@@ -51,22 +52,23 @@
       }
     })
 
-
-    // 透過API取得國家資料
-    $.ajax({
-      type: "POST",
-      url: "/get_country_city",
-      data: {},
-      success: function (msg) {
-        let country_html = ""
-        for (var key in msg['receivedData']) {
-          country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+    updateCountry()
+    function updateCountry() {
+      // 透過API取得國家資料
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {},
+        success: function (msg) {
+          let country_html = ""
+          for (var key in msg['receivedData']) {
+            country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_country").html(country_html)
+          updateCities()
         }
-        $("#select_country").html(country_html)
-        updateCities()
-      }
-    });
-    
+      });
+    }
 
     // 國家相對應城市
     function updateCities() {
@@ -398,21 +400,15 @@
         國家
         <sup> 必填 </sup>
         <select id="select_country" name="select_country" size="number" onchange="updateCities()">
-          <option value="" disabled selected>Select</option>
-          <option value="台灣">台灣</option>
-          <option value="美國">美國</option>
-          <option value="英國">英國</option>
-          <option value="中國">中國</option>
         </select><br>
 
         城市 <sup> 必填 </sup>
         <select name="select_city" id="select_city" size="number">
-          <option value="">請選擇國家以顯示城市</option>
         </select><br>
 
 
         性別 &emsp;
-        <input type="radio" name="sex" value="male" checked> &emsp; 男性 
+        <input type="radio" name="sex" value="male" checked> &emsp; 男性
         <input type="radio" name="sex" value="female"> &emsp; 女性<br>
 
         專長
