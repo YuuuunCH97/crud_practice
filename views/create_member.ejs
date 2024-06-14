@@ -125,8 +125,10 @@
       });
     }
 
+    // 驗證表單
     function validateForm(event) {
       event.preventDefault(); // 防止表單提交
+      $('#checkboxContainer input[type="checkbox"]').prop('checked', true);
       document.forms["registration"].submit();
     }
 
