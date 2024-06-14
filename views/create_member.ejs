@@ -125,25 +125,9 @@
       });
     }
 
-    /////// 檢查email是否有@
-    function validateEmail() {
-      var email = document.getElementById('email').value;
-      if (!email.includes('@')) {
-        alert('請輸入有效的電子郵件地址。');
-        return false;
-      }
-      return true;
-    }
-
     function validateForm(event) {
       event.preventDefault(); // 防止表單提交
-
-      if (validateEmail()) {
-        // 如果所有驗證都通過，顯示成功訊息
-        // alert('已增加會員');
-        // 確保表單提交
-        document.forms["registration"].submit();
-      }
+      document.forms["registration"].submit();
     }
 
     /////修改會員資料
@@ -393,7 +377,7 @@
 
       <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
         <label for="email">電子郵件:</label><sup> 必填 </sup>
-        <input type="email" id="email" name="email" onblur="validateEmail()" required><br>
+        <input type="email" id="email" name="email" required><br>
         <label for="name">姓名:</label><sup> 必填 </sup>
         <input type="text" id="name" name="name" required><br>
 
