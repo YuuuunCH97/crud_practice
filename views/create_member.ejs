@@ -37,18 +37,36 @@
       }
 
       if (Object.keys(jsonData).length > 0){
-        console.log(jsonData["email"])
         $("#email").val(jsonData["email"])
         $("#name").val(jsonData["name"])
         $("#select_country").val(jsonData["select_country"])
         updateCities();
         setTimeout(() => {
           $("#select_city").val(jsonData["select_city"])
-        }, 500);
+        }, 300);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
-        //TODO 專長 主題
 
+        let sell_data = ''
+        if (typeof(jsonData.sell) === "string"){
+          sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell}">${jsonData.sell}</label><br>`
+        } else if (typeof(jsonData.sell) === "object"){
+          for (i=0; i<jsonData.sell.length; i++ ) {
+            sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell[i]}">${jsonData.sell[i]}</label><br>`
+          }
+        }
+        $("#checkboxContainer").html(sell_data)
+        setTimeout(() => {
+          if (typeof(jsonData.interests) === "string"){
+          $(`input[name="interests"][value="${jsonData.interests}"]`).prop('checked', true);
+        } else if (typeof(jsonData.interests) === "object"){
+          for (i=0; i<jsonData.interests.length; i++ ) {
+            $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
+            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
+            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
+        }}
+        }, 300);
+        $('textarea[name="note"]').val(jsonData.note)
       }
     })
 
@@ -394,9 +412,9 @@
 
 
         性別 &emsp;
-        <input type="radio" name="sex" value="male" checked> &emsp; 男性
-        <input type="radio" name="sex" value="female"> &emsp; 女性<br>
-
+        <label><input type="radio" name="sex" value="male" checked> &emsp; 男性</label>&emsp;
+        <label><input type="radio" name="sex" value="female"> &emsp; 女性</label>
+        <br>
         專長
         <sup> 必填 </sup>
         <input id="skillInput" name="skillInput" size="10">
