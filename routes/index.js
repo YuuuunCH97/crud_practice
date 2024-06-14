@@ -45,8 +45,10 @@ const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json
 // });
 
 // 渲染查詢會員頁面，初始頁面不顯示會員資料
-router.get('/search_member', (req, res) => {
-    return res.render('search_member', { data: [], errorMessage: null });
+router.get('/search_member', async (req, res) => {
+    const data = await fs.readFile(DATA_PATH, 'utf8');
+    let jsonData = JSON.parse(data).members || [];
+    return res.render('search_member', { data: jsonData, errorMessage: null });
 });
 
 
@@ -183,6 +185,7 @@ router.post('/create_member', async (req, res) => {
 // 修改會員
 router.post('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
+
     const updatedMemberData = req.body;
     try {
         const data = await fs.readFile(DATA_PATH, 'utf8');
@@ -193,40 +196,36 @@ router.post('/edit_member/:email', async (req, res) => {
             console.log('Member not found:', email);
             return res.status(404).send('未找到會員資料，請創建會員');
         }
-
+        updatedMemberData['record_date'] = jsonData.members[memberIndex]['record_date']
         jsonData.members[memberIndex] = updatedMemberData;
-
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
         console.log('Member updated:', email);
 
-        res.redirect(`/edit_member/${encodeURIComponent(updatedMemberData.email)}`);
+        // res.redirect(`/edit_member/${encodeURIComponent(updatedMemberData.email)}`);
+        res.redirect('/search_member');
     } catch (err) {
         console.error('Error:', err.stack);
         return res.status(500).send('Internal Server Error');
+        
     }
 });
 
 router.get('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
-    console.log('收到编辑会员请求，邮箱:', email);
-
     try {
-        console.log('Reading data file:', DATA_PATH);
         //讀取數據文件
         const data = await fs.readFile(DATA_PATH, 'utf8');
-        console.log('Data file read successfully');
-        const jsonData = JSON.parse(data);//解析json
-        console.log('JSON data parsed successfully');
+        const jsonData = JSON.parse(data); //解析json
         const member = jsonData.members.find(member => member.email === email);
         if (!member) {
             console.log('Member not found:', email);
-            return res.status(404).send('未找到会员数据，请创建会员');
+            return res.status(404).send('未找到會員數據，請建立會員');
         }
-        return res.render('edit_member', { member: member });
+        return res.render('edit_member', {data: JSON.stringify(member), "msg": ""});
     } catch (err) {
-        console.error('错误:', err.stack);
+        console.error('錯誤:', err.stack);
         if (!res.headersSent) {
-            return res.status(500).send(`内部服务器错误: ${err.message}`);
+            return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
         }
     }
 });

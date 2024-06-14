@@ -1,79 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Member</title>
-  <script>
-    // Update cities based on the selected country
-    function updateCities() {
-      const country = document.getElementById("select_country").value;
-      const citySelect = document.getElementById("select_city");
-      let cities = [];
+  <title>會員修改</title>
+  <%- include('./header') %>
 
-      switch (country) {
-        case "台灣":
-          cities = ["台北", "高雄", "台中","台南","宜蘭","花蓮","屏東"];
-          break;
-        case "美國":
-          cities = ["紐約", "洛杉磯", "芝加哥","加州"];
-          break;
-        case "英國":
-          cities = ["倫敦", "愛丁堡", "倫敦","劍橋"];
-          break;
-        case "中國":
-          cities = ["北京", "上海", "廣州","哈爾濱"];
-          break;
-        default:
-          cities = [];
+  <script>
+    let data = {}
+
+    function get_data() {
+      data["user"] = $("#user").val()
+    }
+
+        // 设置记录日期为当前日期
+        function setRecordDate() {
+        const today = new Date().toISOString().split('T')[0]; // 格式化当前日期为 YYYY-MM-DD
+        document.getElementById('record_date').value = today;
+    }
+
+    // 在页面加载时设置记录日期
+    window.onload = function () {
+        setRecordDate();
+        loadInterests(); // 保留已有的 loadInterests 调用
+    }
+
+    
+    $(document).ready(function() {
+      let dataElement = document.getElementById("data-json");
+      let jsonData;
+      if (dataElement && dataElement.textContent){
+          jsonData = JSON.parse(dataElement.textContent);
+      } else {
+          jsonData = {}
       }
 
-      // Clear current options
-      citySelect.innerHTML = '';
+      if (Object.keys(jsonData).length > 0){
+        $("#email").val(jsonData["email"])
+        $("#name").val(jsonData["name"])
+        $("#select_country").val(jsonData["select_country"])
+        updateCities();
+        setTimeout(() => {
+          $("#select_city").val(jsonData["select_city"])
+        }, 300);
 
-      // Populate new options
-      cities.forEach(city => {
-        const option = document.createElement("option");
-        option.value = city;
-        option.text = city;
-        citySelect.add(option);
+        $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
+
+        let sell_data = ''
+        if (typeof(jsonData.sell) === "string"){
+          sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell}">${jsonData.sell}</label><br>`
+        } else if (typeof(jsonData.sell) === "object"){
+          for (i=0; i<jsonData.sell.length; i++ ) {
+            sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell[i]}">${jsonData.sell[i]}</label><br>`
+          }
+        }
+        $("#checkboxContainer").html(sell_data)
+        setTimeout(() => {
+          if (typeof(jsonData.interests) === "string"){
+          $(`input[name="interests"][value="${jsonData.interests}"]`).prop('checked', true);
+        } else if (typeof(jsonData.interests) === "object"){
+          for (i=0; i<jsonData.interests.length; i++ ) {
+            $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
+            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
+            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
+        }}
+        }, 300);
+        $('textarea[name="note"]').val(jsonData.note)
+      }
+    })
+
+    updateCountry()
+    function updateCountry() {
+      // 透過API取得國家資料
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {},
+        success: function (msg) {
+          let country_html = ""
+          for (var key in msg['receivedData']) {
+            country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_country").html(country_html)
+          updateCities()
+        }
       });
-
-      // Select the city that matches the member's data
-      citySelect.value = "<%= member.select_city %>";
     }
 
-    // Ensure cities are updated on page load
-    window.onload = function() {
-      updateCities();
+    // 國家相對應城市
+    function updateCities() {
+      var country = document.getElementById("select_country").value;
+      $.ajax({
+        type: "POST",
+        url: "/get_country_city",
+        data: {"country": country},
+        success: function (msg) {
+          let city_html = ""
+          for (var key in msg['receivedData']) {
+            city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+          }
+          $("#select_city").html(city_html)
+        }
+      });
     }
 
-    // 在表單提交後顯示訊息
-    document.querySelector('form').addEventListener('submit', function(event) {
-      event.preventDefault(); // 防止表單默認提交行為
-      // 提交表單
-      // 可以添加其他程式碼來處理表單提交，例如發送 POST 請求到後端儲存資料
-      // 在此處添加顯示訊息的代碼
-      alert('會員資料已成功保存修改！');
-    });
+    ///專長輸入產生
+    function addSkillToCheckbox() {
+      var skillInput = document.getElementById("skillInput");
+      var skill = skillInput.value.trim();
+      if (skill) {
+        var checkboxContainer = document.getElementById("checkboxContainer");
+
+        var newCheckbox = document.createElement("input");
+        newCheckbox.type = "checkbox";
+        newCheckbox.name = "sell";
+        newCheckbox.value = skill;
+
+        var newLabel = document.createElement("label");
+        newLabel.appendChild(newCheckbox);
+        newLabel.appendChild(document.createTextNode(skill));
+
+        checkboxContainer.appendChild(newLabel);
+        checkboxContainer.appendChild(document.createElement("br"));
+
+        skillInput.value = ""; // 清空輸入框
+      } else {
+        alert("請輸入專長");
+      }
+    }
+
+    /////選擇刪除專長
+    function removeSelectedSkills() {
+      var checkboxContainer = document.getElementById("checkboxContainer");
+      var checkboxes = checkboxContainer.querySelectorAll("input[type='checkbox']:checked");
+
+      checkboxes.forEach(function (checkbox) {
+        var label = checkbox.parentNode;
+        var br = label.nextSibling;
+        checkboxContainer.removeChild(label); // 移除标签（包含复选框）
+        checkboxContainer.removeChild(br); // 移除换行符
+      });
+    }
+
+    // 驗證表單
+    function validateForm(event) {
+      event.preventDefault(); // 防止表單提交
+      $('#checkboxContainer input[type="checkbox"]').prop('checked', true);
+      document.forms["registration"].submit();
+    }
+
+    ///////json讀入興趣
+    // 動態加載興趣列表
+    function loadInterests() {
+      fetch('/data/interests.json')
+        .then(response => response.json())
+        .then(data => {
+          var interestsContainer = document.getElementById("interestsContainer");
+          data.interests.forEach(interest => {
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "interests";
+            checkbox.value = interest;
+
+            var label = document.createElement("label");
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(interest));
+
+            interestsContainer.appendChild(label);
+            interestsContainer.appendChild(document.createElement("br"));
+          });
+        })
+        .catch(error => console.error('Error loading interests:', error));
+    }
+
+    window.onload = function () {
+      loadInterests();
+    }
 
 
   </script>
+
   <style>
+    /* 设置表单元素之间的间距 */
+    form label {
+      margin-bottom: 5px; /* 设置标签下方的间距 */
+    }
+
+    form input,
+    form select,
+    form textarea {
+      margin-bottom: 10px; /* 设置表单元素之间的垂直间距 */
+    }
+
+    form button {
+      margin-bottom: 20px; /* 设置按钮下方的间距 */
+    }
+
     /* 增加整体容器的左侧边距 */
     .container {
       margin-left: 20px; /* 可以根据需要调整具体的数值 */
     }
 
-
-    /*必填*/
-    sup {
-      font-weight: bold;
-      font-size: 11px;
-      color: #b62525;
+    
+    h1 {
+      background-color: #ece8e8;
+      color: rgb(153, 151, 151);
+      font-size: 13px;
+      background-size: 100%;
     }
 
-    button {
+    div li {
+      display: inline;
+      margin-right: 10px;
+    }
+
+    p {
+      width: 120px;
+      text-align: center;
+      background-color: #dddedf;
+      border-radius: 100px;
+    }
+
+    div a {
+      color: black;
+      text-decoration: none;
+    }
+    
+
+    /*會員管理系統 新增 查詢*/
+    .tit {
+      background-color: #dddedf;
+      height: 30px;
+      width: 100%;
+      font-size: 20px;
+      ;
+    }
+    /*修改會員*/    
+    button[name="modify"] {
+      width: 80px;
+      text-align: center;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      outline-color: #90b0cc;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
+
+    /*滑鼠懸停顯示*/
+    button[name="modify"]:hover {
+      background-color: #5b85c9;
+    }
+
+    /*按鈕被點即時的顏色*/
+    button[name="modify"]:active {
+      background-color: #737e74;
+    }
+
+    form input[name="show"] {
+      width: 20%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: white;
+      border-radius: 100px;
+      border-color: #90b0cc;
+      outline-color: #90b0cc;
+    }
+
+    form input[name="sex"] {
+      margin-right: 5px;
+      position: absolute;
+      content: "";
+      border-radius: 50%;
+      background-color: #90b0cc;
+      border: 1px solid #90b0cc;
+    }
+
+    form button[name="sel"] {
       width: 10%;
       padding: 8px;
       margin-top: 10px;
@@ -83,61 +286,124 @@
       color: #ece8e8;
       border-radius: 100px;
     }
-    button:hover {
-      background-color: #4961d4;
+
+    /*滑鼠懸停顯示*/
+    form button[name="sel"]:hover {
+      background-color: #5b85c9;
     }
+
     /*按鈕被點即時的顏色*/
-    button:active {
+    form button[name="sel"]:active {
       background-color: #737e74;
     }
 
+    form button[name="send"] {
+      width: 10%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: #90b0cc;
+      border-color: #90b0cc;
+      border-style: solid;
+      color: #ece8e8;
+      border-radius: 100px;
+    }
 
+    /*必填*/
+    form sup {
+      font-weight: bold;
+      font-size: 11px;
+      color: #b62525;
+    }
 
+    #successMessage {
+      display: none;
+      color: green;
+      margin-top: 10px;
+    }
 
+    /* 增加横排显示兴趣列表的样式 */
+    #interestsContainer {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
 
+    #interestsContainer label {
+      margin-right: 10px;
+      margin-bottom: 5px;
+    }
+    
+    /* Clear float every two items */
+    #interestsContainer label:nth-child(odd) {
+      clear: left;
+    }
 
 
   </style>
+
 </head>
+
 <body>
-  <div class="container">
-    <h1>修改會員資料</h1>
+    <div class="tit">
+      <ul>
+        <li><b> 會員管理系統</b>
+        <li><a aria-current="page" href="/create_member"> 新增</a>
+        <li><a aria-current="page" href="/search_member">查詢</a>
+        <li><a aria-current="page" href="/shop_sys">購物車系統</a>
+        <li><a aria-current="page" href="/shop_search">購物車查詢</a>
+        </ul>
+    </div><br>
 
-    <form action="/edit_member/<%= member.email %>" method="POST">
-      <label for="email">電子郵件:</label><sup> 必填 </sup>
-      <input type="email" id="email" name="email" value="<%= member.email %>" readonly><br><br>
 
-      <label for="name">姓名:</label><sup> 必填 </sup>
-      <input type="text" id="name" name="name" value="<%= member.name %>" required><br><br>
+    <div class="container">
+      <p><b>會員修改</b></p>
 
-      <label for="select_country">國家:</label><sup> 必填 </sup>
-      <select id="select_country" name="select_country" onchange="updateCities()" required>
-        <option value="" disabled>Select</option>
-        <option value="台灣" <%= member.select_country === "台灣" ? "selected" : "" %>>台灣</option>
-        <option value="美國" <%= member.select_country === "美國" ? "selected" : "" %>>美國</option>
-        <option value="英國" <%= member.select_country === "英國" ? "selected" : "" %>>英國</option>
-        <option value="中國" <%= member.select_country === "中國" ? "selected" : "" %>>中國</option>
-      </select><br><br>
+      <form name="registration" action="" method="post" onsubmit="validateForm(event)">
+        <label for="email">電子郵件:</label><sup> 必填 </sup>
+        <input type="email" id="email" name="email" required><br>
+        <label for="name">姓名:</label><sup> 必填 </sup>
+        <input type="text" id="name" name="name" required><br>
 
-      <label for="select_city">城市:</label><sup> 必填 </sup>
-      <select id="select_city" name="select_city" required>
-        <option value="">請選擇國家以顯示城市</option>
-      </select><br><br>
+        國家
+        <sup> 必填 </sup>
+        <select id="select_country" name="select_country" size="number" onchange="updateCities()">
+        </select><br>
 
-      <label for="sex">性別:</label><br>
-      <input type="radio" id="male" name="sex" value="male" <%= member.sex === "male" ? "checked" : "" %>> 男性
-      <input type="radio" id="female" name="sex" value="female" <%= member.sex === "female" ? "checked" : "" %>> 女性<br><br>
+        城市 <sup> 必填 </sup>
+        <select name="select_city" id="select_city" size="number">
+        </select><br>
 
-      <label for="interests">興趣:</label><br>
-      <input type="text" id="interests" name="interests" value="<%= member.interests %>"><br><br>
 
-      <label for="note">備註:</label><br>
-      <textarea id="note" name="note"><%= member.note %></textarea><br><br>
+        性別 &emsp;
+        <label><input type="radio" name="sex" value="male" checked> &emsp; 男性</label>&emsp;
+        <label><input type="radio" name="sex" value="female"> &emsp; 女性</label>
+        <br>
+        專長
+        <sup> 必填 </sup>
+        <input id="skillInput" name="skillInput" size="10">
+        <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
+        <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
+        <br>
+        <div id="checkboxContainer"></div>
 
-      <button type="submit">保存修改</button>
-    </form>
+        <br> 請選擇感興趣的主題 <br>
+        <div id="interestsContainer"></div>
 
-    <button onclick="window.location.href='/create_member'">返回</button>
-  </div>
+
+        <br>備註<br>
+        <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
+
+        <% if (msg) { %>
+        <div class="alert alert-danger" role="alert">
+          <%= msg %>
+        </div>
+        <% } %>
+        <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
+        <input type="hidden" id="record_date" name="record_date" value="">
+      </form>
+    </div>
+
+    <script type="application/json" id="data-json"><%- data %></script>
 </body>
+
 </html>

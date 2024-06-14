@@ -37,18 +37,36 @@
       }
 
       if (Object.keys(jsonData).length > 0){
-        console.log(jsonData["email"])
         $("#email").val(jsonData["email"])
         $("#name").val(jsonData["name"])
         $("#select_country").val(jsonData["select_country"])
         updateCities();
         setTimeout(() => {
           $("#select_city").val(jsonData["select_city"])
-        }, 500);
+        }, 300);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
-        //TODO 專長 主題
 
+        let sell_data = ''
+        if (typeof(jsonData.sell) === "string"){
+          sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell}">${jsonData.sell}</label><br>`
+        } else if (typeof(jsonData.sell) === "object"){
+          for (i=0; i<jsonData.sell.length; i++ ) {
+            sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell[i]}">${jsonData.sell[i]}</label><br>`
+          }
+        }
+        $("#checkboxContainer").html(sell_data)
+        setTimeout(() => {
+          if (typeof(jsonData.interests) === "string"){
+          $(`input[name="interests"][value="${jsonData.interests}"]`).prop('checked', true);
+        } else if (typeof(jsonData.interests) === "object"){
+          for (i=0; i<jsonData.interests.length; i++ ) {
+            $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
+            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
+            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
+        }}
+        }, 300);
+        $('textarea[name="note"]').val(jsonData.note)
       }
     })
 
@@ -125,59 +143,12 @@
       });
     }
 
-    /////// 檢查email是否有@
-    function validateEmail() {
-      var email = document.getElementById('email').value;
-      if (!email.includes('@')) {
-        alert('請輸入有效的電子郵件地址。');
-        return false;
-      }
-      return true;
-    }
-
+    // 驗證表單
     function validateForm(event) {
       event.preventDefault(); // 防止表單提交
-
-      if (validateEmail()) {
-        // 如果所有驗證都通過，顯示成功訊息
-        // alert('已增加會員');
-        // 確保表單提交
-        document.forms["registration"].submit();
-      }
+      $('#checkboxContainer input[type="checkbox"]').prop('checked', true);
+      document.forms["registration"].submit();
     }
-
-    /////修改會員資料
-    function redirectToEditMember() {
-      const email = document.getElementById('email').value;
-      if (email) {
-        // 發送一個GET請求到後端，檢查email是否存在於data.json中
-        fetch(`/edit_member/${email}`)
-          .then(response => {
-            if (response.ok) {
-              // 如果email存在，將用戶重定向到編輯會員資料的頁面
-              window.location.href = `/edit_member/${email}`;
-            } else {
-              // 如果回應中包含 "Member not found with email" 的錯誤訊息，彈出提醒訊息
-              response.text().then(data => {
-                if (data.includes("Member not found")) {
-                  alert("未找到會員資料，請創建會員");
-                } else {
-                  // 其他錯誤，彈出通用錯誤訊息
-                  alert("發生錯誤，請稍後再試");
-                }
-              });
-            }
-          })
-          .catch(error => {
-            console.error('Error checking member:', error);
-            alert("發生錯誤，請稍後再試");
-          });
-      } else {
-        // 如果用戶未填寫電子郵件地址，彈出一條消息提示用戶
-        alert("請先填寫電子郵件地址");
-      }
-    }
-
 
     ///////json讀入興趣
     // 動態加載興趣列表
@@ -388,12 +359,10 @@
 
     <div class="container">
       <p><b>會員新增</b></p>
-      <button type="button" name="modify" onclick="redirectToEditMember()" >修改會員</button><br><br>
-
 
       <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
         <label for="email">電子郵件:</label><sup> 必填 </sup>
-        <input type="email" id="email" name="email" onblur="validateEmail()" required><br>
+        <input type="email" id="email" name="email" required><br>
         <label for="name">姓名:</label><sup> 必填 </sup>
         <input type="text" id="name" name="name" required><br>
 
@@ -408,9 +377,9 @@
 
 
         性別 &emsp;
-        <input type="radio" name="sex" value="male" checked> &emsp; 男性
-        <input type="radio" name="sex" value="female"> &emsp; 女性<br>
-
+        <label><input type="radio" name="sex" value="male" checked> &emsp; 男性</label>&emsp;
+        <label><input type="radio" name="sex" value="female"> &emsp; 女性</label>
+        <br>
         專長
         <sup> 必填 </sup>
         <input id="skillInput" name="skillInput" size="10">
