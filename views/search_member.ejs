@@ -382,7 +382,13 @@
               <td><%= member.select_country %></td>
               <td><%= member.select_city %></td>
               <td><%= member.name %></td>
-              <td><%= member.sex %></td>
+
+              <% if (member.sex == "male") { %>
+                <td>男</td>
+              <% } else {%>
+                <td>女</td>
+              <% }%>
+
               <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
             </tr>
           <% }); %>
@@ -411,7 +417,6 @@
       </table>
     <% } %>
   </div>
-
   <div class="delete-button-container">
     <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
   </div>
