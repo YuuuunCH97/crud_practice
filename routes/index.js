@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const bodyParser = require('body-parser');
+const { start } = require('repl');
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -296,10 +297,11 @@ router.post('/shop_submit', async (req, res) => {
 });
 
 
-
 // 渲染 shop_search 页面
-router.get('/shop_search', (req, res) => {
-    return res.render('shop_search', { data: [] });
+router.get('/shop_search', async(req, res) => {
+    const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
+    const jsonData = JSON.parse(data);
+    return res.render('shop_search', { data: jsonData , startDate: "", endDate: "", email: ""});
 });
 
 // 处理表单提交的 POST 请求
@@ -309,11 +311,11 @@ router.post('/shop_search', async (req, res) => {
     const email = req.body.email;
 
     if (!startDate || !endDate || !email) {
-        return res.render('shop_search', { data: [], errorMessage: '請填寫日期或帳號' });
+        return res.status(500).send('Internal Server Error');
     }
 
     try {
-        const data = await fs.readFile(path.join(__dirname, '../public/data/shop_searchdata.json'), 'utf8');
+        const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
         const jsonData = JSON.parse(data);
 
         const filteredData = jsonData.filter(item => {
@@ -327,7 +329,7 @@ router.post('/shop_search', async (req, res) => {
             return true;
         });
 
-        return res.render('shop_search', { data: filteredData, errorMessage: null });
+        return res.render('shop_search', { data: filteredData, startDate: req.body['start-date'], endDate: req.body['end-date'], email: email});
     } catch (err) {
         console.error('Error:', err);
         return res.status(500).send('Internal Server Error');

@@ -129,13 +129,13 @@
 
         <form method="POST" action="/shop_search" onsubmit="return validateForm()">
             <label for="start-date">管理日期 開始日</label>
-            <input type="date" id="start-date" name="start-date">
+            <input type="date" id="start-date" name="start-date" value="<%= startDate %>">
             
             <label for="end-date">~結束日</label>
-            <input type="date" id="end-date" name="end-date">
+            <input type="date" id="end-date" name="end-date" value="<%= endDate %>">
 
             <label for="email">帳號</label>
-            <input type="email" id="email" name="email" placeholder="請輸入email">
+            <input type="email" id="email" name="email" placeholder="請輸入email" value="<%= email %>">
 
             <button type="submit">查詢</button>
         </form>

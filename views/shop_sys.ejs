@@ -92,8 +92,8 @@
                             var totalCell = row.insertCell(4); // 总价单元格
 
                             nameCell.textContent = product.name;
-                            photoCell.innerHTML = '<img src="' + product.photo + '" alt="' + product.name + '">';
-                            priceCell.textContent = product.price; // 保留两位小数
+                            photoCell.innerHTML = `<img src="${product.photo}" alt="${product.name}" style="height: 100px; width: 100px;">`
+                            priceCell.textContent = product.price; // 保留兩位小數
                             quantityCell.innerHTML = '<input type="number" value="" step="1" min="1" onchange="calculateTotal(this)">';
                             totalCell.className = 'item-total'; // 设置 class 以便后续更新总金额
                             totalCell.textContent = '0'; // 初始化总价为 0.00
