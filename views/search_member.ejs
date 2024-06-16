@@ -382,12 +382,13 @@
               <td><%= member.select_country %></td>
               <td><%= member.select_city %></td>
               <td><%= member.name %></td>
-
-              <% if (member.sex == "male") { %>
-                <td>男</td>
-              <% } else {%>
-                <td>女</td>
-              <% }%>
+              <td>
+                <% if (member.sex == "male") { %>
+                  男
+                <% } else {%>
+                  女
+                <% }%>
+              </td>
 
               <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
             </tr>
