@@ -62,9 +62,8 @@ router.post('/search_member', async (req, res) => {
     try {
         const data = await fs.readFile(DATA_PATH, 'utf8');
         let jsonData = JSON.parse(data).members || [];
-
         let filteredData = [];
-        // 如果所有字段都为空，则不发送任何会员数据到前端
+        //如果所有字段都为空，则不发送任何会员数据到前端
         if (!isEmpty) {
             filteredData = jsonData.filter(member => {
                 const recordDate = new Date(member.recordDate);
@@ -76,6 +75,8 @@ router.post('/search_member', async (req, res) => {
             });
         }
 
+        //檢查篩選後的數據是否為空，並設置相應的錯誤消息
+        const errorMessage = filteredData.length === 0 ? '找不到符合條件的會員' : null;
 
         return res.render('search_member', { data: filteredData, errorMessage: filteredData.length === 0 ? null : null });
     } catch (err) {

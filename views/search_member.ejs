@@ -7,7 +7,6 @@
   <%- include('./header') -%>
 
   <script>
-
     updateCountry()
     function updateCountry() {
       // 透過API取得國家資料
@@ -99,6 +98,8 @@
     }
     return true; // 允許表單提交
   }
+
+
 
   </script>
   <style>
@@ -377,8 +378,9 @@
                   男
                 <% } else {%>
                   女
-                <% }%>
+                <% }%>      
               </td>
+              <!--<td><%= member.sex === "male" ? "男" : "女" %></td>-->
 
               <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
             </tr>
