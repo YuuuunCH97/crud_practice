@@ -22,8 +22,8 @@
             var priceCell = tr.cells[2];
             var totalCell = tr.cells[4];
             // 解析價格和數量，確保為有效數字
-            var price = parseFloat(priceCell.textContent) || 0; // 如果解析失敗，默認為 0
-            var quantity = parseInt(selectElement.value) || 0; // 如果解析失敗，默認為 0
+            var price = parseFloat(priceCell.textContent) || 0; // 如果解析失敗，預設為 0
+            var quantity = parseInt(selectElement.value) || 0; // 如果解析失敗，預設為 0
             // 計算總價
             var total = price * quantity;
             // 更新總價單元格
@@ -48,8 +48,7 @@
         window.onload = function() {
 
             var dataList = document.getElementById('emailOptions');
-
-            // 使用fetch从data.json加载数据
+            // 使用fetch從data.json加載數據
             fetch('/data/data.json')
                 .then(response => response.json())
                 .then(data => {
@@ -61,17 +60,17 @@
                 })
                 .catch(error => console.error('Error loading data:', error));
 
-            // 获取table元素
+            // 獲取table元素
             var table = document.getElementById('productTable');
 
-            // 使用fetch从product.json加载数据
+            // 使用fetch從product.json加載數據
             fetch('/data/product.json')
                 .then(response => response.json())
                 .then(data => {
-                    // 清空表格内容
+                    // 清空表格內容
                     table.innerHTML = '';
 
-                    // 创建一个 Set 用于存储已经添加的商品名称，确保不重复添加
+                    // 創建一個 Set 用於存儲已經添加的商品名稱，確保不重複添加
                     var addedProducts = new Set();
                     // 添加商品列表
                     var productListRow = table.insertRow();
@@ -79,35 +78,34 @@
                     var headerRow = table.insertRow();
                     headerRow.innerHTML = '<th>商品名稱</th><th>照片</th><th>價格</th><th>購買數量</th><th>總價</th>';
 
-
-                    // 迭代每个产品并将其添加到表格中
+                    // 迭代每個產品並將其添加到表格中
                     data.products.forEach(product => {
-                        // 检查商品是否已经添加过
+                        // 檢查商品是否已經添加過
                         if (!addedProducts.has(product.name)) {
                             var row = table.insertRow(); // 插入新行到表格末尾
-                            var nameCell = row.insertCell(0); // 商品名单元格
-                            var photoCell = row.insertCell(1); // 照片单元格
-                            var priceCell = row.insertCell(2); // 价格单元格
-                            var quantityCell = row.insertCell(3); // 购买数量单元格
-                            var totalCell = row.insertCell(4); // 总价单元格
+                            var nameCell = row.insertCell(0); // 商品名稱單元格
+                            var photoCell = row.insertCell(1); // 照片單元格
+                            var priceCell = row.insertCell(2); // 價格單元格
+                            var quantityCell = row.insertCell(3); // 購買數量單元格
+                            var totalCell = row.insertCell(4); // 總價單元格
 
                             nameCell.textContent = product.name;
                             photoCell.innerHTML = `<img src="${product.photo}" alt="${product.name}" style="height: 100px; width: 100px;">`
                             priceCell.textContent = product.price; // 保留兩位小數
                             quantityCell.innerHTML = '<input type="number" value="" step="1" min="1" onchange="calculateTotal(this)">';
-                            totalCell.className = 'item-total'; // 设置 class 以便后续更新总金额
-                            totalCell.textContent = '0'; // 初始化总价为 0.00
+                            totalCell.className = 'item-total'; // 設置 class 以便後續更新總金額
+                            totalCell.textContent = '0'; // 初始化總價為 0
 
-                            // 将商品名称添加到 Set 中
+                            // 將商品名稱添加到 Set 中
                             addedProducts.add(product.name);
                         }
                     });
-                    // 添加总价行
+                    // 添加總價行
                     var totalRow = table.insertRow();
                     totalRow.innerHTML = '<td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>';
 
 
-                    // 更新总金额
+                    // 更新總金額
                     updateGrandTotal();
                 })
                 .catch(error => console.error('Error loading data:', error));
@@ -120,7 +118,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('shoppingCartForm').addEventListener('submit', function(event) {
-                event.preventDefault(); // 阻止默认的表单提交行为
+                event.preventDefault(); // 阻止默認的表單提交行為
 
                 var email = document.getElementById('emailInput').value;
                 if (!email) {
@@ -183,9 +181,9 @@
 
     </script>
     <style>
-        /* 增加整体容器的左侧边距 */
+        /* 增加整體容器的左側邊距 */
         .container {
-        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+        margin-left: 20px; /* 可以根據需要調整具體的數值 */
         }
         h1 {
             background-color:#ece8e8;
@@ -205,7 +203,6 @@
             text-align:center;
             background-color: #dddedf;
             border-radius: 100px;
-
         }
 
         div a {
@@ -220,8 +217,6 @@
             width:100%;
             font-size: 20px;;
         }
-
-
 
         /*左右框線*/
         .no-border-left {
@@ -257,12 +252,12 @@
 
 
         th {
-            background-color: #E6E6FA; /* 淡紫色 */
+            background-color: #E6E6FA; 
         }
 
         .product-list-header {
-            background-color: #b693b6; /* 紫色 */
-            color: rgb(29, 27, 27); /* 白色文字 */
+            background-color: #b693b6; 
+            color: rgb(29, 27, 27); 
             font-weight: bold;
             text-align: center;
             border-top: none;  /* 移除最上邊線 */
@@ -275,7 +270,7 @@
             border-right: none;
             border-top: 1px solid black;
             border-bottom: 1px solid black;
-            background-color: #90b0cc; /* 淺藍色 */
+            background-color: #90b0cc; 
         }
 
 
@@ -291,7 +286,7 @@
             border-radius: 100px;
         }    
 
-                /*滑鼠懸停顯示*/
+        /*滑鼠懸停顯示*/
         button:hover {
             background-color: #5c68d4;
         }
@@ -326,7 +321,7 @@
 
         <div class="table-section">
             <form id="shoppingCartForm" action="/shop_submit" method="post">
-                <table id="productTable" rules="groups" width="80%"  >           
+                <table id="productTable" rules="groups" width="80%">           
                     <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
                     
                     <tr>
@@ -354,7 +349,7 @@
 
                 </table>
                 
-                <button type="submit" >送出</button>
+                <button type="submit">送出</button>
             </form>
 
         </div>

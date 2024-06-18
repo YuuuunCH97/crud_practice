@@ -159,5 +159,27 @@
         "price": 2180
       }
     ]
+  },
+  {
+    "purchaseDate": "2024-06-16",
+    "serialNumber": "shop4430060198",
+    "email": "user2@gmail.com",
+    "items": [
+      {
+        "name": "keyboard",
+        "quantity": 2,
+        "price": 50
+      },
+      {
+        "name": "mouse",
+        "quantity": 1,
+        "price": 200
+      },
+      {
+        "name": "商品3",
+        "quantity": 1,
+        "price": 2180
+      }
+    ]
   }
 ]

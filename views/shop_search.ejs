@@ -7,11 +7,13 @@
     <%- include('./header') -%>
 
     <script>
+        // 表單驗證函數
         function validateForm() {
             var startDate = document.getElementById("start-date").value;
             var endDate = document.getElementById("end-date").value;
             var email = document.getElementById("email").value;
 
+            // 如果開始日期、結束日期或電子郵件為空，則提示填寫信息
             if (!startDate || !endDate || !email) {
                 alert("請填寫日期跟帳號");
                 return false;
@@ -21,67 +23,66 @@
     </script>
 
     <style>
-        /* 增加整体容器的左侧边距 */
+        /* 增加整體容器的左側邊距 */
         .container {
-        margin-left: 20px; /* 可以根据需要调整具体的数值 */
+            margin-left: 20px; /* 可以根據需要調整具體的數值 */
         }
         h1 {
-            background-color:#ece8e8;
-            color:rgb(153, 151, 151);
-            font-size:13px;
-            background-size:100%;
+            background-color: #ece8e8;
+            color: rgb(153, 151, 151);
+            font-size: 13px;
+            background-size: 100%;
         }
 
         div li {
-            display:inline;
-            margin-right:10px;
+            display: inline;
+            margin-right: 10px;
         }
 
-        /*購物車系統*/
+        /* 購物車系統 */
         div p {
             width: 120px;
-            text-align:center;
+            text-align: center;
             background-color: #dddedf;
             border-radius: 100px;
-
         }
 
         div a {
-            color:black;
+            color: black;
             text-decoration: none;
         }
 
-        /*會員管理系統 新增 查詢*/
-        .tit{
+        /* 會員管理系統 新增 查詢 */
+        .tit {
             background-color: #dddedf;
-            height:30px;
-            width:100%;
-            font-size: 20px;;
+            height: 30px;
+            width: 100%;
+            font-size: 20px;
         }
 
-        /*查詢*/
-        form button{
+        /* 查詢按鈕樣式 */
+        form button {
             width: 10%;
             padding: 8px;
             margin-top: 10px;
             background-color: #90b0cc;
-            border-color:#90b0cc;
-            border-style:solid;
-            color:#ece8e8;
+            border-color: #90b0cc;
+            border-style: solid;
+            color: #ece8e8;
             border-radius: 100px;
         }
 
+        /* 按鈕滑鼠懸停樣式 */
         form button:hover {
-        background-color: #5b85c9;
+            background-color: #5b85c9;
         }
 
-        /*按鈕被點即時的顏色*/
+        /* 按鈕按下時的顏色 */
         form button:active {
-        background-color: #737e74;
+            background-color: #737e74;
         }
 
-
-
+        /* 表格樣式 */
         table {
             width: 80%;
             margin: 20px 0;
@@ -90,22 +91,25 @@
             border-collapse: collapse;
             /*
             border-top: none;   /* 移除最上邊線 */
-            /*border-left: none; /* 移除最左邊線 */
-            /*border-right: 1px solid black; /* 只留右邊框線 */
-            /*border-bottom: 1px solid black; /* 只留下邊框線 */ 
+            /* border-left: none; /* 移除最左邊線 */
+            /* border-right: 1px solid black; /* 只留右邊框線 */
+            /* border-bottom: 1px solid black; /* 只留下邊框線 */ 
         }
 
+        /* 表頭和表格單元樣式 */
         th, td {
-            border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
+            border: 1px solid black; /* 為th和td添加1px寬的黑色實線邊框 */
             padding: 15px; /* 增加內邊距 */
             text-align: center; /* 文字置中對齊 */
         }
 
+        /* 商品列表的樣式 */
         table ul li {
             display: block; /* 每個商品顯示為獨立的一行 */
             margin-bottom: 5px; /* 為每個商品之間增加些許間距 */
         }
 
+        /* 表頭行的背景顏色 */
         table thead tr {
             background-color: #a8aca9;
         }
@@ -114,13 +118,13 @@
 </head>
 
 <body>
-    <div class = "tit">
+    <div class="tit">
         <ul>
-            <li><b>會員管理系統</b>
-            <li><a aria-current="page" href="/create_member"> 新增</a>
-            <li><a aria-current="page" href="/search_member" >查詢</a>
-            <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-            <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
+            <li><b>會員管理系統</b></li>
+            <li><a aria-current="page" href="/create_member">新增</a></li>
+            <li><a aria-current="page" href="/search_member">查詢</a></li>
+            <li><a aria-current="page" href="/shop_sys">購物車系統</a></li>
+            <li><a aria-current="page" href="/shop_search">購物車查詢</a></li>  
         </ul>
     </div><br>
 
@@ -139,7 +143,6 @@
 
             <button type="submit">查詢</button>
         </form>
-
 
         <table border="1">
             <thead>
@@ -177,9 +180,6 @@
             </tbody>
         </table>
     </div>
-    
-
-
 </body>
 </html>
 
