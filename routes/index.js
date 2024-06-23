@@ -56,6 +56,8 @@ router.get('/search_member', async (req, res) => {
 // 处理查询会员的 POST 请求
 router.post('/search_member', async (req, res) => {
     const { startDate, endDate, email, country, city } = req.body;
+    // 輸出請求的查詢條件以進行調試
+    console.log('Received search criteria:', { startDate, endDate, email, country, city });
     // 檢查是否所有字段都為空
     const isEmpty = !startDate && !endDate && !email && !country && !city;
 
@@ -63,12 +65,13 @@ router.post('/search_member', async (req, res) => {
         const data = await fs.readFile(DATA_PATH, 'utf8');
         let jsonData = JSON.parse(data).members || [];
         let filteredData = [];
-        //如果所有字段都为空，则不发送任何会员数据到前端
+        //如果所有字段都為空，則不發送任何會員數據到前端
         if (!isEmpty) {
             filteredData = jsonData.filter(member => {
                 const recordDate = new Date(member.recordDate);
+                //調試輸出每個條件的值和匹配結果
                 return (!startDate || recordDate >= new Date(startDate)) &&
-                    (!endDate || recordDate <= new Date(endDate)) &&
+                    (!endDate || recordDate <= new Date(endDate)) && 
                     (!email || member.email.includes(email)) &&
                     (!country || member.select_country === country) &&
                     (!city || member.select_city === city);
@@ -77,14 +80,13 @@ router.post('/search_member', async (req, res) => {
 
         //檢查篩選後的數據是否為空，並設置相應的錯誤消息
         const errorMessage = filteredData.length === 0 ? '找不到符合條件的會員' : null;
-
+        console.log("Filtered Data:", filteredData);
         return res.render('search_member', { data: filteredData, errorMessage: filteredData.length === 0 ? null : null });
     } catch (err) {
         console.error('Error:', err);
         return res.status(500).send('Internal Server Error');
     }
 });
-
 
 // POST 請求處理刪除選取的會員
 router.post('/delete_selected_members', async (req, res) => {

@@ -15,7 +15,7 @@
         url: "/get_country_city",
         data: {},
         success: function (msg) {
-          let country_html = ""
+          let country_html = "<option value='' disabled selected>請選擇國家</option>"
           for (var key in msg['receivedData']) {
             country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
           }
@@ -33,7 +33,7 @@
         url: "/get_country_city",
         data: {"country": country},
         success: function (msg) {
-          let city_html = ""
+          let city_html = "<option value='' disabled selected>請選擇城市</option>"
           for (var key in msg['receivedData']) {
             city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
           }
@@ -300,10 +300,10 @@
       <tr>
         <td>紀錄日期 </td>
         <td>開始日 
-          <input type="date" ame="start-date" size="10">       
+          <input type="date" name="startDate" size="10">       
         </td>
         <td> ~ 結束日
-          <input type="date" ame="end-date" size="10">
+          <input type="date" name="endDate" size="10">
         </td>
         <td> 流水號 </td>
         <td> <input name="nunber" size="10" style="width: 200px;"> </td>
@@ -312,13 +312,15 @@
       <tr>
         <td>國家</td>
         <td>
-          <select id="select_country" name="select_country"  size="number" onchange="updateCities()" style="width:100px;">
+          <select id="select_country" name="country"  size="number" onchange="updateCities()" style="width:100px;">
+
           </select>
         </td>
         <td></td>
         <td>城市</td>
         <td>
-          <select name="select_city" id="select_city" size="number" style="width:100px;">
+          <select name="city" id="select_city" size="number" style="width:100px;">
+
           </select><br>
         </td>
       </tr>
@@ -332,7 +334,7 @@
         </td>
         <td></td>
         <td>帳號</td>
-        <td><input typr=“email” name="email" size="10" style="width: 200px;" > </td>
+        <td><input type=“email” name="email" size="10" style="width: 200px;" > </td>
       </tr>
       <tr>
         <td></td>
