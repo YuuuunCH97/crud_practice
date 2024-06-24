@@ -7,11 +7,11 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-
+var mysql = require("mysql2");
 
 
 // ///////////////////////////////////// DataBase 
-var mysql = require("mysql2");
+
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -19,7 +19,6 @@ var con = mysql.createConnection({
     password: "password",
     database: "member_data",
     insecureAuth: true
-
 });
 
 con.connect(function(err) {
@@ -47,11 +46,13 @@ app.use(function(req, res, next) {
   req.con = con;
   next();
 });
+
+
 //////////////////////////////////////////////////
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+//app.use('/create_member', createMemberRouter); // 使用新的路由
 
 
 // catch 404 and forward to error handler

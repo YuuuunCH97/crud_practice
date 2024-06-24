@@ -36,12 +36,12 @@
       }
 
       if (Object.keys(jsonData).length > 0){
-        $("#email").val(jsonData["email"])
-        $("#name").val(jsonData["name"])
-        $("#select_country").val(jsonData["select_country"])
+        $("#email").val(jsonData["EMAIL"])
+        $("#name").val(jsonData["NAME"])
+        $("#select_country").val(jsonData["COUNTRY"])
         updateCities();
         setTimeout(() => {
-          $("#select_city").val(jsonData["select_city"])
+          $("#select_city").val(jsonData["CITY"])
         }, 300);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
@@ -355,7 +355,7 @@
     <div class="container">
       <p><b>會員修改</b></p>
 
-      <form name="registration" action="" method="post" onsubmit="validateForm(event)">
+      <form name="registration" action="/edit_member/<%= data.email %>" method="post" onsubmit="validateForm(event)">
         <label for="email">電子郵件:</label><sup> 必填 </sup>
         <input type="email" id="email" name="email" required><br>
         <label for="name">姓名:</label><sup> 必填 </sup>
@@ -364,15 +364,17 @@
         國家
         <sup> 必填 </sup>
         <select id="select_country" name="select_country" size="number" onchange="updateCities()">
+          <option value="<%= member.COUNTRY %>"><%= member.COUNTRY %></option>
         </select><br>
 
         城市 <sup> 必填 </sup>
         <select name="select_city" id="select_city" size="number">
+          <option value="<%= member.CITY %>"><%= member.CITY %></option>
         </select><br>
 
         性別 &emsp;
-        <label><input type="radio" name="sex" value="male" checked> &emsp; 男性</label>&emsp;
-        <label><input type="radio" name="sex" value="female"> &emsp; 女性</label>
+        <label><input type="radio" name="sex" value="male" <%= member.SEX === 'female' ? 'checked' : '' %>> checked> &emsp; 男性</label>&emsp;
+        <label><input type="radio" name="sex" value="female"<%= member.SEX === 'female' ? 'checked' : '' %>> &emsp; 女性</label>
         <br>
         專長
         <sup> 必填 </sup>
@@ -393,12 +395,13 @@
           <%= msg %>
         </div>
         <% } %>
-        <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button>
+        <!-- <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button> -->
+        <button type="submit" name="send" class="btn btn-outline-primary">送出</button>
         <input type="hidden" id="record_date" name="record_date" value="">
       </form>
     </div>
 
-    <script type="application/json" id="data-json"><%- data %></script>
+    <script type="application/json" id="data-json"><%- JSON.stringify(data) %></script>
 </body>
 
 </html>

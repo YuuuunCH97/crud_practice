@@ -370,22 +370,14 @@
         <tbody>
           <% data.forEach(member => { %>
             <tr>
-              <td><input type="checkbox" name="delete" value="<%= member.email %>"></td>
-              <td><%= member.record_date %></td>
-              <td><%= member.email %></td>
-              <td><%= member.select_country %></td>
-              <td><%= member.select_city %></td>
-              <td><%= member.name %></td>
-              <td>
-                <% if (member.sex == "male") { %>
-                  男
-                <% } else {%>
-                  女
-                <% }%>      
-              </td>
-              <!--<td><%= member.sex === "male" ? "男" : "女" %></td>-->
-
-              <td><button onclick="window.location.href='/edit_member/<%= member.email %>'">修改</button></td>
+              <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
+              <td><%= member.RECORD_DATE %></td>
+              <td><%= member.EMAIL %></td>
+              <td><%= member.COUNTRY %></td>
+              <td><%= member.CITY %></td>
+              <td><%= member.NAME %></td>
+              <td><%= member.SEX === 'male' ? '男' : '女' %></td>
+              <td><button onclick="window.location.href='/edit_member/<%= member.EMAIL %>'">修改</button></td>
             </tr>
           <% }); %>
         </tbody>
