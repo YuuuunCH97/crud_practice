@@ -24,3 +24,12 @@ nodemon start
 http://127.0.0.1:8888/create_member
 ```
 
+```bash
+#看端口 
+netstat -ano | findstr :8888
+
+#終止端口
+taskkill /PID ***** /F
+
+```
+

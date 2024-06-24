@@ -19,20 +19,20 @@ const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json
 
 // 取出資料表
 router.get('/mem2024', function(req, res, next) {
+    console.log('Handling GET request for /mem2024'); // 打印路由处理函数开始的日志
 
     var db = req.con;
 
     // 執行資料庫查詢
     db.query('SELECT * FROM member2024', function(err, rows) {
         if (err) {
-            console.log(err);
+            console.log('Database query error:', err); //數據查詢錯誤
             return next(err); // 錯誤處理
         }
-        console.log(rows); // 檢查資料
+        console.log('Query result:', rows); // 檢查資料
         //var data = rows; // 將資料存入 data 變數
-        res.render('index', {  title: 'Member List', data: rows });
+        res.render('mem2024', {  title: 'Member List', data: rows });
     });
-
 });
 
 
