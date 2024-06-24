@@ -16,6 +16,8 @@ const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.js
 const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json');
 
 
+
+
 // 渲染查詢會員頁面
 //router.get('/search_member', async (req, res) => {
 //    const newData = { user: 'xxx@gmail.com' };
@@ -53,7 +55,7 @@ router.get('/search_member', async (req, res) => {
 });
 
 
-// 处理查询会员的 POST 请求
+// 處理查尋會員的 POST 請求
 router.post('/search_member', async (req, res) => {
     const { startDate, endDate, email, country, city } = req.body;
     // 輸出請求的查詢條件以進行調試

@@ -116,16 +116,16 @@
       background-size:100%;
     }
 
-    div li {
+    /* div li {
       display:inline;
       margin-right:10px;
-    }
+    } */
 
     /*超連結黑色 無下底線*/
-    div a {
+    /* div a {
       color: black;
       text-decoration: none;
-    }
+    } */
 
     div p {
       width: 120px;
@@ -134,13 +134,13 @@
       border-radius: 100px;
     }
 
-    /*會員管理系統 新增 查詢*/
+    /* 會員管理系統 新增 查詢
     .tit{
       background-color: #dddedf;
       height:30px;
       width:100%;
       font-size: 20px;;
-    }
+    } */
 
     /* 表格全局樣式 */
     table {
@@ -281,7 +281,8 @@
 </head>
 
 <body>
-  <div class = "tit">
+  <%- include('./head') %>
+  <!-- <div class = "tit">
     <ul>
       <li><b>會員管理系統</b>
       <li><a aria-current="page" href="/create_member"> 新增</a>
@@ -289,7 +290,7 @@
       <li><a aria-current="page" href="/shop_sys">購物車系統</a>
       <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
     </ul>
-  </div><br>
+  </div><br> -->
 
   <div class="container">
     <div><p><b>會員查詢</b></p></div>

@@ -207,10 +207,7 @@
       background-size: 100%;
     }
 
-    div li {
-      display: inline;
-      margin-right: 10px;
-    }
+
 
     p {
       width: 120px;
@@ -219,18 +216,24 @@
       border-radius: 100px;
     }
 
+    /* div li {
+      display: inline;
+      margin-right: 10px;
+    }
+
     div a {
       color: black;
       text-decoration: none;
     }
 
-    /*會員管理系統 新增 查詢*/
+    /*會員管理系統 新增 查詢
     .tit {
       background-color: #dddedf;
       height: 30px;
       width: 100%;
       font-size: 20px;
-    }
+    } */
+
     /*修改會員*/    
     button[name="modify"] {
       width: 80px;
@@ -338,7 +341,8 @@
 </head>
 
 <body>
-    <div class="tit">
+  <%- include('./head') %>
+    <!-- <div class="tit">
       <ul>
         <li><b> 會員管理系統</b>
         <li><a aria-current="page" href="/create_member"> 新增</a>
@@ -346,7 +350,7 @@
         <li><a aria-current="page" href="/shop_sys">購物車系統</a>
         <li><a aria-current="page" href="/shop_search">購物車查詢</a>
         </ul>
-    </div><br>
+    </div><br> -->
 
     <div class="container">
       <p><b>會員修改</b></p>
