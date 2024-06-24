@@ -10,14 +10,16 @@ var usersRouter = require('./routes/users');
 
 
 
-///////////////////////////////////// DataBase 
-var mysql = require("mysql");
+// ///////////////////////////////////// DataBase 
+var mysql = require("mysql2");
 
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "password",
-    database: "member2024"
+    database: "member_data",
+    insecureAuth: true
+
 });
 
 con.connect(function(err) {

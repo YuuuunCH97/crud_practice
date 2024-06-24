@@ -17,6 +17,24 @@ const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json
 
 
 
+// 取出資料表
+router.get('/mem2024', function(req, res, next) {
+
+    var db = req.con;
+
+    // 執行資料庫查詢
+    db.query('SELECT * FROM member2024', function(err, rows) {
+        if (err) {
+            console.log(err);
+            return next(err); // 錯誤處理
+        }
+        console.log(rows); // 檢查資料
+        //var data = rows; // 將資料存入 data 變數
+        res.render('index', {  title: 'Member List', data: rows });
+    });
+
+});
+
 
 // 渲染查詢會員頁面
 //router.get('/search_member', async (req, res) => {
@@ -79,7 +97,6 @@ router.post('/search_member', async (req, res) => {
                     (!city || member.select_city === city);
             });
         }
-
         //檢查篩選後的數據是否為空，並設置相應的錯誤消息
         const errorMessage = filteredData.length === 0 ? '找不到符合條件的會員' : null;
         console.log("Filtered Data:", filteredData);
@@ -97,13 +114,10 @@ router.post('/delete_selected_members', async (req, res) => {
         // 讀取現有會員數據
         const data = await fs.readFile(DATA_PATH, 'utf8');
         const jsonData = JSON.parse(data);
-
         // 刪除選中的會員
         jsonData.members = jsonData.members.filter(member => !selectedEmails.includes(member.email));
-
         // 寫入更新後的數據到 data.json 文件中
         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
-
         return res.status(200).send('成功刪除選取的會員');
     } catch (err) {
         console.error('Error:', err);
