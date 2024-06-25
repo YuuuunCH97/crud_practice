@@ -51,7 +51,8 @@
                     <td><%= item.NOTE %></td>
                     <td><%= new Date(item.RECORD_DATE).toLocaleDateString('en-CA') %></td> 
                     <td><%= item.SERIAL_NUMBER %></td>
-                    <td><%= new Date(item.ORDER_DATE).toLocaleDateString('en-CA') %></td> 
+                    <td><%= item.ORDER_DATE ? new Date(item.ORDER_DATE).toLocaleDateString('en-CA') : '' %></td>
+                    <!-- 要先確認null 直接new Date 會有個默認日期 -->
                     <td><%= item.PURCHASED_ITEMS %></td>
                 </tr>
             <% }); %>

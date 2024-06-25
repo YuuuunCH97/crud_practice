@@ -108,7 +108,6 @@
       margin-left: 20px; /* 可以根據需要調整具體的數值 */
     }
 
-
     h1 {
       background-color:#ece8e8;
       color:rgb(153, 151, 151);
@@ -165,22 +164,36 @@
 
     /* 表格 2 的樣式 */
     #name2 {
-        border-collapse: separate;
+        border-collapse: collapse;
         border-spacing: 0;
         border: 1px solid black;
-        width:"80%";
+        width:100%;
+        table-layout: auto; /* 表格布局固定，寬度自動調整 */
     }
 
     #name2 thead {
       background-color: lightgrey; /* 設置灰色背景 */
+      position: sticky; /* 固定表头 */
+      top: 0; /* 确保固定在顶部 */
+      z-index: 1; /* 确保在滚动时表头不被遮挡 */
     }
 
     /* 表格單元格的樣式 */
-    #name2 td {
+    /* #name2 td {
         border: 1px solid black;
         padding: 8px;
         text-align: center;
+    } */
+
+    #name2 td, #name2 th {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+        white-space: nowrap; /* 禁止文本换行 */
+        /* overflow: hidden; 溢出隐藏 */
+        text-overflow: ellipsis; /* 文本溢出显示省略号 */
     }
+
 
     /* 修改按鈕 */
     #name2 td button {
@@ -242,6 +255,13 @@
     /*按鈕被點即時的顏色*/
     button[name="sex"]:active {
       background-color: #737e74;
+    }
+
+    .table-container {
+      max-height: 300px; /* 表格最大高度，视需要调整 */
+      overflow-y: auto; /* 垂直滚动 */
+      border: 1px solid #ddd; /* 可选，增加边框以区分滚动区域 */
+      margin-top: 10px; /* 与上方元素的距离 */
     }
 
     /*delete button*/
@@ -353,58 +373,60 @@
       </div>
     <% } %>
 
-    <% if (data && data.length > 0) { %>
-      <table id="name2" border="1" rules="groups">
-        <thead>
-          <tr>
-            <td>刪除</td>
-            <td>紀錄日期</td>
-            <td>帳號</td>
-            <td>國家</td>
-            <td>城市</td>
-            <td>姓名</td>
-            <td>性別</td>
-            <td>修改</td>
-          </tr>
-        </thead>
-        <tbody>
-          <% data.forEach(member => { %>
+    <div class="table-container"> <!--滾動 -->
+      <% if (data && data.length > 0) { %>
+        <table id="name2" border="1" rules="groups">
+          <thead>
             <tr>
-              <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
-              <td><%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %></td>
-              <td><%= member.EMAIL %></td>
-              <td><%= member.COUNTRY %></td>
-              <td><%= member.CITY %></td>
-              <td><%= member.NAME %></td>
-              <td><%= member.SEX === 'male' ? '男' : '女' %></td>
-              <td><button onclick="window.location.href='/edit_member/<%= member.EMAIL %>'">修改</button></td>
+              <td>刪除</td>
+              <td>紀錄日期</td>
+              <td>帳號</td>
+              <td>國家</td>
+              <td>城市</td>
+              <td>姓名</td>
+              <td>性別</td>
+              <td>修改</td>
             </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    <% } else { %>
-      <table id="name2" border="1" rules="groups">
-        <thead>
-          <tr>
-            <td>刪除</td>
-            <td>紀錄日期</td>
-            <td>帳號</td>
-            <td>國家</td>
-            <td>城市</td>
-            <td>姓名</td>
-            <td>性別</td>
-            <td>修改</td>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 空的第一列 -->
-          <tr>
-            <td colspan="8">No data found</td>
-          </tr>
-        </tbody>
-      </table>
-    <% } %>
-  </div>
+          </thead>
+          <tbody>
+            <% data.forEach(member => { %>
+              <tr>
+                <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
+                <td><%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %></td>
+                <td><%= member.EMAIL %></td>
+                <td><%= member.COUNTRY %></td>
+                <td><%= member.CITY %></td>
+                <td><%= member.NAME %></td>
+                <td><%= member.SEX === 'male' ? '男' : '女' %></td>
+                <td><button onclick="window.location.href='/edit_member/<%= member.EMAIL %>'">修改</button></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <table id="name2" border="1" rules="groups">
+          <thead>
+            <tr>
+              <td>刪除</td>
+              <td>紀錄日期</td>
+              <td>帳號</td>
+              <td>國家</td>
+              <td>城市</td>
+              <td>姓名</td>
+              <td>性別</td>
+              <td>修改</td>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 空的第一列 -->
+            <tr>
+              <td colspan="8">No data found</td>
+            </tr>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div> 
   <div class="delete-button-container">
     <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
   </div>

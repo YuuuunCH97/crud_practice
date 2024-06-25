@@ -355,53 +355,71 @@
     <div class="container">
       <p><b>會員修改</b></p>
 
-      <form name="registration" action="/edit_member/<%= data.email %>" method="post" onsubmit="validateForm(event)">
+
+
+      <form name="registration" action="/edit_member/<%= member.EMAIL %>" method="post" onsubmit="validateForm(event)">
+        <!-- 電子郵件 -->
         <label for="email">電子郵件:</label><sup> 必填 </sup>
-        <input type="email" id="email" name="email" required><br>
+        <input type="email" id="email" name="email" value="<%= member.EMAIL %>" readonly><br>
+
+        <!-- 姓名 -->
         <label for="name">姓名:</label><sup> 必填 </sup>
-        <input type="text" id="name" name="name" required><br>
+        <input type="text" id="name" name="name" value="<%= member.NAME %>" required><br>
 
-        國家
-        <sup> 必填 </sup>
-        <select id="select_country" name="select_country" size="number" onchange="updateCities()">
-          <option value="<%= member.COUNTRY %>"><%= member.COUNTRY %></option>
+        <!-- 国家 -->
+        <label for="select_country">國家:</label><sup> 必填 </sup>
+        <select id="select_country" name="select_country">
+            <option value="英國" <%= member.COUNTRY === '英國' ? 'selected' : '' %>>英國</option>
+            <!-- 根据实际需要添加更多选项 -->
         </select><br>
 
-        城市 <sup> 必填 </sup>
-        <select name="select_city" id="select_city" size="number">
-          <option value="<%= member.CITY %>"><%= member.CITY %></option>
+        <!-- 城市 -->
+        <label for="select_city">城市:</label><sup> 必填 </sup>
+        <select id="select_city" name="select_city">
+            <option value="布里斯托" <%= member.CITY === '布里斯托' ? 'selected' : '' %>>布里斯托</option>
+            <!-- 根据实际需要添加更多选项 -->
         </select><br>
 
-        性別 &emsp;
-        <label><input type="radio" name="sex" value="male" <%= member.SEX === 'female' ? 'checked' : '' %>> checked> &emsp; 男性</label>&emsp;
-        <label><input type="radio" name="sex" value="female"<%= member.SEX === 'female' ? 'checked' : '' %>> &emsp; 女性</label>
-        <br>
-        專長
-        <sup> 必填 </sup>
-        <input id="skillInput" name="skillInput" size="10">
+        <!-- 性别 -->
+        <label>性別:</label>
+        <label><input type="radio" name="sex" value="male" <%= member.SEX === 'male' ? 'checked' : '' %>> 男性</label>
+        <label><input type="radio" name="sex" value="female" <%= member.SEX === 'female' ? 'checked' : '' %>> 女性</label><br>
+
+        <!-- 專長 -->
+        <label for="skillInput">專長:</label><sup> 必填 </sup>
+        <input id="skillInput" name="skillInput" size="10" value="<%= member.SKILLS %>">
         <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
-        <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
-        <br>
-        <div id="checkboxContainer"></div>
+        <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br><br>
 
-        <br> 請選擇感興趣的主題 <br>
-        <div id="interestsContainer"></div>
-
-        <br>備註<br>
-        <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
-
-        <% if (msg) { %>
-        <div class="alert alert-danger" role="alert">
-          <%= msg %>
-        </div>
+        <!-- 兴趣主题 -->
+        <label>感興趣的主題:</label><br>
+        <% if (Array.isArray(member.INTERESTS)) { %>
+          <% member.INTERESTS.forEach(function(interest) { %>
+              <label><input type="checkbox" name="interests" value="<%= interest %>" checked> <%= interest %></label><br>
+          <% }); %>
+        <% } else { %>
+            <p>無效的興趣主題數據</p>
         <% } %>
-        <!-- <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button> -->
+        <!-- 根据实际情况显示已选中的兴趣主题 -->
+
+        <!-- 备注 -->
+        <label>備註:</label><br>
+        <textarea name="note" rows="5" cols="100" wrap="off"><%= member.NOTE %></textarea><br><br>
+
+        <!-- 错误消息提示 -->
+        <% if (msg) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= msg %>
+            </div>
+        <% } %>
+
+        <!-- 提交按钮 -->
         <button type="submit" name="send" class="btn btn-outline-primary">送出</button>
-        <input type="hidden" id="record_date" name="record_date" value="">
-      </form>
+        <input type="hidden" id="record_date" name="record_date" value="<%= member.RECORD_DATE %>">
+    </form>
     </div>
 
-    <script type="application/json" id="data-json"><%- JSON.stringify(data) %></script>
+    <!-- <script type="application/json" id="data-json"><%- JSON.stringify(data) %></script> -->
 </body>
 
 </html>

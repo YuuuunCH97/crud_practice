@@ -131,7 +131,7 @@
                 var items = [];
                 var rows = document.querySelectorAll('#productTable tr');
                 rows.forEach((row, index) => {
-                    if (index > 0 && index < rows.length - 1) {
+                    if (index > 0 && index < rows.length - 1) { // 忽略標題行和最後一行
                         var cells = row.cells;
                         var name = cells[0].textContent.trim(); // 商品名稱
                         var price = parseFloat(cells[2].textContent) || 0; // 商品價格
@@ -151,7 +151,9 @@
                     return;
                 }
                 var now = new Date();
-                var orderDate = now.getFullYear() + '-' + (now.getMonth() + 1).toString().padStart(2, '0') + '-' + now.getDate().toString().padStart(2, '0'); // 格式化日期為 'YYYY-MM-DD'
+                var orderDate = now.getFullYear() + '-' + 
+                                (now.getMonth() + 1).toString().padStart(2, '0') + '-' 
+                                + now.getDate().toString().padStart(2, '0'); // 格式化日期為 'YYYY-MM-DD'
                 var serialNumber = generateSerialNumber(); // 隨機生成流水號
 
                 var formData = {
@@ -171,7 +173,7 @@
                 .then(response => {
                     if (response.ok) {
                         alert("購物車資料已成功保存");
-                        emailInput.value = ''; // 清空輸入框內容
+                        document.getElementById('emailInput').value = ''; // 清空輸入框內容
                         document.querySelectorAll('#productTable input[type=number]').forEach(input => input.value = ''); // 清空商品數量輸入框
                         document.querySelectorAll('.item-total').forEach(cell => cell.textContent = '0'); // 重置總價格顯示
                         document.getElementById('grandTotal').textContent = '0';
