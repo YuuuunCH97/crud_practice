@@ -24,24 +24,29 @@
     window.onload = function () {
         setRecordDate();
         loadInterests(); // 保留已有的 loadInterests 調用
-    }
-
-    $(document).ready(function() {
-      let dataElement = document.getElementById("data-json");
-      let jsonData;
-      if (dataElement && dataElement.textContent){
-          jsonData = JSON.parse(dataElement.textContent);
-      } else {
-          jsonData = {}
-      }
+        let dataElement = document.getElementById("data-json");
+        let jsonData;
+        if (dataElement && dataElement.textContent){
+            jsonData = JSON.parse(dataElement.textContent);
+        } else {
+            jsonData = {}
+        }
+    // $(document).ready(function() {
+    //   let dataElement = document.getElementById("data-json");
+    //   let jsonData;
+    //   if (dataElement && dataElement.textContent){
+    //       jsonData = JSON.parse(dataElement.textContent);
+    //   } else {
+    //       jsonData = {}
+    //   }
 
       if (Object.keys(jsonData).length > 0){
-        $("#email").val(jsonData["EMAIL"])
-        $("#name").val(jsonData["NAME"])
-        $("#select_country").val(jsonData["COUNTRY"])
+        $("#email").val(jsonData.EMAIL)
+        $("#name").val(jsonData.NAME)
+        $("#select_country").val(jsonData.COUNTRY)
         updateCities();
         setTimeout(() => {
-          $("#select_city").val(jsonData["CITY"])
+          $("#select_city").val(jsonData.CITY)
         }, 300);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
@@ -56,18 +61,18 @@
         }
         $("#checkboxContainer").html(sell_data)
         setTimeout(() => {
-          if (typeof(jsonData.interests) === "string"){
+          if (typeof(jsonData.INTERESTS) === "string"){
           $(`input[name="interests"][value="${jsonData.interests}"]`).prop('checked', true);
-        } else if (typeof(jsonData.interests) === "object"){
-          for (i=0; i<jsonData.interests.length; i++ ) {
-            $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
-            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
-            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
+        } else if (typeof(jsonData.INTERESTS) === "object"){
+          for (i=0; i<jsonData.INTERESTS.length; i++ ) {
+            $(`input[name="interests"][value="${jsonData.INTERESTS[i]}"]`).prop('checked', true);
+            console.log(`input[name="interests"][value="${jsonData.INTERESTS[i]}"]`)
+            console.log($(`input[name="interests"][value="${jsonData.INTERESTS[i]}"]`))
         }}
         }, 300);
         $('textarea[name="note"]').val(jsonData.note)
       }
-    })
+    }
 
     updateCountry()
     function updateCountry() {
@@ -173,9 +178,6 @@
         .catch(error => console.error('Error loading interests:', error));
     }
 
-    window.onload = function () {
-      loadInterests();
-    }
 
   </script>
 
@@ -342,15 +344,6 @@
 
 <body>
   <%- include('./head') %>
-    <!-- <div class="tit">
-      <ul>
-        <li><b> 會員管理系統</b>
-        <li><a aria-current="page" href="/create_member"> 新增</a>
-        <li><a aria-current="page" href="/search_member">查詢</a>
-        <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-        <li><a aria-current="page" href="/shop_search">購物車查詢</a>
-        </ul>
-    </div><br> -->
 
     <div class="container">
       <p><b>會員修改</b></p>
@@ -366,24 +359,18 @@
         <label for="name">姓名:</label><sup> 必填 </sup>
         <input type="text" id="name" name="name" value="<%= member.NAME %>" required><br>
 
-        <!-- 国家 -->
+        <!-- ecountry -->
         <label for="select_country">國家:</label><sup> 必填 </sup>
-        <select id="select_country" name="select_country">
-            <option value="英國" <%= member.COUNTRY === '英國' ? 'selected' : '' %>>英國</option>
-            <!-- 根据实际需要添加更多选项 -->
-        </select><br>
+        <select id="select_country" name="select_country"></select><br>
 
         <!-- 城市 -->
         <label for="select_city">城市:</label><sup> 必填 </sup>
-        <select id="select_city" name="select_city">
-            <option value="布里斯托" <%= member.CITY === '布里斯托' ? 'selected' : '' %>>布里斯托</option>
-            <!-- 根据实际需要添加更多选项 -->
-        </select><br>
+        <select id="select_city" name="select_city"></select><br>
 
         <!-- 性别 -->
         <label>性別:</label>
-        <label><input type="radio" name="sex" value="male" <%= member.SEX === 'male' ? 'checked' : '' %>> 男性</label>
-        <label><input type="radio" name="sex" value="female" <%= member.SEX === 'female' ? 'checked' : '' %>> 女性</label><br>
+        <label><input type="radio" name="sex" value="male" <%= member.SEX === 'male' ? 'checked' : '' %>> &emsp;男性</label>
+        <label><input type="radio" name="sex" value="female" <%= member.SEX === 'female' ? 'checked' : '' %>> &emsp;女性</label><br>
 
         <!-- 專長 -->
         <label for="skillInput">專長:</label><sup> 必填 </sup>
@@ -391,22 +378,22 @@
         <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
         <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br><br>
 
-        <!-- 兴趣主题 -->
+        <!-- 興趣主题 -->
         <label>感興趣的主題:</label><br>
-        <% if (Array.isArray(member.INTERESTS)) { %>
+        <div id="interestsContainer"></div>
+        <!-- <% if (Array.isArray(member.INTERESTS)) { %>
           <% member.INTERESTS.forEach(function(interest) { %>
               <label><input type="checkbox" name="interests" value="<%= interest %>" checked> <%= interest %></label><br>
           <% }); %>
         <% } else { %>
             <p>無效的興趣主題數據</p>
-        <% } %>
-        <!-- 根据实际情况显示已选中的兴趣主题 -->
+        <% } %> -->
 
-        <!-- 备注 -->
+        <!-- note -->
         <label>備註:</label><br>
         <textarea name="note" rows="5" cols="100" wrap="off"><%= member.NOTE %></textarea><br><br>
 
-        <!-- 错误消息提示 -->
+        <!-- 錯誤消息提示 -->
         <% if (msg) { %>
             <div class="alert alert-danger" role="alert">
                 <%= msg %>
@@ -419,7 +406,7 @@
     </form>
     </div>
 
-    <!-- <script type="application/json" id="data-json"><%- JSON.stringify(data) %></script> -->
+    <script type="application/json" id="data-json"><%- JSON.stringify(member) %></script>
 </body>
 
 </html>

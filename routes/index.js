@@ -329,10 +329,11 @@ router.post('/create_member', async (req, res) => {
         }
         
         // 插入資料到 member2024 表
-        const sql = "INSERT INTO member2024 (EMAIL, NAME, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         await con.promise().execute(sql, [
             memberData.email,
             memberData.name,
+            memberData.sex,
             memberData.select_country,
             memberData.select_city,
             JSON.stringify(memberData.interests), // 將興趣轉為 JSON 字串存儲
@@ -504,9 +505,6 @@ router.get('/edit_member/:email', async (req, res) => {
         return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
     }
 });
-
-
-
 
 
 
