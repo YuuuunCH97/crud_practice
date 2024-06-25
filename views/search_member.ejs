@@ -371,7 +371,7 @@
           <% data.forEach(member => { %>
             <tr>
               <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
-              <td><%= member.RECORD_DATE %></td>
+              <td><%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %></td>
               <td><%= member.EMAIL %></td>
               <td><%= member.COUNTRY %></td>
               <td><%= member.CITY %></td>

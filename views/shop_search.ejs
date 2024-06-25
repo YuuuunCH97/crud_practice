@@ -133,7 +133,7 @@
     <div class="container">
         <div><p><b>購物車系統</b></p></div>
 
-        <form method="POST" action="/shop_search" onsubmit="return validateForm()">
+        <!-- <form method="POST" action="/shop_search" onsubmit="return validateForm()">
             <label for="start-date">管理日期 開始日</label>
             <input type="date" id="start-date" name="start-date" value="<%= startDate %>">
             
@@ -144,7 +144,20 @@
             <input type="email" id="email" name="email" placeholder="請輸入email" value="<%= email %>">
 
             <button type="submit">查詢</button>
+        </form> -->
+        <form method="GET" action="/shop_search" onsubmit="return validateForm()" >
+            <label for="start-date">管理日期 開始日</label>
+            <input type="date" id="start-date" name="startDate" value="<%= startDate %>">
+            
+            <label for="end-date">~ 結束日</label>
+            <input type="date" id="end-date" name="endDate" value="<%= endDate %>">
+
+            <label for="email">帳號</label>
+            <input type="email" id="email" name="email" placeholder="請輸入email" value="<%= email %>">
+
+            <button type="submit">查詢</button>
         </form>
+
 
         <table border="1">
             <thead>
@@ -156,27 +169,26 @@
                     <th>總採購金額</th>
                 </tr>
             </thead>
-            
             <tbody>
                 <% data.forEach(function(item) { %>
                     <tr>
-                        <td><%= item.purchaseDate %></td>
-                        <td><%= item.serialNumber %></td>
-                        <td><%= item.email %></td>
+                        <td><%= new Date(item.ORDER_DATE).toLocaleDateString('zh-TW') %></td>
+                        <td><%= item.SERIAL_NUMBER %></td>
+                        <td><%= item.EMAIL %></td>
                         <td>
                             <ul>
-                                <% var totalPurchase = 0; %>
-                                <% item.items.forEach(function(product) { %>
-                                    <% var subtotal = product.quantity * product.price; %>
-                                    <% totalPurchase += subtotal; %>
-                                    <li><%= product.name %> - 數量: <%= product.quantity %>, 
-                                        價錢: <%= product.price %>, 
-                                        金額: <%= subtotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %>
-                                    </li>
+                                <% 
+                                    let purchasedItems = JSON.parse(item.PURCHASED_ITEMS || '[]');
+                                    let totalPurchase = 0;
+                                    purchasedItems.forEach(function(product) {
+                                        let subtotal = product.quantity * product.price;
+                                        totalPurchase += subtotal;
+                                %>
+                                    <li><%= product.name %> - 數量: <%= product.quantity %>, 價錢: <%= product.price %>, 金額: <%= subtotal.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }) %></li>
                                 <% }); %>
                             </ul>
                         </td>
-                        <td><%= totalPurchase.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %></td>
+                        <td><%= totalPurchase.toLocaleString('zh-TW', { style: 'currency', currency: 'TWD' }) %></td>
                     </tr>
                 <% }); %>
             </tbody>

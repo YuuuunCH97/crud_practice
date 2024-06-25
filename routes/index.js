@@ -76,13 +76,29 @@ router.get('/mem2024', function(req, res, next) {
 //     }
 // });
 
-// 渲染查詢會員頁面，初始頁面不顯示會員資料
-router.get('/search_member', async (req, res) => {
-    const data = await fs.readFile(DATA_PATH, 'utf8');
-    let jsonData = JSON.parse(data).members || [];
-    return res.render('search_member', { data: jsonData, errorMessage: null });
-});
+// 渲染查詢會員頁面，初始頁面顯示會員資料
+// router.get('/search_member', async (req, res) => {
+//     const data = await fs.readFile(DATA_PATH, 'utf8');
+//     let jsonData = JSON.parse(data).members || [];
+//     return res.render('search_member', { data: jsonData, errorMessage: null });
+// });
 
+router.get('/search_member', async (req, res) => {
+    try {
+        // 獲取連結
+        const connection = await pool.getConnection();
+        // 查詢獲取所有會員數據
+        const [rows, fields] = await connection.execute('SELECT * FROM member2024');
+        // 释放连接回连接池
+        connection.release();
+
+        // 渲染页面并传递所有会员数据
+        res.render('search_member', { data: rows, errorMessage: null });
+    } catch (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+});
 
 // // 處理查尋會員的 POST 請求
 // router.post('/search_member', async (req, res) => {
@@ -171,23 +187,50 @@ router.post('/search_member', async (req, res) => {
 });
 
 
-// POST 請求處理刪除選取的會員
+// // POST 請求處理刪除選取的會員
+// router.post('/delete_selected_members', async (req, res) => {
+//     const { selectedEmails } = req.body;
+//     try {
+//         // 讀取現有會員數據
+//         const data = await fs.readFile(DATA_PATH, 'utf8');
+//         const jsonData = JSON.parse(data);
+//         // 刪除選中的會員
+//         jsonData.members = jsonData.members.filter(member => !selectedEmails.includes(member.email));
+//         // 寫入更新後的數據到 data.json 文件中
+//         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
+//         return res.status(200).send('成功刪除選取的會員');
+//     } catch (err) {
+//         console.error('Error:', err);
+//         return res.status(500).send('Internal Server Error');
+//     }
+// });
+
+// 刪除會員的 POST 請求處理器
 router.post('/delete_selected_members', async (req, res) => {
     const { selectedEmails } = req.body;
+
+    if (!selectedEmails || selectedEmails.length === 0) {
+        return res.status(400).send('沒有選擇任何會員');
+    }
+
     try {
-        // 讀取現有會員數據
-        const data = await fs.readFile(DATA_PATH, 'utf8');
-        const jsonData = JSON.parse(data);
-        // 刪除選中的會員
-        jsonData.members = jsonData.members.filter(member => !selectedEmails.includes(member.email));
-        // 寫入更新後的數據到 data.json 文件中
-        await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 4), 'utf8');
+        const connection = await mysql.createConnection(dbConfig);
+
+        // 構建刪除查詢
+        const placeholders = selectedEmails.map(() => '?').join(',');
+        const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
+
+        // 執行刪除查詢
+        await connection.execute(sql, selectedEmails);
+
+        console.log('Deleted members:', selectedEmails);
         return res.status(200).send('成功刪除選取的會員');
     } catch (err) {
         console.error('Error:', err);
         return res.status(500).send('Internal Server Error');
     }
 });
+
 
 // // 創建會員
 // router.post('/create_member', async (req, res) => {
@@ -308,8 +351,6 @@ router.post('/create_member', async (req, res) => {
 });
 
 
-
-
 // 修改會員
 // router.post('/edit_member/:email', async (req, res) => {
 //     const email = req.params.email;
@@ -337,6 +378,7 @@ router.post('/create_member', async (req, res) => {
         
 //     }
 // });
+
 // 編輯會員資料的 POST 請求處理器
 router.post('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
@@ -414,8 +456,7 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    return res.render('create_member', {"msg": "", "data": "{}"});
-    
+    return res.render('create_member', {"msg": "", "data": "{}"});    
 });
 
 // 渲染購物車系統頁面 /shop_sys
@@ -430,58 +471,167 @@ router.get('/shop_sys', async (req, res) => {
     }
 });
 
-// 处理购物车提交的 POST 请求
-router.post('/shop_submit', async (req, res) => {
-    const { email, items } = req.body;
+// 渲染購物車系統頁面 獲取email
+// router.get('/shop_sys', async (req, res) => {
+//     try {
+//         const connection = await pool.getConnection();
+//         const [rows] = await connection.execute('SELECT EMAIL FROM member2024');
+//         connection.release();
+//         res.json(rows);
+//     } catch (err) {
+//         console.error('Error fetching emails:', err);
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
 
-    if (!email || !items || items.length === 0) {
-        return res.status(400).send('請輸入帳號和購物車項目');
+
+// 处理购物车提交的 POST 请求
+// router.post('/shop_submit', async (req, res) => {
+//     const { email, items } = req.body;
+
+//     if (!email || !items || items.length === 0) {
+//         return res.status(400).send('請輸入帳號和購物車項目');
+//     }
+
+//     const generateSerialNumber = () => {
+//         return 'shop' + Math.floor(1000000000 + Math.random() * 9000000000);
+//     };
+
+//     const newCartData = {
+//         purchaseDate: new Date().toISOString().split('T')[0],
+//         serialNumber: generateSerialNumber(),
+//         email: email,
+//         items: items
+//     };
+
+//     try {
+//         let shopData = [];
+//         try {
+//             const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
+//             if (data) {
+//                 shopData = JSON.parse(data);
+//             }
+//         } catch (err) {
+//             if (err.code !== 'ENOENT') {
+//                 console.error('Error reading shop search file:', err);
+//                 return res.status(500).send('Internal Server Error');
+//             }
+//         }
+
+//         shopData.push(newCartData);
+
+//         await fs.writeFile(SHOP_SEARCH_PATH, JSON.stringify(shopData, null, 2), 'utf8');
+//         console.log('購物車資料已成功保存:', newCartData);
+
+//         return res.status(200).send('購物車資料已成功保存');
+//     } catch (err) {
+//         console.error('Error saving shop search data:', err);
+//         return res.status(500).send('Internal Server Error');
+//     }
+// });
+
+//更新現有資料而不是插入新資料
+router.post('/shop_submit', async (req, res) => {
+    const { orderDate, serialNumber, email, purchasedItems } = req.body;
+
+    // 檢查請求參數是否存在或有效
+    if (!email || !orderDate || !serialNumber || !purchasedItems || purchasedItems.length === 0){
+        console.log('Invalid request parameters:', { orderDate, serialNumber, email, purchasedItems });
+        return res.status(400).send('請輸入電子郵件地址和購物車項目');
     }
 
-    const generateSerialNumber = () => {
-        return 'shop' + Math.floor(1000000000 + Math.random() * 9000000000);
-    };
-
-    const newCartData = {
-        purchaseDate: new Date().toISOString().split('T')[0],
-        serialNumber: generateSerialNumber(),
-        email: email,
-        items: items
-    };
-
     try {
-        let shopData = [];
-        try {
-            const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
-            if (data) {
-                shopData = JSON.parse(data);
-            }
-        } catch (err) {
-            if (err.code !== 'ENOENT') {
-                console.error('Error reading shop search file:', err);
-                return res.status(500).send('Internal Server Error');
-            }
+        const con = req.con;
+        console.log('購物車資料嘗試保存:', { orderDate, serialNumber, email, purchasedItems });
+        // 檢查 EMAIL 是否已存在
+        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
+        const [rows] = await con.promise().execute(checkEmailSql, [email]);
+        const emailExists = rows[0].count > 0;
+
+        console.log('Email exists:', emailExists);
+
+        if (!emailExists) {
+            // 如果 EMAIL 不存在，返回無會員資料的訊息
+            return res.status(404).send('無會員資料，無法新增購物車資料');
         }
 
-        shopData.push(newCartData);
+        // 如果 EMAIL 已存在，可以更新該記錄而不是插入新的
+        if (emailExists) {
+            // 更新購物車資料
+            const updateSql = `
+                UPDATE member2024
+                SET ORDER_DATE = ?,
+                    SERIAL_NUMBER = ?,
+                    PURCHASED_ITEMS = ?
+                WHERE EMAIL = ?
+        `;
+        await con.promise().execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
 
-        await fs.writeFile(SHOP_SEARCH_PATH, JSON.stringify(shopData, null, 2), 'utf8');
-        console.log('購物車資料已成功保存:', newCartData);
+        console.log('購物車資料已更新:', { orderDate, serialNumber, email, purchasedItems });
+        return res.status(200).send('購物車資料已更新');
+    } else {
+        // 插入新購物車資料（若需要的話）
+        const insertSql = `
+            INSERT INTO member2024 (ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS)
+            VALUES (?, ?, ?, ?)
+        `;
+        await con.promise().execute(insertSql, [orderDate, serialNumber, email, purchasedItems]);
 
+        console.log('購物車資料已成功保存:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已成功保存');
-    } catch (err) {
-        console.error('Error saving shop search data:', err);
+    }
+    
+} catch (err) {
+    console.error('Error saving shop data:', err);
+    return res.status(500).send('Internal Server Error');
+}
+});
+
+
+// 渲染 shop_search
+
+// router.get('/shop_search', async(req, res) => {
+//     const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
+//     const jsonData = JSON.parse(data);
+//     return res.render('shop_search', { data: jsonData , startDate: "", endDate: "", email: ""});
+// });
+
+router.get('/shop_search', async (req, res) => {
+    const { startDate, endDate, email } = req.query;
+
+    try {
+        // 從連接池獲取連接
+        const con = await pool.getConnection();
+
+        let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
+        const params = [];
+
+        // 如果有過濾條件，則添加到查詢中
+        if (startDate && endDate && email) {
+            query += ` WHERE DATE(ORDER_DATE) BETWEEN ? AND ? AND EMAIL = ?`;
+            params.push(startDate, endDate, email);
+        } else if (startDate && endDate) {
+            query += ` WHERE DATE(ORDER_DATE) BETWEEN ? AND ?`;
+            params.push(startDate, endDate);
+        } else if (email) {
+            query += ` WHERE EMAIL = ?`;
+            params.push(email);
+        }
+        console.log('Executing query:', query, params); // 在控制台記錄即將執行的查詢和參數
+        const [rows] = await con.execute(query, params);
+
+        // 釋放連接
+        con.release();
+        console.log('Fetched data:', rows); // 在控制台記錄成功獲取的資料
+
+        return res.render('shop_search', { data: rows, startDate, endDate, email });
+    } catch (error) {
+        console.error('Error fetching data from database:', error);
         return res.status(500).send('Internal Server Error');
     }
 });
 
 
-// 渲染 shop_search 页面
-router.get('/shop_search', async(req, res) => {
-    const data = await fs.readFile(SHOP_SEARCH_PATH, 'utf8');
-    const jsonData = JSON.parse(data);
-    return res.render('shop_search', { data: jsonData , startDate: "", endDate: "", email: ""});
-});
 
 // 处理表单提交的 POST 请求
 router.post('/shop_search', async (req, res) => {

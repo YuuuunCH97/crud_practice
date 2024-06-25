@@ -31,8 +31,10 @@
                 <th>Country</th>
                 <th>City</th>
                 <th>Interests</th>
-                <th>RECORD_DATE</th>
                 <th>NOTE</th>
+                <th>RECORD_DATE</th>
+                <th>SERIAL_NUMBER</th>
+                <th>ORDER_DATE</th>
                 <th>Item List</th>
             </tr>
         </thead>
@@ -46,8 +48,10 @@
                     <td><%= item.CITY %></td>
                     <td><%= item.INTERESTS %></td>
                     <!-- 日期只顯示年月日 -->
-                    <td><%= new Date(item.RECORD_DATE).toLocaleDateString('en-CA') %></td> 
                     <td><%= item.NOTE %></td>
+                    <td><%= new Date(item.RECORD_DATE).toLocaleDateString('en-CA') %></td> 
+                    <td><%= item.SERIAL_NUMBER %></td>
+                    <td><%= new Date(item.ORDER_DATE).toLocaleDateString('en-CA') %></td> 
                     <td><%= item.PURCHASED_ITEMS %></td>
                 </tr>
             <% }); %>
