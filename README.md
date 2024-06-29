@@ -10,6 +10,9 @@ npm install
 
 # 執行有問題的話 嘗試修復
 npm audit fix --force
+
+# 套件更新
+npm update
 ```
 
 # 啟動專案
@@ -51,3 +54,8 @@ CREATE TABLE member2024 (
 ```
 
 (dberve 無法連線處理)[https://sinyilin.github.io/SQL/20230425/4002286829/]
+
+## 設定檔設定
+
+1. 將config.ini.example 複製檔 並命名為config.ini
+2. 到config.ini檔案內更改db, server 配置

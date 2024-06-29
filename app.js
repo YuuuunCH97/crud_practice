@@ -7,28 +7,11 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var mysql = require("mysql2");
-
-
-// ///////////////////////////////////// DataBase 
-
-
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password",
-    database: "member_data",
-    insecureAuth: true
-});
-
-con.connect(function(err) {
-    if (err) {
-        console.log('connecting error', err.stack);
-        return;
-    }
-    console.log('connecting success');
-});
-//////////////////////////////////////////
+// 變數設定
+const fs = require('fs');
+const ini = require('ini');
+const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
+process.env.PORT = config['SERVER']['PORT'];
 
 var app = express();
 // view engine setup
@@ -40,15 +23,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-//////////////////////////////////////////////////
-app.use(function(req, res, next) {
-  req.con = con;
-  next();
-});
-
-
-//////////////////////////////////////////////////
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

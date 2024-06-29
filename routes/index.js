@@ -4,6 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const { start } = require('repl');
 const router = express.Router();
+const db = require('../db')
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -12,23 +13,8 @@ const DATA_PATH = path.join(__dirname, '../public/data/data.json');
 const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
 // 設定存儲購物車資料的文件路徑
 const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.json');
-
 const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json');
-
-
 const mysql = require('mysql2/promise');
-
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'member_data',
-    insecureAuth: true
-};
-
-// 建立 MySQL 連線池
-const pool = mysql.createPool(dbConfig);
-
 
 // 取出資料表
 router.get('/mem2024', function(req, res, next) {
@@ -86,7 +72,7 @@ router.get('/mem2024', function(req, res, next) {
 router.get('/search_member', async (req, res) => {
     try {
         // 獲取連結
-        const connection = await pool.getConnection();
+        const connection = await db.pool.getConnection();
         // 查詢獲取所有會員數據
         const [rows, fields] = await connection.execute('SELECT * FROM member2024');
         // 释放连接回连接池
@@ -168,7 +154,7 @@ router.post('/search_member', async (req, res) => {
         // 執行 SQL 查詢前輸出調試日誌
         console.log('Executing SQL:', sql, params);
         // 從連線池獲取連線
-        const connection = await pool.getConnection();
+        const connection = await db.pool.getConnection();
         // 執行 SQL 查詢
         const [rows, fields] = await connection.execute(sql, params);        
         // 釋放連線回連線池
@@ -658,7 +644,7 @@ router.get('/shop_search', async (req, res) => {
 
     try {
         // 從連接池獲取連接
-        const con = await pool.getConnection();
+        const con = await db.pool.getConnection();
 
         let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
         const params = [];
