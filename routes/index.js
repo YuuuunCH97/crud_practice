@@ -4,6 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const { start } = require('repl');
 const router = express.Router();
+const db = require('../db')
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -12,38 +13,26 @@ const DATA_PATH = path.join(__dirname, '../public/data/data.json');
 const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
 // 設定存儲購物車資料的文件路徑
 const SHOP_SEARCH_PATH = path.join(__dirname, '../public/data/shop_searchdata.json');
-
 const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json');
-
-
 const mysql = require('mysql2/promise');
 
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'member_data',
-    insecureAuth: true
-};
-
-// 建立 MySQL 連線池
-const pool = mysql.createPool(dbConfig);
+router.get('/', async (req, res) => {
+    res.redirect('/search_member');
+});
 
 
 // 取出資料表
-router.get('/mem2024', function(req, res, next) {
-    console.log('Handling GET request for /mem2024'); // 打印路由处理函数开始的日志
-    var db = req.con;
-    // 執行資料庫查詢
-    db.query('SELECT * FROM member2024', function(err, rows) {
-        if (err) {
-            console.log('Database query error:', err); //數據查詢錯誤
-            return next(err); // 錯誤處理
-        }
-        console.log('Query result:', rows); // 檢查資料
-        //var data = rows; // 將資料存入 data 變數
-        res.render('mem2024', {  title: 'Member List', data: rows });
-    });
+router.get('/mem2024', async function(req, res, next) {
+    // 獲取連結
+    const connection = await db.pool.getConnection();
+
+    // 查詢獲取所有會員數據
+    const [rows] = await connection.execute('SELECT * FROM member2024');
+    // console.log('Query result:', rows); // 檢查資料
+
+    // 釋放連接
+    connection.release();
+    res.render('mem2024', {  title: 'Member List', data: rows });
 });
 
 
@@ -86,10 +75,10 @@ router.get('/mem2024', function(req, res, next) {
 router.get('/search_member', async (req, res) => {
     try {
         // 獲取連結
-        const connection = await pool.getConnection();
+        const connection = await db.pool.getConnection();
         // 查詢獲取所有會員數據
-        const [rows, fields] = await connection.execute('SELECT * FROM member2024');
-        // 释放连接回连接池
+        const [rows] = await connection.execute('SELECT * FROM member2024');
+        // 釋放連接
         connection.release();
 
         // 回傳所有會員數據
@@ -168,10 +157,10 @@ router.post('/search_member', async (req, res) => {
         // 執行 SQL 查詢前輸出調試日誌
         console.log('Executing SQL:', sql, params);
         // 從連線池獲取連線
-        const connection = await pool.getConnection();
+        const connection = await db.pool.getConnection();
         // 執行 SQL 查詢
         const [rows, fields] = await connection.execute(sql, params);        
-        // 釋放連線回連線池
+        // 釋放連接
         connection.release();
 
         // 調試輸出查詢結果
@@ -214,7 +203,8 @@ router.post('/delete_selected_members', async (req, res) => {
     }
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
+        // 獲取連接
+        const connection = await db.pool.getConnection();
 
         // 構建刪除查詢
         const placeholders = selectedEmails.map(() => '?').join(',');
@@ -222,6 +212,9 @@ router.post('/delete_selected_members', async (req, res) => {
 
         // 執行刪除查詢
         await connection.execute(sql, selectedEmails);
+
+        // 釋放連接
+        connection.release();
 
         console.log('Deleted members:', selectedEmails);
         return res.status(200).send('成功刪除選取的會員');
@@ -316,11 +309,12 @@ router.post('/create_member', async (req, res) => {
         memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式為 YYYY-MM-DD
     }
     try {
-        // 建立 MySQL 連接
-        const con = req.con;
-        // 檢查 EMAIL 是否已存在
+        // 獲取連結
+        const connection = await db.pool.getConnection();
+        // 查詢 檢查 EMAIL 是否已存在
         const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
-        const [rows] = await con.promise().execute(checkEmailSql, [memberData.email]);
+        const [rows, fields] = await connection.execute(checkEmailSql, [memberData.email]);
+
         const emailExists = rows[0].count > 0;
 
         if (emailExists) {
@@ -330,7 +324,8 @@ router.post('/create_member', async (req, res) => {
         
         // 插入資料到 member2024 表
         const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        await con.promise().execute(sql, [
+
+        await connection.execute(sql, [
             memberData.email,
             memberData.name,
             memberData.sex,
@@ -341,6 +336,8 @@ router.post('/create_member', async (req, res) => {
             memberData.record_date
         ]);
 
+        // 释放连接回连接池
+        connection.release();
         console.log('Member data inserted:', memberData.email);
 
         // 重定向到 create_member 頁面或其他適當的頁面
@@ -385,34 +382,38 @@ router.post('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
     const updatedMemberData = req.body;
 
+    let connection;
     try {
-        // 创建数据库连接
-        const connection = await mysql.createConnection(dbConfig);
-        // 查询要更新的会员信息
+        // 獲取連接
+        connection = await db.pool.getConnection();
+        // 查詢
         const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
-        // 检查是否找到了会员信息
+
+        // 檢查是否找到了會員信息
         if (rows.length === 0) {
             console.log('Member not found:', email);
-            await connection.end(); // 结束数据库连接
             return res.status(404).send('未找到會員資料，請創建會員');
         }
-        // 执行更新操作
+
+        // 執行更新操作
         await connection.execute(
             'UPDATE member2024 SET NAME = ?, COUNTRY = ?, CITY = ?, SEX = ?, NOTE = ?, RECORD_DATE = ? WHERE EMAIL = ?',
             [updatedMemberData.name, updatedMemberData.select_country, updatedMemberData.select_city, updatedMemberData.sex, updatedMemberData.note, updatedMemberData.record_date, email]
         );
 
         console.log('Member updated:', email);
-        // 关闭数据库连接
-        await connection.end(); // 结束数据库连接
         return res.redirect('/search_member');
 
     } catch (err) {
         console.error('錯誤:', err.stack);
         return res.status(500).send('內部伺服器錯誤');
+    } finally {
+        if (connection){
+            // 確保連線被釋放
+            connection.release();
+        }
     }
 });
-
 
 
 // 編輯會員資料的 GET 請求處理器
@@ -470,14 +471,15 @@ router.get('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
     
     try {
+        // 獲取連接
+        const connection = await db.pool.getConnection();
         console.log('Connecting to the database...');
-        const connection = await mysql.createConnection(dbConfig); // 創建數據庫連接
+
         console.log('Database connection established.');
         console.log(`Fetching member data for email: ${email}`);
         const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
 
         if (rows.length === 0) {
-            console.log('Member not found:', email);
             return res.status(404).send('未找到會員數據，請建立會員');
         }
 
@@ -503,7 +505,13 @@ router.get('/edit_member/:email', async (req, res) => {
             body: req.body
         });
         return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
+    } finally {
+        if (connection){
+            // 確保連線被釋放
+            connection.release();
+        }
     }
+
 });
 
 
@@ -596,11 +604,17 @@ router.post('/shop_submit', async (req, res) => {
     }
 
     try {
-        const con = req.con;
         console.log('購物車資料嘗試保存:', { orderDate, serialNumber, email, purchasedItems });
         // 檢查 EMAIL 是否已存在
+
+        // 獲取連接
+        const connection = await db.pool.getConnection();
+
         const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
-        const [rows] = await con.promise().execute(checkEmailSql, [email]);
+        const [rows] = await connection.execute(checkEmailSql, [email]);
+        // 釋放連接
+        connection.release();
+
         const emailExists = rows[0].count > 0;
 
         console.log('Email exists:', emailExists);
@@ -658,7 +672,7 @@ router.get('/shop_search', async (req, res) => {
 
     try {
         // 從連接池獲取連接
-        const con = await pool.getConnection();
+        const con = await db.pool.getConnection();
 
         let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
         const params = [];

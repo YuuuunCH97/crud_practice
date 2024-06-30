@@ -1,0 +1,8 @@
+[DATABASE]
+HOST = localhost
+PORT = 3306
+USER = root
+PASSWORD = password
+
+[SERVER]
+PORT = 8888
