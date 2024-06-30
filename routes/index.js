@@ -636,7 +636,7 @@ router.post('/shop_submit', async (req, res) => {
                     PURCHASED_ITEMS = ?
                 WHERE EMAIL = ?
         `;
-        await con.promise().execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
+        await connection.execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
 
         console.log('購物車資料已更新:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已更新');
@@ -646,7 +646,7 @@ router.post('/shop_submit', async (req, res) => {
             INSERT INTO member2024 (ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS)
             VALUES (?, ?, ?, ?)
         `;
-        await con.promise().execute(insertSql, [orderDate, serialNumber, email, purchasedItems]);
+        await connection.execute(insertSql, [orderDate, serialNumber, email, purchasedItems]);
 
         console.log('購物車資料已成功保存:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已成功保存');

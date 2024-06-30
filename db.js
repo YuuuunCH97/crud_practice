@@ -6,7 +6,7 @@ const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
 
 // 設定 MySQL 連線配置
 const pool = mysql.createPool({
-    host: config['DATABASE']['HOST'],
+    host: config['DATABASE']['MEMBER'],
     user: config['DATABASE']['USER'],
     password: config['DATABASE']['PASSWORD'],
     database: 'member_data',
