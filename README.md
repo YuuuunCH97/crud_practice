@@ -13,6 +13,9 @@ npm audit fix --force
 
 # 套件更新
 npm update
+
+# 移除套件
+npm uninstall mysql
 ```
 
 # 啟動專案
