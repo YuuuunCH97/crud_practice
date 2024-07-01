@@ -612,8 +612,6 @@ router.post('/shop_submit', async (req, res) => {
 
         const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
         const [rows] = await connection.execute(checkEmailSql, [email]);
-        // 釋放連接
-        connection.release();
 
         const emailExists = rows[0].count > 0;
 
@@ -637,7 +635,6 @@ router.post('/shop_submit', async (req, res) => {
                 WHERE EMAIL = ?
         `;
         await connection.execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
-
         console.log('購物車資料已更新:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已更新');
     } else {
@@ -655,6 +652,9 @@ router.post('/shop_submit', async (req, res) => {
 } catch (err) {
     console.error('Error saving shop data:', err);
     return res.status(500).send('Internal Server Error');
+} finally {
+    // 釋放連接
+    connection.release();
 }
 });
 
@@ -672,7 +672,7 @@ router.get('/shop_search', async (req, res) => {
 
     try {
         // 從連接池獲取連接
-        const con = await db.pool.getConnection();
+        const connection  = await db.pool.getConnection();
 
         let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
         const params = [];
@@ -689,16 +689,17 @@ router.get('/shop_search', async (req, res) => {
             params.push(email);
         }
         console.log('Executing query:', query, params); // 在控制台記錄即將執行的查詢和參數
-        const [rows] = await con.execute(query, params);
+        const [rows] = await connection.execute(query, params);
 
-        // 釋放連接
-        con.release();
         console.log('Fetched data:', rows); // 在控制台記錄成功獲取的資料
 
         return res.render('shop_search', { data: rows, startDate, endDate, email });
     } catch (error) {
         console.error('Error fetching data from database:', error);
         return res.status(500).send('Internal Server Error');
+    } finally {
+    // 釋放連接
+    connection.release();
     }
 });
 
