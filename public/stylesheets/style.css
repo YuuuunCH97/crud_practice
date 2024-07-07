@@ -1,8 +1,252 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.top-li {
+  display: inline;
+  margin-right: 10px;
+}
+.top-a {
+  color: black;
+  text-decoration: none;
+}
+.tit {
+  background-color: #dddedf;
+  height: 30px;
+  width: 100%;
+  font-size: 20px;
 }
 
-a {
-  color: #00B7FF;
+.page-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  width: 120px;
+  text-align: center;
+  background-color: #dddedf;
+  border-radius: 100px;
+}
+
+/* 增加整體容器的左側邊距 */
+.container {
+  margin-left: 20px; /* 可以根據需要調整具體的數值 */
+}
+
+.mb1 {
+  margin-bottom: 1em;
+}
+
+.left-column {
+  width: 6em;
+}
+
+.right-column {
+  width: 12em;
+}
+
+.add-button {
+  width: 100px;
+  padding: 8px;
+  background-color: #90b0cc;
+  border-color: #90b0cc;
+  border-style: solid;
+  color: #ece8e8;
+  border-radius: 100px;
+}
+
+.add-button:hover {
+  background-color: #5b85c9;
+}
+
+.add-button:active {
+  background-color: #737e74;
+}
+
+.del-button {
+  width: 100px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 100px;
+  border-color: #90b0cc;
+  outline-color: #90b0cc;
+}
+
+.del-button:hover {
+  background-color: #5b85c9;
+}
+
+.sup-need {
+  font-weight: bold;
+  font-size: 11px;
+  color: #b62525;
+}
+
+#successMessage {
+  display: none;
+  color: green;
+  margin-top: 10px;
+}
+
+/* 增加橫排顯示興趣列表的樣式 */
+#interestsContainer {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+#interestsContainer label {
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+/* Clear float every two items */
+#interestsContainer label:nth-child(odd) {
+  clear: left;
+}
+
+.width-100 {
+  width: 100%;
+}
+.black-border {
+  border: 1px solid #000;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.td1 {
+  display: inline-block;
+  width: 80px;
+  min-width: 80px;
+  margin: 10px;
+}
+.td2 {
+  display: inline-block;
+  width: 400px;
+  min-width: 200px;
+  margin: 10px;
+}
+.td3 {
+  display: inline-block;
+  width: 80px;
+  min-width: 80px;
+  margin: 10px;
+}
+.td4 {
+  display: inline-block;
+  width: 160px;
+  min-width: 80px;
+  margin: 10px;
+}
+.td-center {
+  text-align: center;
+}
+
+.label-inline {
+  display: inline;
+}
+
+#name2 {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid black;
+  width: 100%;
+  table-layout: auto; /* 表格布局固定，寬度自動調整 */
+}
+
+#name2 thead {
+  background-color: lightgrey; /* 設置灰色背景 */
+  position: sticky; /* 固定表头 */
+  top: 0; /* 确保固定在顶部 */
+  z-index: 1; /* 确保在滚动时表头不被遮挡 */
+}
+
+#name2 td,
+#name2 th {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+  white-space: nowrap; /* 禁止文本换行 */
+  /* overflow: hidden; 溢出隐藏 */
+  text-overflow: ellipsis; /* 文本溢出显示省略号 */
+}
+
+.table-container {
+  max-height: 300px; /* 表格最大高度，视需要调整 */
+  overflow-y: auto; /* 垂直滚动 */
+  border: 1px solid #ddd; /* 可选，增加边框以区分滚动区域 */
+  margin-top: 10px; /* 与上方元素的距离 */
+}
+
+/*delete button*/
+.delete-button-container {
+  position: fixed;
+  bottom: 20px; /* 與底部的距離 */
+  left: 50%; /* 與左邊的距離 */
+  transform: translateX(-50%); /* 水平居中 */
+  z-index: 999; /* 確保在最上層 */
+  width: 25%;
+  padding: 8px;
+  margin-top: 10px;
+  background-color: transparent; /* 背景透明 */
+  border: none; /* 刪除外框 */
+  cursor: pointer;
+  outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
+}
+
+#productTable {
+  width: 80%;
+  margin: 20px 0;
+  font-size: 18px;
+  text-align: center; /* 表格內容置中 */
+  border-collapse: collapse;
+}
+
+#productTable > th,
+td {
+  border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
+  padding: 8px; /* 增加內邊距 */
+  text-align: center; /* 文字置中對齊 */
+}
+
+.product-list-header {
+  background-color: #b693b6;
+  color: rgb(29, 27, 27);
+  font-weight: bold;
+  text-align: center;
+  border-top: none; /* 移除最上邊線 */
+  border-right: none; /* 移除最右邊線 */
+}
+
+.total {
+  font-weight: bold;
+  border-left: none;
+  border-right: none;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  background-color: #90b0cc;
+}
+
+/* 表格樣式 */
+#shop_search_table {
+  width: 100%;
+  margin: 20px 0;
+  font-size: 18px;
+  text-align: center; /* 表格內容置中 */
+  border-collapse: collapse;
+}
+
+/* 表頭和表格單元樣式 */
+#shop_search_table th,
+td {
+  border: 1px solid black; /* 為th和td添加1px寬的黑色實線邊框 */
+  padding: 15px; /* 增加內邊距 */
+  text-align: center; /* 文字置中對齊 */
+}
+
+/* 商品列表的樣式 */
+#shop_search_table > ul li {
+  display: block; /* 每個商品顯示為獨立的一行 */
+  margin-bottom: 5px; /* 為每個商品之間增加些許間距 */
+}
+
+/* 表頭行的背景顏色 */
+#shop_search_table > thead tr {
+  background-color: #a8aca9;
 }
