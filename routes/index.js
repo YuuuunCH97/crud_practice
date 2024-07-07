@@ -42,7 +42,7 @@ router.get('/mem2024', async function(req, res, next) {
 //    try {
 //        await fs.writeFile(DATA_PATH, JSON.stringify(newData, null, 2));
 //        console.log('File successfully written');
-//        
+//
 //        const data = await fs.readFile(DATA_PATH, 'utf8');
 //        const jsonData = JSON.parse(data);
 //        res.render('search_member', jsonData);
@@ -107,7 +107,7 @@ router.get('/search_member', async (req, res) => {
 //                 const recordDate = new Date(member.recordDate);
 //                 //調試輸出每個條件的值和匹配結果
 //                 return (!startDate || recordDate >= new Date(startDate)) &&
-//                     (!endDate || recordDate <= new Date(endDate)) && 
+//                     (!endDate || recordDate <= new Date(endDate)) &&
 //                     (!email || member.email.includes(email)) &&
 //                     (!country || member.select_country === country) &&
 //                     (!city || member.select_city === city);
@@ -159,7 +159,7 @@ router.post('/search_member', async (req, res) => {
         // 從連線池獲取連線
         const connection = await db.pool.getConnection();
         // 執行 SQL 查詢
-        const [rows, fields] = await connection.execute(sql, params);        
+        const [rows, fields] = await connection.execute(sql, params);
         // 釋放連接
         connection.release();
 
@@ -240,7 +240,7 @@ router.post('/delete_selected_members', async (req, res) => {
 //         jsonData.members = jsonData.members || [];
 //         // 添加新成员数据
 //         jsonData.members.push(memberData);
-        
+
 //         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
 //         console.log('Member created:', memberData.email);
 //         res.redirect('/create_member');
@@ -263,7 +263,7 @@ router.post('/delete_selected_members', async (req, res) => {
 //         // 读取现有数据
 //         const data = await fs.readFile(DATA_PATH, 'utf8');
 //         let jsonData;
-        
+
 //         try {
 //             jsonData = JSON.parse(data); // 解析 JSON 数据
 //         } catch (parseError) {
@@ -321,7 +321,7 @@ router.post('/create_member', async (req, res) => {
             // 如果 EMAIL 已存在，返回錯誤
             return res.status(400).send('Email already exists.');
         }
-        
+
         // 插入資料到 member2024 表
         const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -357,7 +357,7 @@ router.post('/create_member', async (req, res) => {
 //     try {
 //         const data = await fs.readFile(DATA_PATH, 'utf8');
 //         let jsonData = JSON.parse(data);
-        
+
 //         const memberIndex = jsonData.members.findIndex(m => m.email === email);
 //         if (memberIndex === -1) {
 //             console.log('Member not found:', email);
@@ -373,7 +373,7 @@ router.post('/create_member', async (req, res) => {
 //     } catch (err) {
 //         console.error('Error:', err.stack);
 //         return res.status(500).send('Internal Server Error');
-        
+
 //     }
 // });
 
@@ -469,7 +469,7 @@ router.post('/edit_member/:email', async (req, res) => {
 
 router.get('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
-    
+
     try {
         // 獲取連接
         const connection = await db.pool.getConnection();
@@ -519,7 +519,7 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    return res.render('create_member', {"msg": "", "data": "{}"});    
+    return res.render('create_member', {"msg": "", "data": "{}"});
 });
 
 // 渲染購物車系統頁面 /shop_sys
@@ -620,7 +620,7 @@ router.post('/shop_submit', async (req, res) => {
         if (!emailExists) {
             // 如果 EMAIL 不存在，返回無會員資料的訊息
             return res.status(404).send('無會員資料，無法新增購物車資料');
-        } 
+        }
         // 將 purchasedItems 轉換為 JSON 字符串
         const purchasedItemsJson = JSON.stringify(purchasedItems);
 
@@ -648,7 +648,7 @@ router.post('/shop_submit', async (req, res) => {
         console.log('購物車資料已成功保存:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已成功保存');
     }
-    
+
 } catch (err) {
     console.error('Error saving shop data:', err);
     return res.status(500).send('Internal Server Error');
