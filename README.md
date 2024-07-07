@@ -25,7 +25,7 @@ nodemon start
 ```
 
 ```bash
-#看端口 
+#看端口
 netstat -ano | findstr :8888
 
 #終止端口
@@ -48,7 +48,7 @@ CREATE TABLE member2024 (
   CITY varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   INTERESTS text COLLATE utf8mb4_unicode_ci,
   NOTE text COLLATE utf8mb4_unicode_ci,
-  RECORD_DATE date DEFAULT NULL,
+  RECORD_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   SERIAL_NUMBER varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL UNIQUE,
   ORDER_DATE date DEFAULT NULL,
   PURCHASED_ITEMS text COLLATE utf8mb4_unicode_ci,

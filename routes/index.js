@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { start } = require('repl');
 const router = express.Router();
 const db = require('../db')
+const memberController = require('../controllers/memberController');
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -250,104 +251,7 @@ router.post('/delete_selected_members', async (req, res) => {
 //     }
 // });
 
-//////  資料加入 data
-// router.post('/create_member', async (req, res) => {
-//     const memberData = req.body;
-
-//     // 检查是否存在 record_date，如果没有，则生成当前日期
-//     if (!memberData.record_date) {
-//         memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式为 YYYY-MM-DD
-//     }
-
-//     try {
-//         // 读取现有数据
-//         const data = await fs.readFile(DATA_PATH, 'utf8');
-//         let jsonData;
-
-//         try {
-//             jsonData = JSON.parse(data); // 解析 JSON 数据
-//         } catch (parseError) {
-//             console.error('Error parsing JSON:', parseError);
-//             return res.status(500).send('Internal Server Error');
-//         }
-
-//         // 确保 members 数组存在
-//         if (!Array.isArray(jsonData.members)) {
-//             jsonData.members = [];
-//         }
-
-//         // 掃描是否有重複的帳號
-//         for (i=0; i<=jsonData.members.length; i++ ) {
-//             let data_email = jsonData.members[i] || {'email': ''}
-//             if (data_email['email'] == memberData['email']){
-//                 let memberData_json = JSON.stringify(memberData)
-//                 return res.render('create_member', {"msg": "帳號重複", "data": memberData_json});
-//             }
-//         }
-//         // 添加新成员数据
-//         jsonData.members.push(memberData);
-//         // 写入文件
-//         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
-//         console.log('Member created:', memberData.email);
-
-//         // 重定向到 create_member 页面
-//         res.redirect('/search_member');
-//     } catch (err) {
-//         console.error('Error:', err);
-//         return res.status(500).send('Internal Server Error');
-//     }
-// });
-
-///////資料加入mysql
-
-
-router.post('/create_member', async (req, res) => {
-    const memberData = req.body;
-
-    // 檢查是否存在 record_date，如果沒有則生成當前日期
-    if (!memberData.record_date) {
-        memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式為 YYYY-MM-DD
-    }
-    try {
-        // 獲取連結
-        const connection = await db.pool.getConnection();
-        // 查詢 檢查 EMAIL 是否已存在
-        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
-        const [rows, fields] = await connection.execute(checkEmailSql, [memberData.email]);
-
-        const emailExists = rows[0].count > 0;
-
-        if (emailExists) {
-            // 如果 EMAIL 已存在，返回錯誤
-            return res.status(400).send('Email already exists.');
-        }
-
-        // 插入資料到 member2024 表
-        const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        await connection.execute(sql, [
-            memberData.email,
-            memberData.name,
-            memberData.sex,
-            memberData.select_country,
-            memberData.select_city,
-            JSON.stringify(memberData.interests), // 將興趣轉為 JSON 字串存儲
-            memberData.note,
-            memberData.record_date
-        ]);
-
-        // 释放连接回连接池
-        connection.release();
-        console.log('Member data inserted:', memberData.email);
-
-        // 重定向到 create_member 頁面或其他適當的頁面
-        res.redirect('/search_member');
-    } catch (err) {
-        console.error('Error inserting member data:', err);
-        return res.status(500).send('Internal Server Error');
-    }
-});
-
+router.post('/create_member', memberController.createMember);
 
 // 修改會員
 // router.post('/edit_member/:email', async (req, res) => {
@@ -669,10 +573,10 @@ router.post('/shop_submit', async (req, res) => {
 
 router.get('/shop_search', async (req, res) => {
     const { startDate, endDate, email } = req.query;
+    const connection  = await db.pool.getConnection();
 
     try {
         // 從連接池獲取連接
-        const connection  = await db.pool.getConnection();
 
         let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
         const params = [];

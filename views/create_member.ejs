@@ -30,7 +30,7 @@
       let dataElement = document.getElementById("data-json");
       let jsonData;
       if (dataElement && dataElement.textContent){
-          jsonData = JSON.parse(dataElement.textContent);
+        jsonData = JSON.parse(dataElement.textContent);
       } else {
           jsonData = {}
       }
@@ -42,7 +42,7 @@
         updateCities();
         setTimeout(() => {
           $("#select_city").val(jsonData["select_city"])
-        }, 300);
+        }, 1000);
 
         $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
 
@@ -61,9 +61,8 @@
         } else if (typeof(jsonData.interests) === "object"){
           for (i=0; i<jsonData.interests.length; i++ ) {
             $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
-            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
-            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
-        }}
+        }
+      }
         }, 300);
         $('textarea[name="note"]').val(jsonData.note)
       }
@@ -226,13 +225,13 @@
     }
     */
 
-    /* 會員管理系統 新增 查詢 
+    /* 會員管理系統 新增 查詢
     .tit {
       background-color: #dddedf;
       height: 30px;
       width: 100%;
       font-size: 20px;
-    } 
+    }
     */
 
     /* 滑鼠懸停顯示 */
@@ -320,7 +319,7 @@
       margin-right: 10px;
       margin-bottom: 5px;
     }
-    
+
     /* Clear float every two items */
     #interestsContainer label:nth-child(odd) {
       clear: left;
