@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>會員查詢</title>
+
   <%- include('./header') -%>
 
   <script>
@@ -302,16 +303,6 @@
 
 <body>
   <%- include('./head') %>
-  <!-- <div class = "tit">
-    <ul>
-      <li><b>會員管理系統</b>
-      <li><a aria-current="page" href="/create_member"> 新增</a>
-      <li><a aria-current="page" href="/search_member" >查詢</a>
-      <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-      <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
-    </ul>
-  </div><br> -->
-
   <div class="container">
     <div><p><b>會員查詢</b></p></div>
 
@@ -320,8 +311,8 @@
       <table id="name1" border="1" rules="groups">
       <tr>
         <td>紀錄日期 </td>
-        <td>開始日 
-          <input type="date" name="startDate" size="10">       
+        <td>開始日
+          <input type="date" name="startDate" size="10">
         </td>
         <td> ~ 結束日
           <input type="date" name="endDate" size="10">
@@ -346,11 +337,12 @@
         </td>
       </tr>
       <tr>
-        <td>專長</td>
+        <td>主題</td>
+        <!-- TODO 專長由成員輸入不可控 需要改成主題 -->
         <td >
-          <select name="select_country" >
+          <select name="select_skill" >
             <option value="" disabled selected>Select</option>
-            <option value="select_country">拉拉拉
+            <option value="select_skill">拉拉拉
           </select>
         </td>
         <td></td>
@@ -379,12 +371,14 @@
           <thead>
             <tr>
               <td>刪除</td>
+              <td>流水號</td>
               <td>紀錄日期</td>
               <td>帳號</td>
               <td>國家</td>
               <td>城市</td>
               <td>姓名</td>
               <td>性別</td>
+              <td>主題</td>
               <td>修改</td>
             </tr>
           </thead>
@@ -392,11 +386,13 @@
             <% data.forEach(member => { %>
               <tr>
                 <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
+                <td><%= member.ID %></td>
                 <td><%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %></td>
                 <td><%= member.EMAIL %></td>
                 <td><%= member.COUNTRY %></td>
                 <td><%= member.CITY %></td>
                 <td><%= member.NAME %></td>
+                <td><%= member.INTERESTS %></td>
                 <td><%= member.SEX === 'male' ? '男' : '女' %></td>
                 <td><button onclick="window.location.href='/edit_member/<%= member.EMAIL %>'">修改</button></td>
               </tr>
@@ -426,7 +422,7 @@
         </table>
       <% } %>
     </div>
-  </div> 
+  </div>
   <div class="delete-button-container">
     <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
   </div>

@@ -32,6 +32,33 @@ const createMember = async (memberData) => {
     }
 }
 
+const searchMember = async (startDate, endDate, email, country, city, id, Skil) => {
+    // TODO
+    const connection = await db.pool.getConnection();
+    try {
+        let rows = []
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const allMember = async () => {
+    const connection = await db.pool.getConnection();
+    try {
+        [rows] = await connection.execute('SELECT * FROM member2024');
+        return { success: true , data: rows, errorMessage: null};
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+
 module.exports = {
     createMember,
+    searchMember,
+    allMember
 };

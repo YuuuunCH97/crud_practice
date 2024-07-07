@@ -1,6 +1,4 @@
-const { json } = require('body-parser');
 const memberModel = require('../models/memberModel');
-
 
 const createMember = async (req, res) => {
     const memberData = req.body;
@@ -24,6 +22,29 @@ const createMember = async (req, res) => {
     }
 }
 
+const searchMember = async (req, res) => {
+    // TODO
+    try {
+        const result = await memberModel.searchMember()
+        res.render('search_member', result);
+    } catch (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+const allMember = async (req, res) => {
+    try {
+        const result = await memberModel.allMember()
+        res.render('search_member', result);
+    } catch (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
 module.exports = {
     createMember,
+    searchMember,
+    allMember
 };

@@ -21,6 +21,8 @@ router.get('/', async (req, res) => {
     res.redirect('/search_member');
 });
 
+router.post('/create_member', memberController.createMember);
+router.get('/search_member', memberController.allMember);
 
 // 取出資料表
 router.get('/mem2024', async function(req, res, next) {
@@ -73,22 +75,6 @@ router.get('/mem2024', async function(req, res, next) {
 //     return res.render('search_member', { data: jsonData, errorMessage: null });
 // });
 
-router.get('/search_member', async (req, res) => {
-    try {
-        // 獲取連結
-        const connection = await db.pool.getConnection();
-        // 查詢獲取所有會員數據
-        const [rows] = await connection.execute('SELECT * FROM member2024');
-        // 釋放連接
-        connection.release();
-
-        // 回傳所有會員數據
-        res.render('search_member', { data: rows, errorMessage: null });
-    } catch (err) {
-        console.error('Error executing query:', err);
-        return res.status(500).send('Internal Server Error');
-    }
-});
 
 // // 處理查尋會員的 POST 請求
 // router.post('/search_member', async (req, res) => {
@@ -251,7 +237,6 @@ router.post('/delete_selected_members', async (req, res) => {
 //     }
 // });
 
-router.post('/create_member', memberController.createMember);
 
 // 修改會員
 // router.post('/edit_member/:email', async (req, res) => {
@@ -373,10 +358,9 @@ router.post('/edit_member/:email', async (req, res) => {
 
 router.get('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
-
+    const connection = await db.pool.getConnection();
     try {
         // 獲取連接
-        const connection = await db.pool.getConnection();
         console.log('Connecting to the database...');
 
         console.log('Database connection established.');
