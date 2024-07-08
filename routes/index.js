@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { start } = require('repl');
 const router = express.Router();
 const db = require('../db')
+const memberController = require('../controllers/memberController');
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +21,8 @@ router.get('/', async (req, res) => {
     res.redirect('/search_member');
 });
 
+router.post('/create_member', memberController.createMember);
+router.get('/search_member', memberController.allMember);
 
 // 取出資料表
 router.get('/mem2024', async function(req, res, next) {
@@ -42,7 +45,7 @@ router.get('/mem2024', async function(req, res, next) {
 //    try {
 //        await fs.writeFile(DATA_PATH, JSON.stringify(newData, null, 2));
 //        console.log('File successfully written');
-//        
+//
 //        const data = await fs.readFile(DATA_PATH, 'utf8');
 //        const jsonData = JSON.parse(data);
 //        res.render('search_member', jsonData);
@@ -72,22 +75,6 @@ router.get('/mem2024', async function(req, res, next) {
 //     return res.render('search_member', { data: jsonData, errorMessage: null });
 // });
 
-router.get('/search_member', async (req, res) => {
-    try {
-        // 獲取連結
-        const connection = await db.pool.getConnection();
-        // 查詢獲取所有會員數據
-        const [rows] = await connection.execute('SELECT * FROM member2024');
-        // 釋放連接
-        connection.release();
-
-        // 回傳所有會員數據
-        res.render('search_member', { data: rows, errorMessage: null });
-    } catch (err) {
-        console.error('Error executing query:', err);
-        return res.status(500).send('Internal Server Error');
-    }
-});
 
 // // 處理查尋會員的 POST 請求
 // router.post('/search_member', async (req, res) => {
@@ -107,7 +94,7 @@ router.get('/search_member', async (req, res) => {
 //                 const recordDate = new Date(member.recordDate);
 //                 //調試輸出每個條件的值和匹配結果
 //                 return (!startDate || recordDate >= new Date(startDate)) &&
-//                     (!endDate || recordDate <= new Date(endDate)) && 
+//                     (!endDate || recordDate <= new Date(endDate)) &&
 //                     (!email || member.email.includes(email)) &&
 //                     (!country || member.select_country === country) &&
 //                     (!city || member.select_city === city);
@@ -159,7 +146,7 @@ router.post('/search_member', async (req, res) => {
         // 從連線池獲取連線
         const connection = await db.pool.getConnection();
         // 執行 SQL 查詢
-        const [rows, fields] = await connection.execute(sql, params);        
+        const [rows, fields] = await connection.execute(sql, params);
         // 釋放連接
         connection.release();
 
@@ -240,7 +227,7 @@ router.post('/delete_selected_members', async (req, res) => {
 //         jsonData.members = jsonData.members || [];
 //         // 添加新成员数据
 //         jsonData.members.push(memberData);
-        
+
 //         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
 //         console.log('Member created:', memberData.email);
 //         res.redirect('/create_member');
@@ -249,104 +236,6 @@ router.post('/delete_selected_members', async (req, res) => {
 //         res.status(500).send('Internal Server Error');
 //     }
 // });
-
-//////  資料加入 data
-// router.post('/create_member', async (req, res) => {
-//     const memberData = req.body;
-
-//     // 检查是否存在 record_date，如果没有，则生成当前日期
-//     if (!memberData.record_date) {
-//         memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式为 YYYY-MM-DD
-//     }
-
-//     try {
-//         // 读取现有数据
-//         const data = await fs.readFile(DATA_PATH, 'utf8');
-//         let jsonData;
-        
-//         try {
-//             jsonData = JSON.parse(data); // 解析 JSON 数据
-//         } catch (parseError) {
-//             console.error('Error parsing JSON:', parseError);
-//             return res.status(500).send('Internal Server Error');
-//         }
-
-//         // 确保 members 数组存在
-//         if (!Array.isArray(jsonData.members)) {
-//             jsonData.members = [];
-//         }
-
-//         // 掃描是否有重複的帳號
-//         for (i=0; i<=jsonData.members.length; i++ ) {
-//             let data_email = jsonData.members[i] || {'email': ''}
-//             if (data_email['email'] == memberData['email']){
-//                 let memberData_json = JSON.stringify(memberData)
-//                 return res.render('create_member', {"msg": "帳號重複", "data": memberData_json});
-//             }
-//         }
-//         // 添加新成员数据
-//         jsonData.members.push(memberData);
-//         // 写入文件
-//         await fs.writeFile(DATA_PATH, JSON.stringify(jsonData, null, 2));
-//         console.log('Member created:', memberData.email);
-
-//         // 重定向到 create_member 页面
-//         res.redirect('/search_member');
-//     } catch (err) {
-//         console.error('Error:', err);
-//         return res.status(500).send('Internal Server Error');
-//     }
-// });
-
-///////資料加入mysql
-
-
-router.post('/create_member', async (req, res) => {
-    const memberData = req.body;
-
-    // 檢查是否存在 record_date，如果沒有則生成當前日期
-    if (!memberData.record_date) {
-        memberData.record_date = new Date().toLocaleDateString('en-CA'); // 格式為 YYYY-MM-DD
-    }
-    try {
-        // 獲取連結
-        const connection = await db.pool.getConnection();
-        // 查詢 檢查 EMAIL 是否已存在
-        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
-        const [rows, fields] = await connection.execute(checkEmailSql, [memberData.email]);
-
-        const emailExists = rows[0].count > 0;
-
-        if (emailExists) {
-            // 如果 EMAIL 已存在，返回錯誤
-            return res.status(400).send('Email already exists.');
-        }
-        
-        // 插入資料到 member2024 表
-        const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE, RECORD_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        await connection.execute(sql, [
-            memberData.email,
-            memberData.name,
-            memberData.sex,
-            memberData.select_country,
-            memberData.select_city,
-            JSON.stringify(memberData.interests), // 將興趣轉為 JSON 字串存儲
-            memberData.note,
-            memberData.record_date
-        ]);
-
-        // 释放连接回连接池
-        connection.release();
-        console.log('Member data inserted:', memberData.email);
-
-        // 重定向到 create_member 頁面或其他適當的頁面
-        res.redirect('/search_member');
-    } catch (err) {
-        console.error('Error inserting member data:', err);
-        return res.status(500).send('Internal Server Error');
-    }
-});
 
 
 // 修改會員
@@ -357,7 +246,7 @@ router.post('/create_member', async (req, res) => {
 //     try {
 //         const data = await fs.readFile(DATA_PATH, 'utf8');
 //         let jsonData = JSON.parse(data);
-        
+
 //         const memberIndex = jsonData.members.findIndex(m => m.email === email);
 //         if (memberIndex === -1) {
 //             console.log('Member not found:', email);
@@ -373,7 +262,7 @@ router.post('/create_member', async (req, res) => {
 //     } catch (err) {
 //         console.error('Error:', err.stack);
 //         return res.status(500).send('Internal Server Error');
-        
+
 //     }
 // });
 
@@ -469,10 +358,9 @@ router.post('/edit_member/:email', async (req, res) => {
 
 router.get('/edit_member/:email', async (req, res) => {
     const email = req.params.email;
-    
+    const connection = await db.pool.getConnection();
     try {
         // 獲取連接
-        const connection = await db.pool.getConnection();
         console.log('Connecting to the database...');
 
         console.log('Database connection established.');
@@ -519,7 +407,7 @@ router.get('/edit_member/:email', async (req, res) => {
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
     console.log('Rendering create_member page');
-    return res.render('create_member', {"msg": "", "data": "{}"});    
+    return res.render('create_member', {"msg": "", "data": "{}"});
 });
 
 // 渲染購物車系統頁面 /shop_sys
@@ -620,7 +508,7 @@ router.post('/shop_submit', async (req, res) => {
         if (!emailExists) {
             // 如果 EMAIL 不存在，返回無會員資料的訊息
             return res.status(404).send('無會員資料，無法新增購物車資料');
-        } 
+        }
         // 將 purchasedItems 轉換為 JSON 字符串
         const purchasedItemsJson = JSON.stringify(purchasedItems);
 
@@ -648,7 +536,7 @@ router.post('/shop_submit', async (req, res) => {
         console.log('購物車資料已成功保存:', { orderDate, serialNumber, email, purchasedItems });
         return res.status(200).send('購物車資料已成功保存');
     }
-    
+
 } catch (err) {
     console.error('Error saving shop data:', err);
     return res.status(500).send('Internal Server Error');
@@ -669,10 +557,10 @@ router.post('/shop_submit', async (req, res) => {
 
 router.get('/shop_search', async (req, res) => {
     const { startDate, endDate, email } = req.query;
+    const connection  = await db.pool.getConnection();
 
     try {
         // 從連接池獲取連接
-        const connection  = await db.pool.getConnection();
 
         let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024";
         const params = [];

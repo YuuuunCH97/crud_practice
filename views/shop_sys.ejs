@@ -1,373 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>購物車系統</title>
     <%- include('./header') -%>
-    
+
     <script>
-        // 算總價
-        function calculateTotal(selectElement) {
-            // 檢查帳號是否已經填寫
-            var emailInput = document.getElementById('emailInput');
-            if (emailInput.value.trim() === "") {
-                alert("請先輸入帳號！");
-                selectElement.value = ""; // 清空購買數量輸入框
-                return;
-            }
-            // 確保正確獲取父級 tr 元素
-            var tr = selectElement.closest('tr');
-            // 獲取價格單元格和總價單元格
-            var priceCell = tr.cells[2];
-            var totalCell = tr.cells[4];
-            // 解析價格和數量，確保為有效數字
-            var price = parseFloat(priceCell.textContent) || 0; // 如果解析失敗，預設為 0
-            var quantity = parseInt(selectElement.value) || 0; // 如果解析失敗，預設為 0
-            // 計算總價
-            var total = price * quantity;
-            // 更新總價單元格
-            totalCell.textContent = total; // 不保留小數位
+      // 算總價
+      function calculateTotal(selectElement) {
+        // 檢查帳號是否已經填寫
+        var emailInput = document.getElementById('emailInput');
+        if (emailInput.value.trim() === '') {
+          alert('請先輸入帳號！');
+          selectElement.value = ''; // 清空購買數量輸入框
+          return;
+        }
+        // 確保正確獲取父級 tr 元素
+        var tr = selectElement.closest('tr');
+        // 獲取價格單元格和總價單元格
+        var priceCell = tr.cells[2];
+        var totalCell = tr.cells[4];
+        // 解析價格和數量，確保為有效數字
+        var price = parseFloat(priceCell.textContent) || 0; // 如果解析失敗，預設為 0
+        var quantity = parseInt(selectElement.value) || 0; // 如果解析失敗，預設為 0
+        // 計算總價
+        var total = price * quantity;
+        // 更新總價單元格
+        totalCell.textContent = total; // 不保留小數位
+        // 更新總金額
+        updateGrandTotal();
+      }
+
+      function updateGrandTotal() {
+        var grandTotal = 0;
+        document.querySelectorAll('.item-total').forEach(function (totalCell) {
+          var total = parseFloat(totalCell.textContent) || 0;
+          grandTotal += total;
+        });
+        // 更新總金額，將值放入 'grandTotal' 元素內
+        document.getElementById('grandTotal').textContent = grandTotal;
+      }
+
+      window.onload = function () {
+        var dataList = document.getElementById('emailOptions');
+        // 使用fetch從data.json加載數據
+        fetch('/data/data.json')
+          .then((response) => response.json())
+          .then((data) => {
+            data.members.forEach((member) => {
+              var option = document.createElement('option');
+              option.value = member.email;
+              dataList.appendChild(option);
+            });
+          })
+          .catch((error) => console.error('Error loading data:', error));
+
+        // 獲取table元素
+        var table = document.getElementById('productTable');
+
+        // 使用fetch從product.json加載數據
+        fetch('/data/product.json')
+          .then((response) => response.json())
+          .then((data) => {
+            // 清空表格內容
+            table.innerHTML = '';
+
+            // 創建一個 Set 用於存儲已經添加的商品名稱，確保不重複添加
+            var addedProducts = new Set();
+            // 添加商品列表
+            var productListRow = table.insertRow();
+            productListRow.innerHTML =
+              '<td colspan="5" class="product-list-header">商品列表</td>';
+            var headerRow = table.insertRow();
+            headerRow.innerHTML =
+              '<th>商品名稱</th><th>照片</th><th>價格</th><th>購買數量</th><th>總價</th>';
+
+            // 迭代每個產品並將其添加到表格中
+            data.products.forEach((product) => {
+              // 檢查商品是否已經添加過
+              if (!addedProducts.has(product.name)) {
+                var row = table.insertRow(); // 插入新行到表格末尾
+                var nameCell = row.insertCell(0); // 商品名稱單元格
+                var photoCell = row.insertCell(1); // 照片單元格
+                var priceCell = row.insertCell(2); // 價格單元格
+                var quantityCell = row.insertCell(3); // 購買數量單元格
+                var totalCell = row.insertCell(4); // 總價單元格
+
+                nameCell.textContent = product.name;
+                photoCell.innerHTML = `<img src="${product.photo}" alt="${product.name}" style="height: 100px; width: 100px;">`;
+                priceCell.textContent = product.price; // 保留兩位小數
+                quantityCell.innerHTML =
+                  '<input type="number" value="" step="1" min="1" onchange="calculateTotal(this)">';
+                totalCell.className = 'item-total'; // 設置 class 以便後續更新總金額
+                totalCell.textContent = '0'; // 初始化總價為 0
+
+                // 將商品名稱添加到 Set 中
+                addedProducts.add(product.name);
+              }
+            });
+            // 添加總價行
+            var totalRow = table.insertRow();
+            totalRow.innerHTML =
+              '<td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>';
+
             // 更新總金額
             updateGrandTotal();
-        }
+          })
+          .catch((error) => console.error('Error loading data:', error));
+      };
 
-
-        function updateGrandTotal() {
-            var grandTotal = 0;
-            document.querySelectorAll('.item-total').forEach(function(totalCell) {
-                var total = parseFloat(totalCell.textContent) || 0;
-                grandTotal += total;
-            });
-            // 更新總金額，將值放入 'grandTotal' 元素內
-            document.getElementById('grandTotal').textContent = grandTotal;
-        }
-
-
-
-        window.onload = function() {
-
-            var dataList = document.getElementById('emailOptions');
-            // 使用fetch從data.json加載數據
-            fetch('/data/data.json')
-                .then(response => response.json())
-                .then(data => {
-                    data.members.forEach(member => {
-                        var option = document.createElement('option');
-                        option.value = member.email;
-                        dataList.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error loading data:', error));
-
-            // 獲取table元素
-            var table = document.getElementById('productTable');
-
-            // 使用fetch從product.json加載數據
-            fetch('/data/product.json')
-                .then(response => response.json())
-                .then(data => {
-                    // 清空表格內容
-                    table.innerHTML = '';
-
-                    // 創建一個 Set 用於存儲已經添加的商品名稱，確保不重複添加
-                    var addedProducts = new Set();
-                    // 添加商品列表
-                    var productListRow = table.insertRow();
-                    productListRow.innerHTML = '<td colspan="5" class="product-list-header">商品列表</td>';
-                    var headerRow = table.insertRow();
-                    headerRow.innerHTML = '<th>商品名稱</th><th>照片</th><th>價格</th><th>購買數量</th><th>總價</th>';
-
-                    // 迭代每個產品並將其添加到表格中
-                    data.products.forEach(product => {
-                        // 檢查商品是否已經添加過
-                        if (!addedProducts.has(product.name)) {
-                            var row = table.insertRow(); // 插入新行到表格末尾
-                            var nameCell = row.insertCell(0); // 商品名稱單元格
-                            var photoCell = row.insertCell(1); // 照片單元格
-                            var priceCell = row.insertCell(2); // 價格單元格
-                            var quantityCell = row.insertCell(3); // 購買數量單元格
-                            var totalCell = row.insertCell(4); // 總價單元格
-
-                            nameCell.textContent = product.name;
-                            photoCell.innerHTML = `<img src="${product.photo}" alt="${product.name}" style="height: 100px; width: 100px;">`
-                            priceCell.textContent = product.price; // 保留兩位小數
-                            quantityCell.innerHTML = '<input type="number" value="" step="1" min="1" onchange="calculateTotal(this)">';
-                            totalCell.className = 'item-total'; // 設置 class 以便後續更新總金額
-                            totalCell.textContent = '0'; // 初始化總價為 0
-
-                            // 將商品名稱添加到 Set 中
-                            addedProducts.add(product.name);
-                        }
-                    });
-                    // 添加總價行
-                    var totalRow = table.insertRow();
-                    totalRow.innerHTML = '<td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>';
-
-
-                    // 更新總金額
-                    updateGrandTotal();
-                })
-                .catch(error => console.error('Error loading data:', error));
-        };
-        
-        function generateSerialNumber() {
+      function generateSerialNumber() {
         // 隨機生成一個不重複的流水號
         return 'shop' + Math.floor(1000000000 + Math.random() * 9000000000);
-        }
+      }
 
-        //提交資料到後端
-        document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('shoppingCartForm').addEventListener('submit', function(event) {
-                event.preventDefault(); // 阻止默認的表單提交行為
+      //提交資料到後端
+      document.addEventListener('DOMContentLoaded', function () {
+        document
+          .getElementById('shoppingCartForm')
+          .addEventListener('submit', function (event) {
+            event.preventDefault(); // 阻止默認的表單提交行為
 
-                var email = document.getElementById('emailInput').value;
-                var email = emailInput.value.trim(); // 確保去除空白字符
-                if (!email) {
-                    alert("請輸入帳號");
-                    return;
+            var email = document.getElementById('emailInput').value;
+            var email = emailInput.value.trim(); // 確保去除空白字符
+            if (!email) {
+              alert('請輸入帳號');
+              return;
+            }
+
+            var items = [];
+            var rows = document.querySelectorAll('#productTable tr');
+            rows.forEach((row, index) => {
+              if (index > 0 && index < rows.length - 1) {
+                // 忽略標題行和最後一行
+                var cells = row.cells;
+                var name = cells[0].textContent.trim(); // 商品名稱
+                var price = parseFloat(cells[2].textContent) || 0; // 商品價格
+                var quantityInput =
+                  cells[3].querySelector('input[type=number]');
+                // 確認 quantityInput 是否存在並且有效
+                var quantity = 0;
+                if (quantityInput) {
+                  quantity = parseInt(quantityInput.value) || 0; // 購買數量
                 }
-
-                var items = [];
-                var rows = document.querySelectorAll('#productTable tr');
-                rows.forEach((row, index) => {
-                    if (index > 0 && index < rows.length - 1) { // 忽略標題行和最後一行
-                        var cells = row.cells;
-                        var name = cells[0].textContent.trim(); // 商品名稱
-                        var price = parseFloat(cells[2].textContent) || 0; // 商品價格
-                        var quantityInput = cells[3].querySelector('input[type=number]');
-                        // 確認 quantityInput 是否存在並且有效
-                        var quantity = 0;
-                        if (quantityInput) {
-                            quantity = parseInt(quantityInput.value) || 0; // 購買數量
-                        }
-                        if (quantity > 0) {
-                            items.push({ name, quantity, price });
-                        }
-                    }
-                });                   
-                if (items.length === 0) {
-                    alert("請至少選擇一個商品");
-                    return;
+                if (quantity > 0) {
+                  items.push({ name, quantity, price });
                 }
-                var now = new Date();
-                var orderDate = now.getFullYear() + '-' + 
-                                (now.getMonth() + 1).toString().padStart(2, '0') + '-' 
-                                + now.getDate().toString().padStart(2, '0'); // 格式化日期為 'YYYY-MM-DD'
-                var serialNumber = generateSerialNumber(); // 隨機生成流水號
-
-                var formData = {
-                    orderDate: orderDate,
-                    serialNumber: serialNumber,
-                    email: email,
-                    purchasedItems: items
-                };
-
-                fetch('/shop_submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert("購物車資料已成功保存");
-                        document.getElementById('emailInput').value = ''; // 清空輸入框內容
-                        document.querySelectorAll('#productTable input[type=number]').forEach(input => input.value = ''); // 清空商品數量輸入框
-                        document.querySelectorAll('.item-total').forEach(cell => cell.textContent = '0'); // 重置總價格顯示
-                        document.getElementById('grandTotal').textContent = '0';
-                    } else {
-                        throw new Error("儲存失敗");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("儲存失敗");
-                });
+              }
             });
-        });
+            if (items.length === 0) {
+              alert('請至少選擇一個商品');
+              return;
+            }
+            var now = new Date();
+            var orderDate =
+              now.getFullYear() +
+              '-' +
+              (now.getMonth() + 1).toString().padStart(2, '0') +
+              '-' +
+              now.getDate().toString().padStart(2, '0'); // 格式化日期為 'YYYY-MM-DD'
+            var serialNumber = generateSerialNumber(); // 隨機生成流水號
 
+            var formData = {
+              orderDate: orderDate,
+              serialNumber: serialNumber,
+              email: email,
+              purchasedItems: items,
+            };
 
-
-
-
+            fetch('/shop_submit', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  alert('購物車資料已成功保存');
+                  document.getElementById('emailInput').value = ''; // 清空輸入框內容
+                  document
+                    .querySelectorAll('#productTable input[type=number]')
+                    .forEach((input) => (input.value = '')); // 清空商品數量輸入框
+                  document
+                    .querySelectorAll('.item-total')
+                    .forEach((cell) => (cell.textContent = '0')); // 重置總價格顯示
+                  document.getElementById('grandTotal').textContent = '0';
+                } else {
+                  throw new Error('儲存失敗');
+                }
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+                alert('儲存失敗');
+              });
+          });
+      });
     </script>
-    <style>
-        /* 增加整體容器的左側邊距 */
-        .container {
-        margin-left: 20px; /* 可以根據需要調整具體的數值 */
-        }
-        h1 {
-            background-color:#ece8e8;
-            color:rgb(153, 151, 151);
-            font-size:13px;
-            background-size:100%;
-        }
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
 
-        /* div li {
-            display:inline;
-            margin-right:10px;
-        } */
-
-        /*購物車系統*/
-        div p {
-            width: 120px;
-            text-align:center;
-            background-color: #dddedf;
-            border-radius: 100px;
-        }
-        /*
-        div a {
-            color: black;
-            text-decoration: none;
-        } */
-
-        /*會員管理系統 新增 查詢*/
-        /* .tit{
-            background-color: #dddedf;
-            height:30px;
-            width:100%;
-            font-size: 20px;;
-        } */
-
-        /*左右框線*/
-        .no-border-left {
-            border-left: none;
-        }
-        .no-border-right {
-            border-right: none;
-        }
-
-        table {
-            width: 80%;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: center; /* 表格內容置中 */
-            border-collapse: collapse;
-
-        }
-
-
-        th, td {
-            border: 1px solid black; /* 對th、td添加1px寬的黑色實線邊框 */
-            padding: 8px; /* 增加內邊距 */
-            text-align: center; /* 文字置中對齊 */
-        }
-
-        td:last-child {
-            border-right: 1px solid black; /* 最右邊的td添加1px寬的黑色實線邊框 */
-        }
-
-        tr:last-child td {
-            border-bottom: 1px solid black; /* 最下面的每個td添加1px寬的黑色實線邊框 */
-        }
-
-
-        th {
-            background-color: #E6E6FA; 
-        }
-
-        .product-list-header {
-            background-color: #b693b6; 
-            color: rgb(29, 27, 27); 
-            font-weight: bold;
-            text-align: center;
-            border-top: none;  /* 移除最上邊線 */
-            border-right: none; /* 移除最右邊線 */
-        }
-
-        .total {
-            font-weight: bold;
-            border-left: none;
-            border-right: none;
-            border-top: 1px solid black;
-            border-bottom: 1px solid black;
-            background-color: #90b0cc; 
-        }
-
-
-        /*送出*/
-        button{
-            width: 10%;
-            padding: 8px;
-            margin-top: 10px;
-            background-color: #90b0cc;
-            border-color:#90b0cc;
-            border-style:solid;
-            color:#ece8e8;
-            border-radius: 100px;
-        }    
-
-        /*滑鼠懸停顯示*/
-        button:hover {
-            background-color: #5c68d4;
-        }
-        /*按鈕被點即時的顏色*/
-        button:active {
-            background-color: #737e74;
-        }
-        
-    </style>
-
-</head>
-
-<body>
+  <body>
     <%- include('./head') %>
-    <!-- <div class = "tit">
-        <ul>
-            <li><b>會員管理系統</b>
-                <li><a aria-current="page" href="/create_member"> 新增</a>
-                <li><a aria-current="page" href="/search_member" >查詢</a>
-                <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-                <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
-        </ul>
-    </div><br> -->
-
     <div class="container">
-        <div><p><b>購物車系統</b></p></div>
+      <div class="page-title">購物車系統</div>
 
-        <label for="email"><b>帳號:</b></label>
-        <input list="emailOptions" id="emailInput" name="email" placeholder="請選擇或輸入帳號">
-        <datalist id="emailOptions"></datalist><br>
+      <label for="email"><b>帳號:</b></label>
+      <input
+        list="emailOptions"
+        id="emailInput"
+        name="email"
+        placeholder="請選擇或輸入帳號"
+      />
+      <datalist id="emailOptions"></datalist><br />
 
+      <div class="table-section">
+        <form id="shoppingCartForm" action="/shop_submit" method="post">
+          <table id="productTable" rules="groups" width="80%">
+            <tr>
+              <td colspan="5" class="product-list-header">產品列表</td>
+            </tr>
 
+            <tr>
+              <th>商品名稱</th>
+              <th>照片</th>
+              <th>價格</th>
+              <th>購買數量</th>
+              <th>總價</th>
+            </tr>
 
-        <div class="table-section">
-            <form id="shoppingCartForm" action="/shop_submit" method="post">
-                <table id="productTable" rules="groups" width="80%">           
-                    <tr><td colspan="5" class="product-list-header">產品列表</td></tr>
-                    
-                    <tr>
-                        <th>商品名稱</th>
-                        <th>照片</th>
-                        <th>價格</th>
-                        <th>購買數量</th>
-                        <th>總價</th>
-                    </tr>
+            <% products.forEach(product => { %>
+            <tr>
+              <td><%= product.name %></td>
+              <td>
+                <img src="<%= product.photo %>" alt="<%= product.name %>" />
+              </td>
+              <td><%= product.price %></td>
+              <td>
+                <input
+                  type="number"
+                  value=""
+                  min="0"
+                  step="1"
+                  onchange="calculateTotal(this)"
+                />
+              </td>
+              <td class="item-total"></td>
+            </tr>
+            <% }); %>
+            <tr class="total">
+              <!-- 將 '總金額' 和數值放在同一個單元格，並將 colspan 設為 5 -->
+              <td colspan="5" style="text-align: center">
+                <b>總金額: <span id="grandTotal">0</span></b>
+              </td>
+            </tr>
+          </table>
 
-                    <% products.forEach(product => { %>
-                        <tr>
-                            <td><%= product.name %></td>
-                            <td><img src="<%= product.photo %>" alt="<%= product.name %>"></td>
-                            <td><%= product.price %></td>
-                            <td><input type="number" value="" min="0" step="1" onchange="calculateTotal(this)"></td>
-                            <td class="item-total"></td>
-                        </tr>
-                    <% }); %>
-                    <tr class="total">
-                        <!-- 將 '總金額' 和數值放在同一個單元格，並將 colspan 設為 5 -->
-                        <td colspan="5" style="text-align: center;"><b>總金額: <span id="grandTotal">0</span></b></td>
-                    </tr>
-
-
-                </table>
-                
-                <button type="submit">送出</button>
-            </form>
-
-        </div>
+          <button class="add-button" type="submit">送出</button>
+        </form>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>

@@ -1,409 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>會員查詢</title>
-  <%- include('./header') -%>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>會員查詢</title>
+    <%- include('./header') -%>
 
-  <script>
-    updateCountry()
-    function updateCountry() {
-      // 透過API取得國家資料
-      $.ajax({
-        type: "POST",
-        url: "/get_country_city",
-        data: {},
-        success: function (msg) {
-          let country_html = "<option value='' disabled selected>請選擇國家</option>"
-          for (var key in msg['receivedData']) {
-            country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
-          }
-          $("#select_country").html(country_html)
-          updateCities()
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <script>
+      updateCountry();
+      function updateCountry() {
+        // 透過API取得國家資料
+        $.ajax({
+          type: 'POST',
+          url: '/get_country_city',
+          data: {},
+          success: function (msg) {
+            let country_html =
+              "<option value='' disabled selected>請選擇國家</option>";
+            for (var key in msg['receivedData']) {
+              country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`;
+            }
+            $('#select_country').html(country_html);
+            updateCities();
+          },
+        });
+      }
+
+      // 國家相對應城市
+      function updateCities() {
+        var country = document.getElementById('select_country').value;
+        $.ajax({
+          type: 'POST',
+          url: '/get_country_city',
+          data: { country: country },
+          success: function (msg) {
+            let city_html =
+              "<option value='' disabled selected>請選擇城市</option>";
+            for (var key in msg['receivedData']) {
+              city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`;
+            }
+            $('#select_city').html(city_html);
+          },
+        });
+      }
+
+      let selectedEmails = []; // 用於存儲選中會員的電子郵件地址
+
+      // 當checkbox選取時將電子郵件地址添加到selectedEmails列表中
+      function handleCheckboxChange(email) {
+        if (selectedEmails.includes(email)) {
+          selectedEmails = selectedEmails.filter((item) => item !== email);
+        } else {
+          selectedEmails.push(email);
         }
-      });
-    }
+      }
 
-    // 國家相對應城市
-    function updateCities() {
-      var country = document.getElementById("select_country").value;
-      $.ajax({
-        type: "POST",
-        url: "/get_country_city",
-        data: {"country": country},
-        success: function (msg) {
-          let city_html = "<option value='' disabled selected>請選擇城市</option>"
-          for (var key in msg['receivedData']) {
-            city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
-          }
-          $("#select_city").html(city_html)
+      // 點擊刪除按鈕時調用的函數
+      function deleteSelectedMembers() {
+        const selectedEmails = Array.from(
+          document.querySelectorAll('input[name="delete"]:checked'),
+        ).map((checkbox) => checkbox.value);
+
+        if (selectedEmails.length === 0) {
+          alert('請選擇要刪除的會員');
+          return;
         }
-      });
-    }
 
-  let selectedEmails = []; // 用於存儲選中會員的電子郵件地址
-
-  // 當checkbox選取時將電子郵件地址添加到selectedEmails列表中
-  function handleCheckboxChange(email) {
-    if (selectedEmails.includes(email)) {
-      selectedEmails = selectedEmails.filter(item => item !== email);
-    } else {
-      selectedEmails.push(email);
-    }
-  }
-
-  // 點擊刪除按鈕時調用的函數
-  function deleteSelectedMembers() {
-
-    const selectedEmails = Array.from(document.querySelectorAll('input[name="delete"]:checked'))
-                  .map(checkbox => checkbox.value);
-
-    if (selectedEmails.length === 0) {
-      alert("請選擇要刪除的會員");
-      return;
-    }
-
-    if (confirm("確定要刪除選取的會員嗎？")) {
-      fetch(`/delete_selected_members`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ selectedEmails })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('刪除會員失敗');
+        if (confirm('確定要刪除選取的會員嗎？')) {
+          fetch(`/delete_selected_members`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ selectedEmails }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('刪除會員失敗');
+              }
+              // 刷新頁面或者重新加載資料
+              window.location.reload();
+            })
+            .catch((error) => {
+              console.error('刪除會員失敗:', error);
+            });
         }
-        // 刷新頁面或者重新加載資料
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error('刪除會員失敗:', error);
-      });
-    }
-  }
+      }
 
-  //按出查詢檢查是否有填入資料
-  function validateForm() {
-    const startDate = document.querySelector('input[name="startDate"]').value;
-    const endDate = document.querySelector('input[name="endDate"]').value;
-    const email = document.querySelector('input[name="email"]').value;
-    const country = document.querySelector('select[name="country"]').value;
-    const city = document.querySelector('select[name="city"]').value;
-    if (!startDate && !endDate && !email && !country && !city) {
-      alert("請輸入查詢條件");
-      return false; // 阻止表單提交
-    }
-    return true; // 允許表單提交
-  }
+      //按出查詢檢查是否有填入資料
+      function validateForm() {
+        const startDate = document.querySelector(
+          'input[name="startDate"]',
+        ).value;
+        const endDate = document.querySelector('input[name="endDate"]').value;
+        const email = document.querySelector('input[name="email"]').value;
+        const country = document.querySelector('select[name="country"]').value;
+        const city = document.querySelector('select[name="city"]').value;
+        if (!startDate && !endDate && !email && !country && !city) {
+          alert('請輸入查詢條件');
+          return false; // 阻止表單提交
+        }
+        return true; // 允許表單提交
+      }
+    </script>
+  </head>
 
+  <body>
+    <%- include('./head') %>
+    <div class="container">
+      <div class="page-title">會員查詢</div>
 
+      <form
+        action="/search_member"
+        method="POST"
+        id="searchForm"
+        onsubmit="return validateForm()"
+      >
+        <div class="width-100 black-border">
+          <div>
+            <div class="td1">
+              <label class="label-inline">紀錄日期：</label>
+            </div>
+            <div class="td2">
+              <label class="label-inline" for="startDate">開始日</label>
+              <input
+                class="label-inline"
+                type="date"
+                name="startDate"
+                id="startDate"
+                size="10"
+              />
 
-  </script>
-  <style>
-    /* 增加整體容器的左側邊距 */
-    .container {
-      margin-left: 20px; /* 可以根據需要調整具體的數值 */
-    }
+              <label class="label-inline" for="endDate"> ~ 結束日</label>
+              <input
+                class="label-inline"
+                type="date"
+                name="endDate"
+                id="endDate"
+                size="10"
+              />
+            </div>
 
-    h1 {
-      background-color:#ece8e8;
-      color:rgb(153, 151, 151);
-      font-size:13px;
-      background-size:100%;
-    }
+            <div class="td3">
+              <label class="label-inline" for="id-nunber">流水號</label>
+            </div>
+            <div class="td4">
+              <input
+                class="label-inline"
+                name="nunber"
+                id="id-nunber"
+                size="10"
+                style="width: 200px"
+              />
+            </div>
+          </div>
+          <div class="td1">
+            <label class="label-inline">國家：</label>
+          </div>
+          <div class="td2">
+            <select
+              id="select_country"
+              name="country"
+              size="number"
+              onchange="updateCities()"
+              style="width: 100px"
+            ></select>
+          </div>
+          <div class="td3">
+            <label class="label-inline" for="select_city">城市：</label>
+          </div>
+          <div class="td4">
+            <select
+              name="city"
+              id="select_city"
+              size="number"
+              style="width: 100px"
+            ></select>
+          </div>
+          <div></div>
 
-    /* div li {
-      display:inline;
-      margin-right:10px;
-    } */
+          <div>
+            <div class="td1">
+              <label class="label-inline">主題：</label>
+            </div>
+            <div class="td2">
+              <select name="select_skill">
+                <option value="" disabled selected>Select</option>
+                <option value="select_skill">拉拉拉</option>
+              </select>
+            </div>
+            <div class="td3">
+              <label class="label-inline" for="select_city">帳號：</label>
+            </div>
+            <div class="td4">
+              <input
+                type="“email”"
+                name="email"
+                size="10"
+                style="width: 200px"
+              />
+            </div>
+          </div>
+          <div class="td-center">
+            <input class="add-button" type="submit" name="send" value="查詢" />
+          </div>
+        </div>
+      </form>
 
-    /*超連結黑色 無下底線*/
-    /* div a {
-      color: black;
-      text-decoration: none;
-    } */
-
-    div p {
-      width: 120px;
-      text-align:center;
-      background-color: #dddedf;
-      border-radius: 100px;
-    }
-
-    /* 會員管理系統 新增 查詢
-    .tit{
-      background-color: #dddedf;
-      height:30px;
-      width:100%;
-      font-size: 20px;;
-    } */
-
-    /* 表格全局樣式 */
-    table {
-        width: 100%;
-    }
-
-    /* 表格 1 的樣式 */
-    #name1 {
-        border-collapse: collapse;
-    }
-
-    #name1 td {
-      padding: 8px;
-      text-align: left;
-    }
-
-    /* 固定表單元素寬度 */
-    #name1 input, #name1 select {
-      width: 100px; /* 調整這個值以達到最佳效果 */
-      box-sizing: border-box; /* 確保 padding 和 border 不影響總寬度 */
-    }
-
-    /* 表格 2 的樣式 */
-    #name2 {
-        border-collapse: collapse;
-        border-spacing: 0;
-        border: 1px solid black;
-        width:100%;
-        table-layout: auto; /* 表格布局固定，寬度自動調整 */
-    }
-
-    #name2 thead {
-      background-color: lightgrey; /* 設置灰色背景 */
-      position: sticky; /* 固定表头 */
-      top: 0; /* 确保固定在顶部 */
-      z-index: 1; /* 确保在滚动时表头不被遮挡 */
-    }
-
-    /* 表格單元格的樣式 */
-    /* #name2 td {
-        border: 1px solid black;
-        padding: 8px;
-        text-align: center;
-    } */
-
-    #name2 td, #name2 th {
-        border: 1px solid black;
-        padding: 8px;
-        text-align: center;
-        white-space: nowrap; /* 禁止文本换行 */
-        /* overflow: hidden; 溢出隐藏 */
-        text-overflow: ellipsis; /* 文本溢出显示省略号 */
-    }
-
-
-    /* 修改按鈕 */
-    #name2 td button {
-      width: 50%;
-      padding: 8px;
-      background-color: #90b0cc; /* 藍色背景 */
-      border: none; /* 刪除四邊形灰色的框 */
-      color: #ece8e8; /* 文字顏色 */
-      border-radius: 100px; /* 四邊圓角 */
-      cursor: pointer;
-      outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
-    }
-
-    /* 滑鼠懸停時的樣式 */
-    #name2 td button:hover {
-      background-color: #4d66d5;
-    }
-
-    /* 按下時的樣式 */
-    #name2 td button:active {
-      background-color: #737e74;
-    }
-
-    #name1 input[type="submit"] {
-      width: 25%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #90b0cc;
-      border-color:#90b0cc;
-      border-style:solid;
-      color:#ece8e8;
-      border-radius: 100px;
-    }
-
-    /*滑鼠懸停顯示*/
-    #name1 input[type="submit"]:hover {
-      background-color: #45a049;
-    }
-    /*按鈕被點即時的顏色*/
-    #name1 input[type="submit"]:active {
-      background-color: #737e74;
-    }
-
-    button[name="sex"] {
-      width: 50%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #90b0cc;
-      border-color:#90b0cc;
-      border-style:solid;
-      color:#ece8e8;
-      border-radius: 100px;
-    }
-
-    /*滑鼠懸停顯示*/
-    button[name="sex"]:hover {
-      background-color: #45a049;
-    }
-    /*按鈕被點即時的顏色*/
-    button[name="sex"]:active {
-      background-color: #737e74;
-    }
-
-    .table-container {
-      max-height: 300px; /* 表格最大高度，视需要调整 */
-      overflow-y: auto; /* 垂直滚动 */
-      border: 1px solid #ddd; /* 可选，增加边框以区分滚动区域 */
-      margin-top: 10px; /* 与上方元素的距离 */
-    }
-
-    /*delete button*/
-    .delete-button-container {
-      position: fixed;
-      bottom: 20px; /* 與底部的距離 */
-      left: 50%; /* 與左邊的距離 */
-      transform: translateX(-50%); /* 水平居中 */
-      z-index: 999; /* 確保在最上層 */
-      width: 25%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: transparent; /* 背景透明 */
-      border: none; /* 刪除外框 */
-      cursor: pointer;
-      outline: none; /* 刪除按鍵被選中時的藍色輪廓 */
-    }
-
-    .delete-button-container button {
-      background-color: #90b0cc; /* 藍色背景 */
-      color: #ece8e8; /* 文字顏色 */
-      border: none; /* 刪除四邊形灰色的框 */
-      border-radius: 100px; /* 四邊圓角 */
-      padding: 8px 16px; /* 調整按鈕內容的間距 */
-    }
-
-    /*滑鼠懸停顯示*/
-    .delete-button-container button:hover {
-      background-color: #4d66d5;
-    }
-    /*按鈕被點即時的顏色*/
-    .delete-button-container button:active {
-      background-color: #737e74;
-    }
-
-  </style>
-</head>
-
-<body>
-  <%- include('./head') %>
-  <!-- <div class = "tit">
-    <ul>
-      <li><b>會員管理系統</b>
-      <li><a aria-current="page" href="/create_member"> 新增</a>
-      <li><a aria-current="page" href="/search_member" >查詢</a>
-      <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-      <li><a aria-current="page" href="/shop_search" >購物車查詢</a>  
-    </ul>
-  </div><br> -->
-
-  <div class="container">
-    <div><p><b>會員查詢</b></p></div>
-
-    <form action="/search_member" method="POST" id="searchForm" onsubmit="return validateForm()">
-
-      <table id="name1" border="1" rules="groups">
-      <tr>
-        <td>紀錄日期 </td>
-        <td>開始日 
-          <input type="date" name="startDate" size="10">       
-        </td>
-        <td> ~ 結束日
-          <input type="date" name="endDate" size="10">
-        </td>
-        <td> 流水號 </td>
-        <td> <input name="nunber" size="10" style="width: 200px;"> </td>
-      </tr>
-      <tr></tr>
-      <tr>
-        <td>國家</td>
-        <td>
-          <select id="select_country" name="country"  size="number" onchange="updateCities()" style="width:100px;">
-
-          </select>
-        </td>
-        <td></td>
-        <td>城市</td>
-        <td>
-          <select name="city" id="select_city" size="number" style="width:100px;">
-
-          </select><br>
-        </td>
-      </tr>
-      <tr>
-        <td>專長</td>
-        <td >
-          <select name="select_country" >
-            <option value="" disabled selected>Select</option>
-            <option value="select_country">拉拉拉
-          </select>
-        </td>
-        <td></td>
-        <td>帳號</td>
-        <td><input type=“email” name="email" size="10" style="width: 200px;" > </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td><th><input type="submit" name="send" value="查詢"></th></td>
-        <td></td>
-        <td></td>
-      </tr>
-      </table>
-    </form>
-
-    <p></p>
-    <% if (errorMessage) { %>
+      <p></p>
+      <% if (errorMessage) { %>
       <div class="alert">
         <p><%= errorMessage %></p>
       </div>
-    <% } %>
+      <% } %>
 
-    <div class="table-container"> <!--滾動 -->
-      <% if (data && data.length > 0) { %>
-        <table id="name2" border="1" rules="groups">
+      <div class="table-container">
+        <!--滾動 -->
+        <% if (data && data.length > 0) { %>
+        <table id="name2" class="black-border" rules="groups">
           <thead>
             <tr>
               <td>刪除</td>
+              <td>流水號</td>
               <td>紀錄日期</td>
               <td>帳號</td>
               <td>國家</td>
               <td>城市</td>
               <td>姓名</td>
               <td>性別</td>
+              <td>主題</td>
               <td>修改</td>
             </tr>
           </thead>
           <tbody>
             <% data.forEach(member => { %>
-              <tr>
-                <td><input type="checkbox" name="delete" value="<%= member.EMAIL %>"></td>
-                <td><%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %></td>
-                <td><%= member.EMAIL %></td>
-                <td><%= member.COUNTRY %></td>
-                <td><%= member.CITY %></td>
-                <td><%= member.NAME %></td>
-                <td><%= member.SEX === 'male' ? '男' : '女' %></td>
-                <td><button onclick="window.location.href='/edit_member/<%= member.EMAIL %>'">修改</button></td>
-              </tr>
+            <tr>
+              <td>
+                <input
+                  type="checkbox"
+                  name="delete"
+                  value="<%= member.EMAIL %>"
+                />
+              </td>
+              <td><%= member.ID %></td>
+              <td>
+                <%= new Date(member.RECORD_DATE).toISOString().split('T')[0] %>
+              </td>
+              <td><%= member.EMAIL %></td>
+              <td><%= member.COUNTRY %></td>
+              <td><%= member.CITY %></td>
+              <td><%= member.NAME %></td>
+              <td><%= member.INTERESTS %></td>
+              <td><%= member.SEX === 'male' ? '男' : '女' %></td>
+              <td>
+                <button class="add-button"
+                  onclick="window.location.href='/edit_member/<%= member.EMAIL %>'"
+                >
+                  修改
+                </button>
+              </td>
+            </tr>
             <% }); %>
           </tbody>
         </table>
-      <% } else { %>
+        <% } else { %>
         <table id="name2" border="1" rules="groups">
           <thead>
             <tr>
@@ -424,11 +286,11 @@
             </tr>
           </tbody>
         </table>
-      <% } %>
+        <% } %>
+      </div>
     </div>
-  </div> 
-  <div class="delete-button-container">
-    <button onclick="deleteSelectedMembers()" id="delete">刪除</button>
-  </div>
-</body>
+    <div class="delete-button-container">
+      <button class="del-button" onclick="deleteSelectedMembers()" id="delete">刪除</button>
+    </div>
+  </body>
 </html>

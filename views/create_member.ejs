@@ -1,396 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>會員新增</title>
+    <%- include('./header') %>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>會員新增</title>
-  <%- include('./header') %>
+    <script>
+      let data = {};
 
-  <script>
-    let data = {}
+      function get_data() {
+        data['user'] = $('#user').val();
+      }
 
-    function get_data() {
-      data["user"] = $("#user").val()
-    }
-
-    // 設定記錄日期為當前日期
-    function setRecordDate() {
+      // 設定記錄日期為當前日期
+      function setRecordDate() {
         const today = new Date().toISOString().split('T')[0]; // 格式化當前日期為 YYYY-MM-DD
         document.getElementById('record_date').value = today;
-    }
+      }
 
-    // 在頁面加載時設定記錄日期
-    window.onload = function () {
+      // 在頁面加載時設定記錄日期
+      window.onload = function () {
         setRecordDate();
         loadInterests(); // 保留已有的 loadInterests 調用
-    }
+      };
 
-    $(document).ready(function() {
-      let dataElement = document.getElementById("data-json");
-      let jsonData;
-      if (dataElement && dataElement.textContent){
+      $(document).ready(function () {
+        let dataElement = document.getElementById('data-json');
+        let jsonData;
+        if (dataElement && dataElement.textContent) {
           jsonData = JSON.parse(dataElement.textContent);
-      } else {
-          jsonData = {}
-      }
-
-      if (Object.keys(jsonData).length > 0){
-        $("#email").val(jsonData["email"])
-        $("#name").val(jsonData["name"])
-        $("#select_country").val(jsonData["select_country"])
-        updateCities();
-        setTimeout(() => {
-          $("#select_city").val(jsonData["select_city"])
-        }, 300);
-
-        $(`input[name="sex"][value="${jsonData['sex']}"]`).prop('checked', true);
-
-        let sell_data = ''
-        if (typeof(jsonData.sell) === "string"){
-          sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell}">${jsonData.sell}</label><br>`
-        } else if (typeof(jsonData.sell) === "object"){
-          for (i=0; i<jsonData.sell.length; i++ ) {
-            sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell[i]}">${jsonData.sell[i]}</label><br>`
-          }
+        } else {
+          jsonData = {};
         }
-        $("#checkboxContainer").html(sell_data)
-        setTimeout(() => {
-          if (typeof(jsonData.interests) === "string"){
-          $(`input[name="interests"][value="${jsonData.interests}"]`).prop('checked', true);
-        } else if (typeof(jsonData.interests) === "object"){
-          for (i=0; i<jsonData.interests.length; i++ ) {
-            $(`input[name="interests"][value="${jsonData.interests[i]}"]`).prop('checked', true);
-            console.log(`input[name="interests"][value="${jsonData.interests[i]}"]`)
-            console.log($(`input[name="interests"][value="${jsonData.interests[i]}"]`))
-        }}
-        }, 300);
-        $('textarea[name="note"]').val(jsonData.note)
-      }
-    })
 
-    updateCountry()
-    function updateCountry() {
-      // 透過API取得國家資料
-      $.ajax({
-        type: "POST",
-        url: "/get_country_city",
-        data: {},
-        success: function (msg) {
-          let country_html = ""
-          for (var key in msg['receivedData']) {
-            country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
+        if (Object.keys(jsonData).length > 0) {
+          $('#email').val(jsonData['email']);
+          $('#name').val(jsonData['name']);
+          $('#select_country').val(jsonData['select_country']);
+          updateCities();
+          setTimeout(() => {
+            $('#select_city').val(jsonData['select_city']);
+          }, 1000);
+
+          $(`input[name="sex"][value="${jsonData['sex']}"]`).prop(
+            'checked',
+            true,
+          );
+
+          let sell_data = '';
+          if (typeof jsonData.sell === 'string') {
+            sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell}">${jsonData.sell}</label><br>`;
+          } else if (typeof jsonData.sell === 'object') {
+            for (i = 0; i < jsonData.sell.length; i++) {
+              sell_data += `<label><input type="checkbox" name="sell" value="${jsonData.sell[i]}">${jsonData.sell[i]}</label><br>`;
+            }
           }
-          $("#select_country").html(country_html)
-          updateCities()
+          $('#checkboxContainer').html(sell_data);
+          setTimeout(() => {
+            if (typeof jsonData.interests === 'string') {
+              $(`input[name="interests"][value="${jsonData.interests}"]`).prop(
+                'checked',
+                true,
+              );
+            } else if (typeof jsonData.interests === 'object') {
+              for (i = 0; i < jsonData.interests.length; i++) {
+                $(
+                  `input[name="interests"][value="${jsonData.interests[i]}"]`,
+                ).prop('checked', true);
+              }
+            }
+          }, 300);
+          $('textarea[name="note"]').val(jsonData.note);
         }
       });
-    }
 
-    // 國家相對應城市
-    function updateCities() {
-      var country = document.getElementById("select_country").value;
-      $.ajax({
-        type: "POST",
-        url: "/get_country_city",
-        data: {"country": country},
-        success: function (msg) {
-          let city_html = ""
-          for (var key in msg['receivedData']) {
-            city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`
-          }
-          $("#select_city").html(city_html)
-        }
-      });
-    }
-
-    // 專長輸入產生
-    function addSkillToCheckbox() {
-      var skillInput = document.getElementById("skillInput");
-      var skill = skillInput.value.trim();
-      if (skill) {
-        var checkboxContainer = document.getElementById("checkboxContainer");
-
-        var newCheckbox = document.createElement("input");
-        newCheckbox.type = "checkbox";
-        newCheckbox.name = "sell";
-        newCheckbox.value = skill;
-
-        var newLabel = document.createElement("label");
-        newLabel.appendChild(newCheckbox);
-        newLabel.appendChild(document.createTextNode(skill));
-
-        checkboxContainer.appendChild(newLabel);
-        checkboxContainer.appendChild(document.createElement("br"));
-
-        skillInput.value = ""; // 清空輸入框
-      } else {
-        alert("請輸入專長");
+      updateCountry();
+      function updateCountry() {
+        // 透過API取得國家資料
+        $.ajax({
+          type: 'POST',
+          url: '/get_country_city',
+          data: {},
+          success: function (msg) {
+            let country_html = '';
+            for (var key in msg['receivedData']) {
+              country_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`;
+            }
+            $('#select_country').html(country_html);
+            updateCities();
+          },
+        });
       }
-    }
 
-    // 選擇刪除專長
-    function removeSelectedSkills() {
-      var checkboxContainer = document.getElementById("checkboxContainer");
-      var checkboxes = checkboxContainer.querySelectorAll("input[type='checkbox']:checked");
+      // 國家相對應城市
+      function updateCities() {
+        var country = document.getElementById('select_country').value;
+        $.ajax({
+          type: 'POST',
+          url: '/get_country_city',
+          data: { country: country },
+          success: function (msg) {
+            let city_html = '';
+            for (var key in msg['receivedData']) {
+              city_html += `<option value='${msg['receivedData'][key]}'>${msg['receivedData'][key]}</option>`;
+            }
+            $('#select_city').html(city_html);
+          },
+        });
+      }
 
-      checkboxes.forEach(function (checkbox) {
-        var label = checkbox.parentNode;
-        var br = label.nextSibling;
-        checkboxContainer.removeChild(label); // 移除標籤（包含複選框）
-        checkboxContainer.removeChild(br); // 移除換行符
-      });
-    }
+      // 專長輸入產生
+      function addSkillToCheckbox() {
+        var skillInput = document.getElementById('skillInput');
+        var skill = skillInput.value.trim();
+        if (skill) {
+          var checkboxContainer = document.getElementById('checkboxContainer');
 
-    // 驗證表單
-    function validateForm(event) {
-      event.preventDefault(); // 防止表單提交
-      $('#checkboxContainer input[type="checkbox"]').prop('checked', true);
-      document.forms["registration"].submit();
-    }
+          var newCheckbox = document.createElement('input');
+          newCheckbox.type = 'checkbox';
+          newCheckbox.name = 'sell';
+          newCheckbox.value = skill;
 
-    // json讀入興趣
-    // 動態加載興趣列表
-    function loadInterests() {
-      fetch('/data/interests.json')
-        .then(response => response.json())
-        .then(data => {
-          var interestsContainer = document.getElementById("interestsContainer");
-          data.interests.forEach(interest => {
-            var checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.name = "interests";
-            checkbox.value = interest;
+          var newLabel = document.createElement('label');
+          newLabel.appendChild(newCheckbox);
+          newLabel.appendChild(document.createTextNode(skill));
 
-            var label = document.createElement("label");
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(interest));
+          checkboxContainer.appendChild(newLabel);
+          checkboxContainer.appendChild(document.createElement('br'));
 
-            interestsContainer.appendChild(label);
-            interestsContainer.appendChild(document.createElement("br"));
-          });
-        })
-        .catch(error => console.error('Error loading interests:', error));
-    }
+          skillInput.value = ''; // 清空輸入框
+        } else {
+          alert('請輸入專長');
+        }
+      }
 
-    window.onload = function () {
-      loadInterests();
-    }
-  </script>
+      // 選擇刪除專長
+      function removeSelectedSkills() {
+        var checkboxContainer = document.getElementById('checkboxContainer');
+        var checkboxes = checkboxContainer.querySelectorAll(
+          "input[type='checkbox']:checked",
+        );
 
-  <style>
-    /* 設定表單元素之間的間距 */
-    form label {
-      margin-bottom: 5px; /* 設定標籤下方的間距 */
-    }
+        checkboxes.forEach(function (checkbox) {
+          var label = checkbox.parentNode;
+          var br = label.nextSibling;
+          checkboxContainer.removeChild(label); // 移除標籤（包含複選框）
+          checkboxContainer.removeChild(br); // 移除換行符
+        });
+      }
 
-    form input,
-    form select,
-    form textarea {
-      margin-bottom: 10px; /* 設定表單元素之間的垂直間距 */
-    }
+      // 驗證表單
+      function validateForm(event) {
+        event.preventDefault(); // 防止表單提交
+        $('#checkboxContainer input[type="checkbox"]').prop('checked', true);
+        document.forms['registration'].submit();
+      }
 
-    form button {
-      margin-bottom: 20px; /* 設定按鈕下方的間距 */
-    }
+      // json讀入興趣
+      // 動態加載興趣列表
+      function loadInterests() {
+        fetch('/data/interests.json')
+          .then((response) => response.json())
+          .then((data) => {
+            var interestsContainer =
+              document.getElementById('interestsContainer');
+            data.interests.forEach((interest) => {
+              var checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              checkbox.name = 'interests';
+              checkbox.value = interest;
 
-    /* 增加整體容器的左側邊距 */
-    .container {
-      margin-left: 20px; /* 可以根據需要調整具體的數值 */
-    }
+              var label = document.createElement('label');
+              label.appendChild(checkbox);
+              label.appendChild(document.createTextNode(interest));
 
-    h1 {
-      background-color: #ece8e8;
-      color: rgb(153, 151, 151);
-      font-size: 13px;
-      background-size: 100%;
-    }
+              interestsContainer.appendChild(label);
+              interestsContainer.appendChild(document.createElement('br'));
+            });
+          })
+          .catch((error) => console.error('Error loading interests:', error));
+      }
 
-    /*
-    div li {
-      display: inline;
-      margin-right: 10px;
-    }
-    */
+      window.onload = function () {
+        loadInterests();
+      };
+    </script>
 
-    p {
-      width: 120px;
-      text-align: center;
-      background-color: #dddedf;
-      border-radius: 100px;
-    }
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
 
-    /* div a {
-      color: black;
-      text-decoration: none;
-    }
-    */
-
-    /* 會員管理系統 新增 查詢 
-    .tit {
-      background-color: #dddedf;
-      height: 30px;
-      width: 100%;
-      font-size: 20px;
-    } 
-    */
-
-    /* 滑鼠懸停顯示 */
-    button[name="modify"]:hover {
-      background-color: #5b85c9;
-    }
-
-    /* 按鈕被點即時的顏色 */
-    button[name="modify"]:active {
-      background-color: #737e74;
-    }
-
-    form input[name="show"] {
-      width: 20%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: white;
-      border-radius: 100px;
-      border-color: #90b0cc;
-      outline-color: #90b0cc;
-    }
-
-    form input[name="sex"] {
-      margin-right: 5px;
-      position: absolute;
-      content: "";
-      border-radius: 50%;
-      background-color: #90b0cc;
-      border: 1px solid #90b0cc;
-    }
-
-    form button[name="sel"] {
-      width: 10%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #90b0cc;
-      border-color: #90b0cc;
-      border-style: solid;
-      color: #ece8e8;
-      border-radius: 100px;
-    }
-
-    /* 滑鼠懸停顯示 */
-    form button[name="sel"]:hover {
-      background-color: #5b85c9;
-    }
-
-    /* 按鈕被點即時的顏色 */
-    form button[name="sel"]:active {
-      background-color: #737e74;
-    }
-
-    form button[name="send"] {
-      width: 10%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #90b0cc;
-      border-color: #90b0cc;
-      border-style: solid;
-      color: #ece8e8;
-      border-radius: 100px;
-    }
-
-    /* 必填 */
-    form sup {
-      font-weight: bold;
-      font-size: 11px;
-      color: #b62525;
-    }
-
-    #successMessage {
-      display: none;
-      color: green;
-      margin-top: 10px;
-    }
-
-    /* 增加橫排顯示興趣列表的樣式 */
-    #interestsContainer {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-    }
-
-    #interestsContainer label {
-      margin-right: 10px;
-      margin-bottom: 5px;
-    }
-    
-    /* Clear float every two items */
-    #interestsContainer label:nth-child(odd) {
-      clear: left;
-    }
-  </style>
-
-</head>
-
-<body>
-  <%- include('./head') %>
-  <!--
-    <div class="tit">
-      <ul>
-        <li><b> 會員管理系統</b>
-        <li><a aria-current="page" href="/create_member"> 新增</a>
-        <li><a aria-current="page" href="/search_member">查詢</a>
-        <li><a aria-current="page" href="/shop_sys">購物車系統</a>
-        <li><a aria-current="page" href="/shop_search">購物車查詢</a>
-        </ul>
-    </div><br>
-    -->
-
+  <body>
+    <%- include('./head') %>
     <div class="container">
-      <p><b>會員新增</b></p>
+      <div class="page-title">會員新增</div>
 
-      <form name="registration" action="/create_member" method="post" onsubmit="validateForm(event)">
-        <label for="email">電子郵件:</label><sup> 必填 </sup>
-        <input type="email" id="email" name="email" required><br>
-        <label for="name">姓名:</label><sup> 必填 </sup>
-        <input type="text" id="name" name="name" required><br>
+      <br />
+      <form
+        name="registration"
+        action="/create_member"
+        method="post"
+        onsubmit="validateForm(event)"
+      >
+        <label class="mb1 left-column" for="email"
+          >電子郵件:<sup class="sup-need"> 必填 </sup></label
+        >
+        <input
+          class="mb1 right-column"
+          type="email"
+          id="email"
+          name="email"
+          required
+        />
+        <br />
 
-        國家
-        <sup> 必填 </sup>
-        <select id="select_country" name="select_country" size="number" onchange="updateCities()">
-        </select><br>
+        <label class="mb1 left-column" for="name"
+          >姓名:<sup class="sup-need"> 必填 </sup></label
+        >
+        <input
+          class="mb1 right-column"
+          type="text"
+          id="name"
+          name="name"
+          required
+        />
+        <br />
 
-        城市 <sup> 必填 </sup>
-        <select name="select_city" id="select_city" size="number">
-        </select><br>
+        <label class="mb1 left-column" for="select_country"
+          >國家:<sup class="sup-need"> 必填 </sup></label
+        >
+        <select
+          class="mb1 right-column"
+          id="select_country"
+          name="select_country"
+          size="number"
+          onchange="updateCities()"
+        ></select>
+        <br />
 
-        性別 &emsp;
-        <label><input type="radio" name="sex" value="male" checked> &emsp; 男性</label>&emsp;
-        <label><input type="radio" name="sex" value="female"> &emsp; 女性</label>
-        <br>
-        專長
-        <sup> 必填 </sup>
-        <input id="skillInput" name="skillInput" size="10">
-        <button type="button" name="sel" onclick="addSkillToCheckbox()">新增</button>
-        <input type="button" name="show" onclick="removeSelectedSkills()" value="刪除專長"><br>
-        <br>
+        <label class="mb1 left-column" for="select_country"
+          >城市:<sup class="sup-need"> 必填 </sup></label
+        >
+        <select
+          class="mb1 right-column"
+          name="select_city"
+          id="select_city"
+          size="number"
+        ></select>
+        <br />
+
+        <label class="mb1 left-column">性別:</label>
+        <input
+          class="mb1"
+          type="radio"
+          name="sex"
+          value="male"
+          id="male"
+          checked
+        /><label for="male">男性</label>
+        <input
+          class="mb1"
+          type="radio"
+          name="sex"
+          value="female"
+          id="female"
+        /><label for="female">女性</label>
+        <br />
+
+        <label class="mb1 left-column" for="skillInput"
+          >專長:<sup class="sup-need"> 必填 </sup></label
+        >
+        <input
+          class="mb1 right-column"
+          id="skillInput"
+          name="skillInput"
+          size="10"
+        />
+        <button
+          type="button"
+          name="sel"
+          class="add-button"
+          onclick="addSkillToCheckbox()"
+        >
+          新增
+        </button>
+        <input
+          type="button"
+          name="show"
+          class="del-button"
+          onclick="removeSelectedSkills()"
+          value="刪除專長"
+        />
+        <br />
+        <br />
+
         <div id="checkboxContainer"></div>
 
-        <br> 請選擇感興趣的主題 <br>
+        <br />
+        請選擇感興趣的主題 <br />
         <div id="interestsContainer"></div>
 
-        <br>備註<br>
-        <textarea name="note" rows="5" cols="100" wrap="off"></textarea><br><br>
+        <br />備註<br />
+        <textarea name="note" rows="5" cols="100" wrap="off"></textarea
+        ><br /><br />
 
         <% if (msg) { %>
-        <div class="alert alert-danger" role="alert">
-          <%= msg %>
-        </div>
+        <div class="alert alert-danger" role="alert"><%= msg %></div>
         <% } %>
         <!-- <button type="submit" name="send" class="btn btn-outline-primary" onclick="get_data()">送出</button> -->
-        <button type="submit" name="send" class="btn btn-outline-primary">送出</button>
-        <input type="hidden" id="record_date" name="record_date" value="">
+        <button type="submit" name="send" class="add-button">送出</button>
+        <input type="hidden" id="record_date" name="record_date" value="" />
       </form>
     </div>
 
-    <script type="application/json" id="data-json"><%- data %></script>
-</body>
-
+    <script type="application/json" id="data-json">
+      <%- data %>
+    </script>
+  </body>
 </html>
