@@ -5,24 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>購物車查詢</title>
     <%- include('./header') -%>
-
     <link rel="stylesheet" href="/stylesheets/style.css" />
-
-    <script>
-      // 表單驗證函數
-      function validateForm() {
-        var startDate = document.getElementById('start-date').value;
-        var endDate = document.getElementById('end-date').value;
-        var email = document.getElementById('email').value;
-
-        // 如果開始日期、結束日期或電子郵件為空，則提示填寫信息
-        if (!startDate || !endDate || !email) {
-          alert('請填寫日期跟帳號');
-          return false;
-        }
-        return true;
-      }
-    </script>
   </head>
 
   <body>
@@ -30,7 +13,7 @@
     <div class="container">
       <div class="page-title">購物車系統</div>
 
-      <form method="GET" action="/shop_search" onsubmit="return validateForm()">
+      <form method="GET" action="/shop_search">
         <label for="start-date">管理日期 開始日</label>
         <input
           type="date"

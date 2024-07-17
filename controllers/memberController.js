@@ -99,12 +99,11 @@ const editMemberPage = async (req, res) => {
     }
 }
 
-
-
-
 const fs = require('fs').promises;
 const path = require('path');
 const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
+const COUNTRY_CITY_PATH = path.join(__dirname, '../public/data/country_city.json');
+
 const shopSystem = async (req, res) => {
     try {
         const productData = await fs.readFile(PRODUCT_DATA_PATH, 'utf8');
@@ -134,6 +133,36 @@ const shopSubmit = async (req, res) => {
     }
 }
 
+const shopSearchPage = async (req, res) => {
+    const { startDate, endDate, email } = req.query;
+    console.log(startDate, endDate, email)
+    try {
+        const result = await memberModel.shopSearchPage(startDate, endDate, email)
+        return res.render('shop_search', result);
+    } catch (err) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+const getCountryCity = async (req, res) => {
+    // 無輸入參數 {} >> 取得國家list資料
+    // 輸入參數 {"country": "台灣"} >> 取得城市list資料
+    try {
+        const country = req.body['country'];
+        const jsonData_text = await fs.readFile(COUNTRY_CITY_PATH, 'utf8');
+        const jsonData = JSON.parse(jsonData_text);
+        let country_city_list
+        if (country){
+            country_city_list = jsonData[country]
+        } else {
+            country_city_list = Object.keys(jsonData)
+        }
+        return res.json({receivedData: country_city_list});
+    } catch (err) {
+        console.error('Error:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
 
 module.exports = {
     createMember,
@@ -144,5 +173,7 @@ module.exports = {
     editMember,
     editMemberPage,
     shopSystem,
-    shopSubmit
+    shopSubmit,
+    shopSearchPage,
+    getCountryCity
 };

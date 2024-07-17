@@ -164,6 +164,32 @@ const shopSubmit = async (orderDate, serialNumber, email, purchasedItems) => {
     }
 }
 
+const shopSearchPage = async (startDate, endDate, email) => {
+    const connection = await db.pool.getConnection();
+    try {
+        let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024 WHERE 1=1";
+        const params = [];
+        // 如果有過濾條件，則添加到查詢中
+        if (startDate){
+            query += ` AND DATE(ORDER_DATE) >= ?`;
+            params.push(startDate)
+        }
+        if (endDate){
+            query += ` AND DATE(ORDER_DATE) <= ?`;
+            params.push(endDate)
+        }
+        if (email){
+            query += ` AND EMAIL = ?`;
+            params.push(email)
+        }
+        const [rows] = await connection.execute(query, params);
+        return { success: true, data: rows, startDate, endDate, email };
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
 
 module.exports = {
     createMember,
@@ -172,5 +198,6 @@ module.exports = {
     deleteMember,
     editMember,
     editMemberPage,
-    shopSubmit
+    shopSubmit,
+    shopSearchPage
 };
