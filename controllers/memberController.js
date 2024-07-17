@@ -1,5 +1,9 @@
 const memberModel = require('../models/memberModel');
 
+const createMemberPage = async (req, res) => {
+    return res.render('create_member', {"msg": "", "data": "{}"});
+}
+
 const createMember = async (req, res) => {
     const memberData = req.body;
     try {
@@ -43,14 +47,14 @@ const searchMemberPage = async (req, res) => {
     }
 }
 
-const deleteMembers = async (req, res) => {
+const deleteMember = async (req, res) => {
     const { selectedEmails } = req.body;
     if (!selectedEmails || selectedEmails.length === 0) {
         return res.status(400).send('沒有選擇任何會員');
     }
     const placeholders = selectedEmails.map(() => '?').join(',');
     try {
-        const result = await memberModel.deleteMembers(placeholders, selectedEmails)
+        const result = await memberModel.deleteMember(placeholders, selectedEmails)
         if (result.success === true){
             res.redirect('/search_member');
         } else {
@@ -91,7 +95,41 @@ const editMemberPage = async (req, res) => {
             return res.status(400).send(result.errorMessage);
         }
     } catch (err) {
-        console.log(err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+
+
+
+const fs = require('fs').promises;
+const path = require('path');
+const PRODUCT_DATA_PATH = path.join(__dirname, '../public/data/product.json');
+const shopSystem = async (req, res) => {
+    try {
+        const productData = await fs.readFile(PRODUCT_DATA_PATH, 'utf8');
+        const products = JSON.parse(productData).products;
+        return res.render('shop_sys', { products });
+    } catch (err) {
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+const shopSubmit = async (req, res) => {
+    const { orderDate, serialNumber, email, purchasedItems } = req.body;
+    console.log(orderDate, serialNumber, email, purchasedItems)
+    // 檢查請求參數是否存在或有效
+    if (!email || !orderDate || !serialNumber || !purchasedItems || purchasedItems.length === 0){
+        return res.status(400).send('請輸入電子郵件地址和購物車項目');
+    }
+    try {
+        const result = await memberModel.shopSubmit(orderDate, serialNumber, email, purchasedItems)
+        if (result.success === true){
+            return res.status(200).send('購物車資料已更新');
+        } else {
+            return res.status(400).send(result.errorMessage);
+        }
+    } catch (err) {
         return res.status(500).send('Internal Server Error');
     }
 }
@@ -99,9 +137,12 @@ const editMemberPage = async (req, res) => {
 
 module.exports = {
     createMember,
+    createMemberPage,
     searchMember,
     searchMemberPage,
-    deleteMembers,
+    deleteMember,
     editMember,
-    editMemberPage
+    editMemberPage,
+    shopSystem,
+    shopSubmit
 };

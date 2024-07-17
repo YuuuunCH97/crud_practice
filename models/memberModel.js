@@ -83,7 +83,7 @@ const searchMemberPage = async () => {
     }
 }
 
-const deleteMembers = async (placeholders, selectedEmails) => {
+const deleteMember = async (placeholders, selectedEmails) => {
     const connection = await db.pool.getConnection();
     try {
         const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
@@ -136,11 +136,41 @@ const editMemberPage = async (email) => {
     }
 }
 
+const shopSubmit = async (orderDate, serialNumber, email, purchasedItems) => {
+    const connection = await db.pool.getConnection();
+    try {
+
+        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
+        const [rows] = await connection.execute(checkEmailSql, [email]);
+
+        if (rows[0].count > 0) {
+            // 更新購物車資料
+            const updateSql = `
+                UPDATE member2024
+                SET ORDER_DATE = ?,
+                    SERIAL_NUMBER = ?,
+                    PURCHASED_ITEMS = ?
+                WHERE EMAIL = ?`;
+            await connection.execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
+            return { success: true, errorMessage:"購物車資料已更新" }
+        } else {
+            return { success: true, errorMessage:"無會員資料，無法新增購物車資料" }
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+
 module.exports = {
     createMember,
     searchMember,
     searchMemberPage,
-    deleteMembers,
+    deleteMember,
     editMember,
-    editMemberPage
+    editMemberPage,
+    shopSubmit
 };
