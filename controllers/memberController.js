@@ -23,9 +23,9 @@ const createMember = async (req, res) => {
 }
 
 const searchMember = async (req, res) => {
-    // TODO
+    const { startDate, endDate, email, country, city } = req.body;
     try {
-        const result = await memberModel.searchMember()
+        const result = await memberModel.searchMember(startDate, endDate, email, country, city)
         res.render('search_member', result);
     } catch (err) {
         console.error('Error executing query:', err);
@@ -43,8 +43,30 @@ const allMember = async (req, res) => {
     }
 }
 
+const del_members = async (req, res) => {
+    // 轉跳畫面?
+    const { selectedEmails } = req.body;
+    if (!selectedEmails || selectedEmails.length === 0) {
+        return res.status(400).send('沒有選擇任何會員');
+    }
+    const placeholders = selectedEmails.map(() => '?').join(',');
+    try {
+        const result = await memberModel.del_members(placeholders, selectedEmails)
+        if (result.success === true){
+            res.redirect('/search_member');
+        } else {
+            return res.status(400).send('刪除失敗');
+            // 待測試
+        }
+    } catch (err) {
+        console.error('Error executing query:', err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
 module.exports = {
     createMember,
     searchMember,
-    allMember
+    allMember,
+    del_members
 };

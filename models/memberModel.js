@@ -32,11 +32,38 @@ const createMember = async (memberData) => {
     }
 }
 
-const searchMember = async (startDate, endDate, email, country, city, id, Skil) => {
-    // TODO
+const searchMember = async (startDate, endDate, email, country, city, id=null, Skil=null) => {
     const connection = await db.pool.getConnection();
+    let sql = 'SELECT * FROM member2024 WHERE 1 = 1';
+    let params = [];
+    // 檢查並擴展 SQL 查詢
+    if (startDate) {
+        sql += ' AND record_date >= ?';
+        params.push(startDate);
+    }
+    if (endDate) {
+        sql += ' AND record_date <= ?';
+        params.push(endDate);
+    }
+    if (email) {
+        sql += ' AND email LIKE ?';
+        params.push(`%${email}%`);
+    }
+    if (country) {
+        sql += ' AND COUNTRY = ?';
+        params.push(country);
+    }
+    if (city) {
+        sql += ' AND CITY = ?';
+        params.push(city);
+    }
+
     try {
-        let rows = []
+        const [rows] = await connection.execute(sql, params);
+        const errorMessage = rows.length === 0
+        ? '找不到符合條件的會員'
+        : null;
+        return { success: true, data: rows, errorMessage };
     } catch (err) {
         throw err;
     } finally {
@@ -56,9 +83,23 @@ const allMember = async () => {
     }
 }
 
+const del_members = async (placeholders, selectedEmails) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
+        await connection.execute(sql, selectedEmails);
+        return { success: true, errorMessage: null};
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
 
 module.exports = {
     createMember,
     searchMember,
-    allMember
+    allMember,
+    del_members
 };
