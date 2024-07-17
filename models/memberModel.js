@@ -71,7 +71,7 @@ const searchMember = async (startDate, endDate, email, country, city, id=null, S
     }
 }
 
-const allMember = async () => {
+const searchMemberPage = async () => {
     const connection = await db.pool.getConnection();
     try {
         [rows] = await connection.execute('SELECT * FROM member2024');
@@ -83,7 +83,7 @@ const allMember = async () => {
     }
 }
 
-const del_members = async (placeholders, selectedEmails) => {
+const deleteMembers = async (placeholders, selectedEmails) => {
     const connection = await db.pool.getConnection();
     try {
         const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
@@ -96,10 +96,51 @@ const del_members = async (placeholders, selectedEmails) => {
     }
 }
 
+const editMember = async (email, updatedMemberData) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        // 檢查是否找到了會員訊息
+        if (rows.length === 0) {
+            return { success: false, errorMessage: '未找到會員資料，請創建會員'};
+        }
+        await connection.execute(
+            'UPDATE member2024 SET NAME = ?, COUNTRY = ?, CITY = ?, SEX = ?, NOTE = ?, RECORD_DATE = ? WHERE EMAIL = ?',
+            [updatedMemberData.name, updatedMemberData.select_country, updatedMemberData.select_city, updatedMemberData.sex, updatedMemberData.note, updatedMemberData.record_date, email]
+        );
+        return { success: true, errorMessage: null};
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const editMemberPage = async (email) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        if (rows.length === 0) {
+            return { success: false, errorMessage: '未找到會員資料，請創建會員'};
+        }
+        const member = rows[0];
+        member.INTERESTS === null
+        ? member.INTERESTS = []
+        : member.INTERESTS = JSON.parse(member.INTERESTS)
+        return { success: true, member: member, errorMessage:null, msg: "" }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
 
 module.exports = {
     createMember,
     searchMember,
-    allMember,
-    del_members
+    searchMemberPage,
+    deleteMembers,
+    editMember,
+    editMemberPage
 };

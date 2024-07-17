@@ -33,9 +33,9 @@ const searchMember = async (req, res) => {
     }
 }
 
-const allMember = async (req, res) => {
+const searchMemberPage = async (req, res) => {
     try {
-        const result = await memberModel.allMember()
+        const result = await memberModel.searchMemberPage()
         res.render('search_member', result);
     } catch (err) {
         console.error('Error executing query:', err);
@@ -43,19 +43,18 @@ const allMember = async (req, res) => {
     }
 }
 
-const del_members = async (req, res) => {
-    // 轉跳畫面?
+const deleteMembers = async (req, res) => {
     const { selectedEmails } = req.body;
     if (!selectedEmails || selectedEmails.length === 0) {
         return res.status(400).send('沒有選擇任何會員');
     }
     const placeholders = selectedEmails.map(() => '?').join(',');
     try {
-        const result = await memberModel.del_members(placeholders, selectedEmails)
+        const result = await memberModel.deleteMembers(placeholders, selectedEmails)
         if (result.success === true){
             res.redirect('/search_member');
         } else {
-            return res.status(400).send('刪除失敗');
+            return res.status(400).send(result.errorMessage);
             // 待測試
         }
     } catch (err) {
@@ -64,9 +63,45 @@ const del_members = async (req, res) => {
     }
 }
 
+const editMember = async (req, res) => {
+    const email = req.params.email;
+    const updatedMemberData = req.body;
+
+    try {
+        const result = await memberModel.editMember(email, updatedMemberData)
+        if (result.success === true){
+            res.redirect('/search_member');
+        } else {
+            return res.status(400).send(result.errorMessage);
+        }
+    } catch (err) {
+        console.error('錯誤:', err.stack);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+const editMemberPage = async (req, res) => {
+    const email = req.params.email;
+    try {
+        const result = await memberModel.editMemberPage(email)
+        if (result.success === true){
+            return res.render('edit_member', result);
+        } else {
+            console.log(result.errorMessage)
+            return res.status(400).send(result.errorMessage);
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send('Internal Server Error');
+    }
+}
+
+
 module.exports = {
     createMember,
     searchMember,
-    allMember,
-    del_members
+    searchMemberPage,
+    deleteMembers,
+    editMember,
+    editMemberPage
 };

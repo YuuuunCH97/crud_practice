@@ -21,13 +21,16 @@ router.get('/', async (req, res) => {
 
 router.post('/create_member', memberController.createMember);
 
-router.get('/search_member', memberController.allMember);
+router.get('/search_member', memberController.searchMemberPage);
 router.post('/search_member', memberController.searchMember);
 
-router.post('/delete_selected_members', memberController.del_members);
+router.post('/delete_selected_members', memberController.deleteMembers);
 
-// 取出資料表
+router.get('/edit_member/:email', memberController.editMemberPage);
+router.post('/edit_member/:email', memberController.editMember);
+
 router.get('/mem2024', async function(req, res, next) {
+    // Bard: 懶懶的 不想動這個!!!
     // 獲取連結
     const connection = await db.pool.getConnection();
 
@@ -39,145 +42,6 @@ router.get('/mem2024', async function(req, res, next) {
     connection.release();
     res.render('mem2024', {  title: 'Member List', data: rows });
 });
-
-
-// 編輯會員資料的 POST 請求處理器
-router.post('/edit_member/:email', async (req, res) => {
-    const email = req.params.email;
-    const updatedMemberData = req.body;
-
-    let connection;
-    try {
-        // 獲取連接
-        connection = await db.pool.getConnection();
-        // 查詢
-        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
-
-        // 檢查是否找到了會員信息
-        if (rows.length === 0) {
-            console.log('Member not found:', email);
-            return res.status(404).send('未找到會員資料，請創建會員');
-        }
-
-        // 執行更新操作
-        await connection.execute(
-            'UPDATE member2024 SET NAME = ?, COUNTRY = ?, CITY = ?, SEX = ?, NOTE = ?, RECORD_DATE = ? WHERE EMAIL = ?',
-            [updatedMemberData.name, updatedMemberData.select_country, updatedMemberData.select_city, updatedMemberData.sex, updatedMemberData.note, updatedMemberData.record_date, email]
-        );
-
-        console.log('Member updated:', email);
-        return res.redirect('/search_member');
-
-    } catch (err) {
-        console.error('錯誤:', err.stack);
-        return res.status(500).send('內部伺服器錯誤');
-    } finally {
-        if (connection){
-            // 確保連線被釋放
-            connection.release();
-        }
-    }
-});
-
-
-// 編輯會員資料的 GET 請求處理器
-// router.get('/edit_member/:email', async (req, res) => {
-//     const email = req.params.email;
-//     try {
-//         //讀取數據文件
-//         const data = await fs.readFile(DATA_PATH, 'utf8');
-//         const jsonData = JSON.parse(data); //解析json
-//         const member = jsonData.members.find(member => member.email === email);
-//         if (!member) {
-//             console.log('Member not found:', email);
-//             return res.status(404).send('未找到會員數據，請建立會員');
-//         }
-//         return res.render('edit_member', {data: JSON.stringify(member), "msg": ""});
-//     } catch (err) {
-//         console.error('錯誤:', err.stack);
-//         if (!res.headersSent) {
-//             return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
-//         }
-//     }
-// });
-
-// 編輯會員資料的 GET 請求處理器
-// router.get('/edit_member/:email', async (req, res) => {
-//     const email = req.params.email;
-//     try {
-//         const connection = await mysql.createConnection(dbConfig);
-//         const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
-
-//         if (rows.length === 0) {
-//             console.log('Member not found:', email);
-//             return res.status(404).send('未找到會員數據，請建立會員');
-//         }
-
-//         const member = rows[0];
-//         return res.render('edit_member', { data: JSON.stringify(member), msg: "" });  // Render the member object directly
-//     } catch (err) {
-//         console.error('錯誤:', err.stack);
-//         return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
-//     } finally {
-//         if (connection) {
-//             try {
-//                 await connection.end();  // Close the database connection
-//             } catch (err) {
-//                 console.error('關閉資料庫連接錯誤:', err);
-//             }
-//         }
-//     }
-// });
-
-
-
-router.get('/edit_member/:email', async (req, res) => {
-    const email = req.params.email;
-    const connection = await db.pool.getConnection();
-    try {
-        // 獲取連接
-        console.log('Connecting to the database...');
-
-        console.log('Database connection established.');
-        console.log(`Fetching member data for email: ${email}`);
-        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
-
-        if (rows.length === 0) {
-            return res.status(404).send('未找到會員數據，請建立會員');
-        }
-
-        const member = rows[0];
-        // 解析 JSON 字符串為 JavaScript 對象或數組
-        try {
-            member.INTERESTS = JSON.parse(member.INTERESTS);
-        } catch (parseError) {
-            console.error('Error parsing INTERESTS JSON:', parseError);
-            member.INTERESTS = []; // 設置一個默認值，例如空陣列
-        }
-        console.log('Member found:', member);
-        console.log('Rendering edit_member page with data:', member);
-        return res.render('edit_member', { member: member, msg: "" });
-    } catch (err) {
-        console.error('內部伺服器錯誤:', err.message);
-        console.error('錯誤堆疊:', err.stack);
-        console.error('請求資訊:', {
-            method: req.method,
-            url: req.url,
-            params: req.params,
-            query: req.query,
-            body: req.body
-        });
-        return res.status(500).send(`內部伺服器錯誤: ${err.message}`);
-    } finally {
-        if (connection){
-            // 確保連線被釋放
-            connection.release();
-        }
-    }
-
-});
-
-
 
 // 渲染創建會員頁面
 router.get('/create_member', (req, res) => {
