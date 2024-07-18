@@ -32,11 +32,38 @@ const createMember = async (memberData) => {
     }
 }
 
-const searchMember = async (startDate, endDate, email, country, city, id, Skil) => {
-    // TODO
+const searchMember = async (startDate, endDate, email, country, city, id=null, Skil=null) => {
     const connection = await db.pool.getConnection();
+    let sql = 'SELECT * FROM member2024 WHERE 1 = 1';
+    let params = [];
+    // 檢查並擴展 SQL 查詢
+    if (startDate) {
+        sql += ' AND record_date >= ?';
+        params.push(startDate);
+    }
+    if (endDate) {
+        sql += ' AND record_date <= ?';
+        params.push(endDate);
+    }
+    if (email) {
+        sql += ' AND email LIKE ?';
+        params.push(`%${email}%`);
+    }
+    if (country) {
+        sql += ' AND COUNTRY = ?';
+        params.push(country);
+    }
+    if (city) {
+        sql += ' AND CITY = ?';
+        params.push(city);
+    }
+
     try {
-        let rows = []
+        const [rows] = await connection.execute(sql, params);
+        const errorMessage = rows.length === 0
+        ? '找不到符合條件的會員'
+        : null;
+        return { success: true, data: rows, errorMessage };
     } catch (err) {
         throw err;
     } finally {
@@ -44,7 +71,7 @@ const searchMember = async (startDate, endDate, email, country, city, id, Skil) 
     }
 }
 
-const allMember = async () => {
+const searchMemberPage = async () => {
     const connection = await db.pool.getConnection();
     try {
         [rows] = await connection.execute('SELECT * FROM member2024');
@@ -56,9 +83,121 @@ const allMember = async () => {
     }
 }
 
+const deleteMember = async (placeholders, selectedEmails) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
+        await connection.execute(sql, selectedEmails);
+        return { success: true, errorMessage: null};
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const editMember = async (email, updatedMemberData) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        // 檢查是否找到了會員訊息
+        if (rows.length === 0) {
+            return { success: false, errorMessage: '未找到會員資料，請創建會員'};
+        }
+        await connection.execute(
+            'UPDATE member2024 SET NAME = ?, COUNTRY = ?, CITY = ?, SEX = ?, NOTE = ?, RECORD_DATE = ? WHERE EMAIL = ?',
+            [updatedMemberData.name, updatedMemberData.select_country, updatedMemberData.select_city, updatedMemberData.sex, updatedMemberData.note, updatedMemberData.record_date, email]
+        );
+        return { success: true, errorMessage: null};
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const editMemberPage = async (email) => {
+    const connection = await db.pool.getConnection();
+    try {
+        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        if (rows.length === 0) {
+            return { success: false, errorMessage: '未找到會員資料，請創建會員'};
+        }
+        const member = rows[0];
+        member.INTERESTS === null
+        ? member.INTERESTS = []
+        : member.INTERESTS = JSON.parse(member.INTERESTS)
+        return { success: true, member: member, errorMessage:null, msg: "" }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const shopSubmit = async (orderDate, serialNumber, email, purchasedItems) => {
+    const connection = await db.pool.getConnection();
+    try {
+
+        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
+        const [rows] = await connection.execute(checkEmailSql, [email]);
+
+        if (rows[0].count > 0) {
+            // 更新購物車資料
+            const updateSql = `
+                UPDATE member2024
+                SET ORDER_DATE = ?,
+                    SERIAL_NUMBER = ?,
+                    PURCHASED_ITEMS = ?
+                WHERE EMAIL = ?`;
+            await connection.execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
+            return { success: true, errorMessage:"購物車資料已更新" }
+        } else {
+            return { success: true, errorMessage:"無會員資料，無法新增購物車資料" }
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
+
+const shopSearchPage = async (startDate, endDate, email) => {
+    const connection = await db.pool.getConnection();
+    try {
+        let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024 WHERE 1=1";
+        const params = [];
+        // 如果有過濾條件，則添加到查詢中
+        if (startDate){
+            query += ` AND DATE(ORDER_DATE) >= ?`;
+            params.push(startDate)
+        }
+        if (endDate){
+            query += ` AND DATE(ORDER_DATE) <= ?`;
+            params.push(endDate)
+        }
+        if (email){
+            query += ` AND EMAIL = ?`;
+            params.push(email)
+        }
+        const [rows] = await connection.execute(query, params);
+        return { success: true, data: rows, startDate, endDate, email };
+    } catch (err) {
+        throw err;
+    } finally {
+        connection.release();
+    }
+}
 
 module.exports = {
     createMember,
     searchMember,
-    allMember
+    searchMemberPage,
+    deleteMember,
+    editMember,
+    editMemberPage,
+    shopSubmit,
+    shopSearchPage
 };
