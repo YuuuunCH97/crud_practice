@@ -135,7 +135,6 @@ const shopSubmit = async (req, res) => {
 
 const shopSearchPage = async (req, res) => {
     const { startDate, endDate, email } = req.query;
-    console.log(startDate, endDate, email)
     try {
         const result = await memberModel.shopSearchPage(startDate, endDate, email)
         return res.render('shop_search', result);
