@@ -44,17 +44,12 @@
 
       window.onload = function () {
         var dataList = document.getElementById('emailOptions');
-        // 使用fetch從data.json加載數據
-        fetch('/data/data.json')
-          .then((response) => response.json())
-          .then((data) => {
-            data.members.forEach((member) => {
-              var option = document.createElement('option');
-              option.value = member.email;
-              dataList.appendChild(option);
-            });
-          })
-          .catch((error) => console.error('Error loading data:', error));
+        // TODO email選項
+        // data.members.forEach((member) => {
+        //       var option = document.createElement('option');
+        //       option.value = member.email;
+        //       dataList.appendChild(option);
+        //     });
 
         // 獲取table元素
         var table = document.getElementById('productTable');

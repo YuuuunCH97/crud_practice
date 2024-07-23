@@ -39,7 +39,8 @@ taskkill /PID ***** /F
 3. 執行以下指令
 
 ```sql
-CREATE TABLE member2024 (
+-- 會員表
+CREATE TABLE members (
   ID int(11) NOT NULL AUTO_INCREMENT,
   EMAIL varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE,
   SEX enum('male', 'female', 'other') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -49,10 +50,18 @@ CREATE TABLE member2024 (
   INTERESTS text COLLATE utf8mb4_unicode_ci,
   NOTE text COLLATE utf8mb4_unicode_ci,
   RECORD_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  SERIAL_NUMBER varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL UNIQUE,
-  ORDER_DATE date DEFAULT NULL,
-  PURCHASED_ITEMS text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 訂單表
+CREATE TABLE orders (
+  ID int(11) NOT NULL AUTO_INCREMENT,
+  MEMBER_ID int(11) NOT NULL,
+  SERIAL_NUMBER varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL UNIQUE,
+  ORDER_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PURCHASED_ITEMS text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (MEMBER_ID) REFERENCES members(ID) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 

@@ -33,23 +33,12 @@
         } else {
           jsonData = {};
         }
-        // $(document).ready(function() {
-        //   let dataElement = document.getElementById("data-json");
-        //   let jsonData;
-        //   if (dataElement && dataElement.textContent){
-        //       jsonData = JSON.parse(dataElement.textContent);
-        //   } else {
-        //       jsonData = {}
-        //   }
 
         if (Object.keys(jsonData).length > 0) {
           $('#email').val(jsonData.EMAIL);
           $('#name').val(jsonData.NAME);
-          $('#select_country').val(jsonData.COUNTRY);
-          updateCities();
-          setTimeout(() => {
-            $('#select_city').val(jsonData.CITY);
-          }, 300);
+
+          updateCountryCities(jsonData.COUNTRY, jsonData.CITY);
 
           $(`input[name="sex"][value="${jsonData['sex']}"]`).prop(
             'checked',
@@ -90,8 +79,6 @@
           $('textarea[name="note"]').val(jsonData.note);
         }
       };
-
-      updateCountry();
 
       ///專長輸入產生
       function addSkillToCheckbox() {

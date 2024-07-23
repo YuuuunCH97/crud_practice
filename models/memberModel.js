@@ -1,10 +1,11 @@
+const { json } = require('body-parser');
 const db = require('../db')
 
 const createMember = async (memberData) => {
     const connection = await db.pool.getConnection();
     try {
         // 查詢 檢查 EMAIL 是否已存在
-        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
+        const checkEmailSql = "SELECT COUNT(*) AS count FROM members WHERE EMAIL = ?";
         const [rows] = await connection.execute(checkEmailSql, [memberData.email]);
         const emailExists = rows[0].count > 0;
         if (emailExists) {
@@ -13,12 +14,16 @@ const createMember = async (memberData) => {
         }
 
         // 插入資料到 member2024 表
-        const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+        // const sql = "INSERT INTO member2024 (EMAIL, NAME, SEX, COUNTRY, CITY, INTERESTS, NOTE) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const sql = `
+            INSERT INTO member_data.members
+            (EMAIL, SEX, NAME, COUNTRY, CITY, INTERESTS, NOTE)
+            VALUES(?, ?, ?, ?, ?, ?, ?);
+            `
         await connection.execute(sql, [
             memberData.email,
-            memberData.name,
             memberData.sex,
+            memberData.name,
             memberData.select_country,
             memberData.select_city,
             JSON.stringify(memberData.interests) || null, // 將興趣轉為 JSON 字串存儲
@@ -33,31 +38,28 @@ const createMember = async (memberData) => {
 }
 
 const searchMember = async (startDate, endDate, email, country, city, id=null, Skil=null) => {
+    // TODO 新增 id Skil 搜尋
+    // TODO 網頁查詢 頁面重新載入後 回填查詢輸入值 與無結果的alart
+    // TODO 可以與searchMemberPage合併
     const connection = await db.pool.getConnection();
-    let sql = 'SELECT * FROM member2024 WHERE 1 = 1';
+    let sql = 'SELECT * FROM members WHERE 1 = 1';
     let params = [];
     // 檢查並擴展 SQL 查詢
     if (startDate) {
-        sql += ' AND record_date >= ?';
-        params.push(startDate);
+        sql += ` AND record_date >= '${startDate}'`;
     }
     if (endDate) {
-        sql += ' AND record_date <= ?';
-        params.push(endDate);
+        sql += ` AND record_date <= '${endDate}'`;
     }
     if (email) {
-        sql += ' AND email LIKE ?';
-        params.push(`%${email}%`);
+        sql += ` AND email LIKE '%${email}%'`;
     }
     if (country) {
-        sql += ' AND COUNTRY = ?';
-        params.push(country);
+        sql += ` AND COUNTRY = '${country}'`;
     }
     if (city) {
-        sql += ' AND CITY = ?';
-        params.push(city);
+        sql += ` AND CITY = '${city}'`;
     }
-
     try {
         const [rows] = await connection.execute(sql, params);
         const errorMessage = rows.length === 0
@@ -74,7 +76,7 @@ const searchMember = async (startDate, endDate, email, country, city, id=null, S
 const searchMemberPage = async () => {
     const connection = await db.pool.getConnection();
     try {
-        [rows] = await connection.execute('SELECT * FROM member2024');
+        [rows] = await connection.execute('SELECT * FROM members');
         return { success: true , data: rows, errorMessage: null};
     } catch (err) {
         throw err;
@@ -86,7 +88,7 @@ const searchMemberPage = async () => {
 const deleteMember = async (placeholders, selectedEmails) => {
     const connection = await db.pool.getConnection();
     try {
-        const sql = `DELETE FROM member2024 WHERE EMAIL IN (${placeholders})`;
+        const sql = `DELETE FROM members WHERE EMAIL IN (${placeholders})`;
         await connection.execute(sql, selectedEmails);
         return { success: true, errorMessage: null};
     } catch (err) {
@@ -99,15 +101,14 @@ const deleteMember = async (placeholders, selectedEmails) => {
 const editMember = async (email, updatedMemberData) => {
     const connection = await db.pool.getConnection();
     try {
-        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        const [rows] = await connection.execute(`SELECT * FROM members WHERE EMAIL = '${email}'`);
         // 檢查是否找到了會員訊息
         if (rows.length === 0) {
             return { success: false, errorMessage: '未找到會員資料，請創建會員'};
         }
-        await connection.execute(
-            'UPDATE member2024 SET NAME = ?, COUNTRY = ?, CITY = ?, SEX = ?, NOTE = ?, RECORD_DATE = ? WHERE EMAIL = ?',
-            [updatedMemberData.name, updatedMemberData.select_country, updatedMemberData.select_city, updatedMemberData.sex, updatedMemberData.note, updatedMemberData.record_date, email]
-        );
+        await connection.execute(`UPDATE members
+            SET NAME = '${updatedMemberData.name}', COUNTRY = '${updatedMemberData.select_country}', CITY = '${updatedMemberData.select_city}',
+            SEX = '${updatedMemberData.sex}', NOTE = '${updatedMemberData.note}', RECORD_DATE = '${updatedMemberData.record_date}' WHERE EMAIL = '${email}'`);
         return { success: true, errorMessage: null};
     } catch (err) {
         throw err;
@@ -119,7 +120,7 @@ const editMember = async (email, updatedMemberData) => {
 const editMemberPage = async (email) => {
     const connection = await db.pool.getConnection();
     try {
-        const [rows] = await connection.execute('SELECT * FROM member2024 WHERE EMAIL = ?', [email]);
+        const [rows] = await connection.execute('SELECT * FROM members WHERE EMAIL = ?', [email]);
         if (rows.length === 0) {
             return { success: false, errorMessage: '未找到會員資料，請創建會員'};
         }
@@ -137,21 +138,24 @@ const editMemberPage = async (email) => {
 }
 
 const shopSubmit = async (orderDate, serialNumber, email, purchasedItems) => {
+    // 新增訂單
     const connection = await db.pool.getConnection();
     try {
-
-        const checkEmailSql = "SELECT COUNT(*) AS count FROM member2024 WHERE EMAIL = ?";
-        const [rows] = await connection.execute(checkEmailSql, [email]);
-
-        if (rows[0].count > 0) {
+        const checkEmailSql = `
+        SELECT ID FROM member_data.members
+        where EMAIL = '${email}';
+        `;
+        const [rows] = await connection.execute(checkEmailSql);
+        if (rows.length > 0) {
+            const member = rows[0]
+            console.log(member.ID);
             // 更新購物車資料
             const updateSql = `
-                UPDATE member2024
-                SET ORDER_DATE = ?,
-                    SERIAL_NUMBER = ?,
-                    PURCHASED_ITEMS = ?
-                WHERE EMAIL = ?`;
-            await connection.execute(updateSql, [orderDate, serialNumber, purchasedItems, email]);
+                INSERT INTO member_data.orders
+                (MEMBER_ID, SERIAL_NUMBER, PURCHASED_ITEMS)
+                VALUES(${member.ID}, '${serialNumber}', '${JSON.stringify(purchasedItems)}');`;
+                console.log(updateSql);
+            await connection.execute(updateSql);
             return { success: true, errorMessage:"購物車資料已更新" }
         } else {
             return { success: true, errorMessage:"無會員資料，無法新增購物車資料" }
@@ -167,24 +171,40 @@ const shopSubmit = async (orderDate, serialNumber, email, purchasedItems) => {
 const shopSearchPage = async (startDate, endDate, email) => {
     const connection = await db.pool.getConnection();
     try {
-        let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM member2024 WHERE 1=1";
-        const params = [];
+        // let query = "SELECT ORDER_DATE, SERIAL_NUMBER, EMAIL, PURCHASED_ITEMS FROM orders WHERE 1=1";
+
+        let query = `
+            SELECT
+                m.ID AS MemberID,
+                m.EMAIL,
+                m.NAME,
+                o.ID AS ORDER_ID,
+                o.SERIAL_NUMBER,
+                o.ORDER_DATE,
+                o.PURCHASED_ITEMS
+            FROM
+                members m
+            JOIN
+                orders o
+            ON
+                m.ID = o.MEMBER_ID
+            WHERE 1=1`;
         // 如果有過濾條件，則添加到查詢中
         if (startDate){
-            query += ` AND DATE(ORDER_DATE) >= ?`;
-            params.push(startDate)
+            query += ` AND DATE(o.ORDER_DATE) >= '${startDate}'`;
         }
         if (endDate){
-            query += ` AND DATE(ORDER_DATE) <= ?`;
-            params.push(endDate)
+            query += ` AND DATE(o.ORDER_DATE) <= '${endDate}'`;
         }
         if (email){
-            query += ` AND EMAIL = ?`;
-            params.push(email)
+            query += ` AND m.EMAIL = '${email}'`;
         }
-        const [rows] = await connection.execute(query, params);
+        console.log(query);
+        const [rows] = await connection.execute(query);
+
         return { success: true, data: rows, startDate, endDate, email };
     } catch (err) {
+        console.log(err);
         throw err;
     } finally {
         connection.release();
